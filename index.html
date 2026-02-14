@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Defense Simulator</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <!-- Main Menu -->
+        <div id="main-menu" class="screen active">
+            <div class="menu-bg">
+                <div class="scanline"></div>
+                <div class="menu-content">
+                    <h1 class="game-title">CYBER DEFENSE<br><span>SIMULATOR</span></h1>
+                    <p class="subtitle">Tower Defense Cybersecurity Training</p>
+                    <div class="menu-buttons">
+                        <button class="btn btn-primary" id="btn-play">PLAY</button>
+                        <button class="btn btn-secondary" id="btn-intel">&#128269; INTEL BRIEFING</button>
+                        <button class="btn btn-secondary" id="btn-encyclopedia">ENCYCLOPEDIA</button>
+                        <button class="btn btn-secondary" id="btn-knowledge">KNOWLEDGE TRACKER</button>
+                        <button class="btn btn-secondary" id="btn-achievements">ACHIEVEMENTS</button>
+                    </div>
+                    <p class="version-info">BTEC IT Unit 1 - Learning Aim D</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Level Select -->
+        <div id="level-select" class="screen">
+            <div class="screen-header">
+                <button class="btn btn-back" id="btn-back-menu">&larr; BACK</button>
+                <h2>SELECT MISSION</h2>
+            </div>
+            <div class="level-grid" id="level-grid"></div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <!-- Top HUD -->
+            <div id="hud">
+                <div class="hud-left">
+                    <div class="hud-item">
+                        <span class="hud-label">BUDGET</span>
+                        <span class="hud-value" id="hud-budget">&pound;0</span>
+                    </div>
+                    <div class="hud-item">
+                        <span class="hud-label">WAVE</span>
+                        <span class="hud-value" id="hud-wave">0 / 0</span>
+                    </div>
+                    <div class="hud-item">
+                        <span class="hud-label">SCORE</span>
+                        <span class="hud-value" id="hud-score">0</span>
+                    </div>
+                    <div class="hud-item">
+                        <span class="hud-label">HEALTH</span>
+                        <div class="health-bar-container">
+                            <div class="health-bar" id="hud-health-bar"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hud-center">
+                    <span id="hud-phase" class="phase-text">PLANNING PHASE</span>
+                    <span id="hud-timer" class="timer-text"></span>
+                </div>
+                <div class="hud-right">
+                    <button class="btn-icon" id="btn-pause" title="Pause">&#9208;</button>
+                    <button class="btn-icon" id="btn-speed" title="Speed">&#9654;&#9654;</button>
+                    <button class="btn-icon" id="btn-menu-ingame" title="Menu">&#9776;</button>
+                </div>
+            </div>
+
+            <!-- Game Area -->
+            <div id="game-container">
+                <canvas id="game-canvas"></canvas>
+
+                <!-- Tower Selection Sidebar -->
+                <div id="tower-sidebar">
+                    <h3>DEFENSES</h3>
+                    <div id="tower-list"></div>
+                    <div id="tower-info-panel" class="hidden">
+                        <h4 id="tower-info-name"></h4>
+                        <div id="tower-info-stats"></div>
+                        <div id="tower-info-buttons">
+                            <button class="btn btn-small btn-upgrade" id="btn-upgrade">UPGRADE</button>
+                            <button class="btn btn-small btn-sell" id="btn-sell">SELL</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notification Area -->
+            <div id="notifications"></div>
+        </div>
+
+        <!-- Level Intro Modal -->
+        <div id="level-intro" class="modal hidden">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-icon">&#128737;</div>
+                <h2 id="intro-title"></h2>
+                <p id="intro-scenario" class="scenario-text"></p>
+                <div id="intro-objectives" class="objectives-list"></div>
+                <div id="intro-available" class="available-towers"></div>
+                <div class="intro-buttons">
+                    <button class="btn btn-secondary" id="btn-view-intel">&#128269; VIEW INTEL BRIEFING</button>
+                    <button class="btn btn-primary" id="btn-start-level">BEGIN MISSION</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Level Complete Modal -->
+        <div id="level-complete" class="modal hidden">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-icon success-icon">&#10003;</div>
+                <h2 id="complete-title">MISSION COMPLETE</h2>
+                <div id="complete-stats" class="stats-grid"></div>
+                <div id="complete-learning" class="learning-summary"></div>
+                <div class="modal-buttons">
+                    <button class="btn btn-primary" id="btn-next-level">NEXT MISSION</button>
+                    <button class="btn btn-secondary" id="btn-back-levels">MISSION SELECT</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Over Modal -->
+        <div id="game-over" class="modal hidden">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-icon fail-icon">&#9888;</div>
+                <h2>BREACH DETECTED</h2>
+                <p id="gameover-message" class="scenario-text"></p>
+                <div class="modal-buttons">
+                    <button class="btn btn-primary" id="btn-retry">RETRY MISSION</button>
+                    <button class="btn btn-secondary" id="btn-back-levels2">MISSION SELECT</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pause Modal -->
+        <div id="pause-modal" class="modal hidden">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <h2>PAUSED</h2>
+                <div class="modal-buttons">
+                    <button class="btn btn-primary" id="btn-resume">RESUME</button>
+                    <button class="btn btn-secondary" id="btn-restart">RESTART</button>
+                    <button class="btn btn-secondary" id="btn-quit">QUIT TO MENU</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Encyclopedia Screen -->
+        <div id="encyclopedia-screen" class="screen">
+            <div class="screen-header">
+                <button class="btn btn-back" id="btn-back-enc">&larr; BACK</button>
+                <h2>CYBER ENCYCLOPEDIA</h2>
+            </div>
+            <div class="encyclopedia-container">
+                <div class="encyclopedia-nav" id="encyclopedia-nav"></div>
+                <div class="encyclopedia-content" id="encyclopedia-content">
+                    <p class="enc-placeholder">Select a topic from the left to learn more.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Achievements Screen -->
+        <div id="achievements-screen" class="screen">
+            <div class="screen-header">
+                <button class="btn btn-back" id="btn-back-ach">&larr; BACK</button>
+                <h2>ACHIEVEMENTS</h2>
+            </div>
+            <div class="achievements-grid" id="achievements-grid"></div>
+        </div>
+
+        <!-- Educational Popup -->
+        <div id="edu-popup" class="modal hidden">
+            <div class="modal-overlay"></div>
+            <div class="modal-content edu-content">
+                <div class="edu-badge">&#128218; LEARNING POINT</div>
+                <h3 id="edu-title"></h3>
+                <p id="edu-text"></p>
+                <div id="edu-legislation" class="legislation-box"></div>
+                <button class="btn btn-primary" id="btn-close-edu">UNDERSTOOD</button>
+            </div>
+        </div>
+
+        <!-- Quiz Modal (between waves & post-level) -->
+        <div id="quiz-modal" class="modal hidden">
+            <div class="modal-overlay"></div>
+            <div class="modal-content quiz-content">
+                <div class="quiz-header">
+                    <div class="quiz-badge">&#127891; KNOWLEDGE CHECK</div>
+                    <div class="quiz-reward" id="quiz-reward">Correct = +&pound;200 bonus!</div>
+                </div>
+                <div class="quiz-spec-ref" id="quiz-spec-ref"></div>
+                <h3 id="quiz-question"></h3>
+                <div id="quiz-options" class="quiz-options"></div>
+                <div id="quiz-feedback" class="quiz-feedback hidden">
+                    <div id="quiz-result-icon" class="quiz-result-icon"></div>
+                    <p id="quiz-explanation"></p>
+                </div>
+                <button class="btn btn-primary hidden" id="btn-quiz-continue">CONTINUE</button>
+            </div>
+        </div>
+
+        <!-- Threat Info Panel (shown on canvas hover/click) -->
+        <div id="threat-info-panel" class="hidden">
+            <div class="threat-info-header">
+                <span id="threat-info-icon" class="threat-info-icon"></span>
+                <div>
+                    <h4 id="threat-info-name"></h4>
+                    <span id="threat-info-type" class="threat-info-type"></span>
+                </div>
+            </div>
+            <div id="threat-info-stats" class="threat-info-stats"></div>
+            <div id="threat-info-edu" class="threat-info-edu"></div>
+            <div id="threat-info-defense" class="threat-info-defense"></div>
+        </div>
+
+        <!-- "Did You Know?" Banner (shown during planning/wave breaks) -->
+        <div id="did-you-know" class="did-you-know hidden">
+            <div class="dyk-icon">&#128161;</div>
+            <div class="dyk-content">
+                <span class="dyk-label">DID YOU KNOW?</span>
+                <p id="dyk-text"></p>
+                <span id="dyk-spec" class="dyk-spec"></span>
+            </div>
+        </div>
+
+        <!-- Knowledge Tracker Screen -->
+        <div id="knowledge-screen" class="screen">
+            <div class="screen-header">
+                <button class="btn btn-back" id="btn-back-knowledge">&larr; BACK</button>
+                <h2>LEARNING AIM D &mdash; KNOWLEDGE TRACKER</h2>
+            </div>
+            <div class="knowledge-container" id="knowledge-container"></div>
+        </div>
+
+        <!-- Case Study Panel (in level intro) -->
+        <!-- (rendered dynamically inside level-intro modal) -->
+
+        <!-- Intel Briefing Screen -->
+        <div id="intel-screen" class="screen">
+            <div class="screen-header">
+                <button class="btn btn-back" id="btn-back-intel">&larr; BACK</button>
+                <h2>INTEL BRIEFING &mdash; THREAT &amp; DEFENSE MATRIX</h2>
+            </div>
+            <div class="intel-container" id="intel-container">
+                <p class="intel-intro">Understanding which security controls counter which threats is essential for effective cyber defense. <strong>No single defense stops everything</strong> &mdash; you must combine the right tools for each threat.</p>
+
+                <!-- Threat cards with counter info -->
+                <div id="intel-threats"></div>
+
+                <!-- Effectiveness matrix table -->
+                <h3 class="intel-section-title">EFFECTIVENESS MATRIX</h3>
+                <p class="intel-sub">Green = strong counter &bull; Yellow = partial &bull; Red = ineffective &bull; Black = no effect</p>
+                <div class="intel-matrix-wrap">
+                    <table id="intel-matrix" class="intel-matrix"></table>
+                </div>
+
+                <!-- Passive tower info -->
+                <h3 class="intel-section-title">PASSIVE DEFENSES</h3>
+                <div id="intel-passives"></div>
+
+                <!-- Key principle -->
+                <div class="intel-principle">
+                    <span class="intel-principle-icon">&#128272;</span>
+                    <div>
+                        <strong>DEFENSE IN DEPTH (D4):</strong> No single control stops all threats.
+                        Layer multiple defenses so that when one fails, others still protect your network.
+                        This is the most important principle in cybersecurity.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Intel Briefing Button (floating, in-game) -->
+        <div id="intel-btn-float" class="hidden">
+            <button class="btn-icon" id="btn-intel-ingame" title="Intel Briefing">&#128269;</button>
+        </div>
+
+        <!-- Tooltip -->
+        <div id="tooltip" class="hidden"></div>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
