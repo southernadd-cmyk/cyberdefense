@@ -7,11 +7,23 @@
 import { STATE, LEVELS } from './config.js';
 import { Game } from './game.js';
 import { UIManager } from './ui.js';
-
+import { loadIconImages } from './iconImages.js';
 // --- Initialize ---
+loadIconImages(); // Preload tower/threat/asset SVG icons (fallback to inline until loaded)
 const canvas = document.getElementById('game-canvas');
+const gameContainer = document.getElementById('game-container');
 const game = new Game(canvas);
 const ui = new UIManager(game);
+
+/** Map a pointer event to canvas coordinates (use container so padding area still maps to canvas). */
+function eventToCanvasCoords(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    let canvasX = (e.clientX - rect.left) * scaleX;
+    let canvasY = (e.clientY - rect.top) * scaleY;
+    return { canvasX, canvasY };
+}
 
 // --- Game Callbacks ---
 game.onStateChange = (state) => {
@@ -73,31 +85,39 @@ game.onThreatHover = (threat) => {
     }
 };
 
-// --- Canvas Event Listeners ---
-canvas.addEventListener('click', (e) => {
+// --- Game area event listeners (on container so bottom padding still counts as bottom row) ---
+gameContainer.addEventListener('click', (e) => {
     const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    const canvasX = (e.clientX - rect.left) * scaleX;
-    const canvasY = (e.clientY - rect.top) * scaleY;
+    const inCanvas = e.clientX >= rect.left && e.clientX <= rect.right &&
+                     e.clientY >= rect.top && e.clientY <= rect.bottom;
+    if (!inCanvas) return;
+    const { canvasX, canvasY } = eventToCanvasCoords(e);
     game.handleCanvasClick(canvasX, canvasY);
 });
 
-canvas.addEventListener('mousemove', (e) => {
+gameContainer.addEventListener('mousemove', (e) => {
     const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    const canvasX = (e.clientX - rect.left) * scaleX;
-    const canvasY = (e.clientY - rect.top) * scaleY;
+    const inCanvas = e.clientX >= rect.left && e.clientX <= rect.right &&
+                     e.clientY >= rect.top && e.clientY <= rect.bottom;
+    if (!inCanvas) {
+        game.hoveredCell = null;
+        ui.hideThreatInfo();
+        return;
+    }
+    const { canvasX, canvasY } = eventToCanvasCoords(e);
     game.handleCanvasMouseMove(canvasX, canvasY);
 });
 
-canvas.addEventListener('contextmenu', (e) => {
+gameContainer.addEventListener('contextmenu', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const inCanvas = e.clientX >= rect.left && e.clientX <= rect.right &&
+                     e.clientY >= rect.top && e.clientY <= rect.bottom;
+    if (!inCanvas) return;
     e.preventDefault();
     game.handleRightClick();
 });
 
-canvas.addEventListener('mouseleave', () => {
+gameContainer.addEventListener('mouseleave', () => {
     game.hoveredCell = null;
     ui.hideThreatInfo();
 });
@@ -189,20 +209,34 @@ document.getElementById('btn-start-level').addEventListener('click', () => {
 document.getElementById('btn-next-level').addEventListener('click', () => {
     ui.hideModal('levelComplete');
     ui.hideDYK();
-    const nextIndex = game.currentLevelIndex + 1;
-    if (nextIndex < LEVELS.length) {
-        game.loadLevel(nextIndex);
-        ui.renderTowerSidebar();
-        ui.showLevelIntro(LEVELS[nextIndex]);
-    }
+
+    // Trigger end-of-level assessment before proceeding
+    const levelId = game.levelConfig.id;
+    ui.startAssessment(levelId, (score) => {
+        // Assessment complete — now proceed to next level
+        const nextIndex = game.currentLevelIndex + 1;
+        if (nextIndex < LEVELS.length) {
+            game.loadLevel(nextIndex);
+            ui.renderTowerSidebar();
+            ui.showLevelIntro(LEVELS[nextIndex]);
+        } else {
+            game.state = STATE.MENU;
+            ui.showLevelSelect();
+        }
+    });
 });
 
 document.getElementById('btn-back-levels').addEventListener('click', () => {
     ui.hideModal('levelComplete');
-    ui.stopHudUpdates();
     ui.hideDYK();
-    game.state = STATE.MENU;
-    ui.showLevelSelect();
+
+    // Trigger assessment even when going back to level select
+    const levelId = game.levelConfig.id;
+    ui.startAssessment(levelId, () => {
+        ui.stopHudUpdates();
+        game.state = STATE.MENU;
+        ui.showLevelSelect();
+    });
 });
 
 // --- Game Over ---
@@ -275,6 +309,15 @@ document.getElementById('btn-close-edu').addEventListener('click', () => {
 // --- Quiz Modal ---
 document.getElementById('btn-quiz-continue').addEventListener('click', () => {
     ui.closeQuiz();
+});
+
+// --- Assessment Modal ---
+document.getElementById('btn-assess-next').addEventListener('click', () => {
+    ui.advanceAssessment();
+});
+
+document.getElementById('btn-assess-done').addEventListener('click', () => {
+    ui.closeAssessment();
 });
 
 // --- Keyboard Shortcuts ---

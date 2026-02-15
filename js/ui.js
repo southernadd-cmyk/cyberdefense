@@ -6,13 +6,13 @@
 
 import {
     STATE, TOWER_TYPES, THREAT_TYPES, LEVELS, ACHIEVEMENTS, ENCYCLOPEDIA,
-    QUIZ_QUESTIONS, CASE_STUDIES, DID_YOU_KNOW_TIPS, SPEC_TOPICS, THREAT_COUNTERS
+    QUIZ_QUESTIONS, CASE_STUDIES, DID_YOU_KNOW_TIPS, SPEC_TOPICS, THREAT_COUNTERS,
+    SYNERGIES, getEncyclopediaEntryCount
 } from './config.js';
 
 export class UIManager {
     constructor(game) {
         this.game = game;
-
         // Cache DOM elements
         this.screens = {
             mainMenu: document.getElementById('main-menu'),
@@ -30,7 +30,8 @@ export class UIManager {
             gameOver: document.getElementById('game-over'),
             pause: document.getElementById('pause-modal'),
             eduPopup: document.getElementById('edu-popup'),
-            quiz: document.getElementById('quiz-modal')
+            quiz: document.getElementById('quiz-modal'),
+            assessment: document.getElementById('assessment-modal')
         };
 
         this.hud = {
@@ -73,9 +74,19 @@ export class UIManager {
         this.dykIndex = 0;
         this.dykInterval = null;
         this.shownTips = new Set();
+        this.elements.didYouKnow.addEventListener('mouseenter', () => {
+            this.elements.didYouKnow.classList.add('dyk-dismissed');
+        });
 
         // Threat info state
         this.hoveredThreat = null;
+
+        // Assessment state (end-of-level mini-assessment)
+        this.assessmentQuestions = [];
+        this.assessmentIndex = 0;
+        this.assessmentScore = 0;
+        this.assessmentAnswered = false;
+        this.assessmentCallback = null;
     }
 
     // --- Screen Management ---
@@ -134,7 +145,7 @@ export class UIManager {
                 <div class="level-name">${level.name}</div>
                 <div class="level-desc">${level.description}</div>
                 <div class="level-difficulty">
-                    ${Array.from({ length: 6 }, (_, i) =>
+                    ${Array.from({ length: 10 }, (_, i) =>
                         `<div class="diff-dot ${i < level.difficulty ? 'active' : ''}"></div>`
                     ).join('')}
                 </div>
@@ -635,8 +646,21 @@ export class UIManager {
     //  Shows between waves and awards bonus budget for correct answers
     // ============================================================
 
+    /** Returns a copy of the question with options shuffled and correct index updated. */
+    shuffleQuestionOptions(q) {
+        if (!q || !q.options || q.options.length === 0) return q;
+        const options = [...q.options];
+        const correctAnswer = options[q.correct];
+        // Fisher-Yates shuffle
+        for (let i = options.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [options[i], options[j]] = [options[j], options[i]];
+        }
+        const newCorrect = options.indexOf(correctAnswer);
+        return { ...q, options, correct: newCorrect };
+    }
+
     getQuizQuestion(levelId) {
-        // Get level-specific questions first, then general
         const levelQs = QUIZ_QUESTIONS[levelId] || [];
         const generalQs = QUIZ_QUESTIONS.general || [];
         const allQs = [...levelQs, ...generalQs];
@@ -661,11 +685,12 @@ export class UIManager {
     }
 
     showQuiz(levelId, callback) {
-        const question = this.getQuizQuestion(levelId);
-        if (!question) {
+        const rawQuestion = this.getQuizQuestion(levelId);
+        if (!rawQuestion) {
             if (callback) callback(false);
             return;
         }
+        const question = this.shuffleQuestionOptions(rawQuestion);
 
         this.currentQuiz = question;
         this.quizAnswered = false;
@@ -683,7 +708,7 @@ export class UIManager {
         question.options.forEach((option, index) => {
             const btn = document.createElement('div');
             btn.className = 'quiz-option';
-            btn.textContent = option;
+            btn.textContent = option.replace(/^[A-D]\)\s*/i, '');
             btn.addEventListener('click', () => this.answerQuiz(index));
             optionsContainer.appendChild(btn);
         });
@@ -707,6 +732,9 @@ export class UIManager {
 
         const question = this.currentQuiz;
         const isCorrect = selectedIndex === question.correct;
+
+        // Track mastery data
+        this._recordQuizResult(question.specRef, isCorrect);
 
         // Highlight options
         const options = document.querySelectorAll('#quiz-options .quiz-option');
@@ -737,14 +765,297 @@ export class UIManager {
             resultIcon.className = 'quiz-result-icon incorrect';
         }
 
-        document.getElementById('quiz-explanation').textContent = question.explanation;
+        // Build feedback content: explanation + remediation (if wrong) + source
+        let feedbackHtml = `<p>${question.explanation}</p>`;
 
-        // Show continue button
-        document.getElementById('btn-quiz-continue').classList.remove('hidden');
+        if (!isCorrect && question.remediation) {
+            feedbackHtml += `<div class="quiz-remediation">
+                <div class="quiz-remediation-label">\uD83D\uDCD6 WHY THIS IS THE CORRECT ANSWER:</div>
+                <p>${question.remediation}</p>
+            </div>`;
+        }
+
+        if (question.source) {
+            feedbackHtml += `<div class="quiz-source">Source: ${question.source}</div>`;
+        }
+
+        document.getElementById('quiz-explanation').innerHTML = feedbackHtml;
+
+        // For correct answers: show continue button immediately
+        // For wrong answers: delay the continue button to force reading the remediation
+        const continueBtn = document.getElementById('btn-quiz-continue');
+        if (isCorrect) {
+            continueBtn.classList.remove('hidden');
+            continueBtn.textContent = 'CONTINUE';
+        } else {
+            continueBtn.classList.add('hidden');
+            continueBtn.textContent = 'I HAVE READ THE EXPLANATION \u2014 CONTINUE';
+            // Show after 4 seconds to force reading
+            this._quizContinueTimer = setTimeout(() => {
+                continueBtn.classList.remove('hidden');
+            }, 4000);
+        }
+    }
+
+    // Record quiz result for mastery tracking (per D1-D5)
+    _recordQuizResult(specRef, isCorrect) {
+        if (!specRef) return;
+        // Extract spec ID like "D1", "D2", etc.
+        const specId = specRef.match(/D[1-5]/)?.[0];
+        if (!specId) return;
+
+        if (!this.game.progress.mastery) {
+            this.game.progress.mastery = {};
+        }
+        if (!this.game.progress.mastery[specId]) {
+            this.game.progress.mastery[specId] = { correct: 0, attempted: 0 };
+        }
+        this.game.progress.mastery[specId].attempted++;
+        if (isCorrect) {
+            this.game.progress.mastery[specId].correct++;
+        }
+        this.game.saveProgress();
+    }
+
+    // ============================================================
+    //  END-OF-LEVEL ASSESSMENT
+    //  A 3-question mini-assessment shown after completing a level.
+    //  Questions are selected from the level pool + general pool,
+    //  covering diverse spec areas (D1-D5).
+    // ============================================================
+
+    startAssessment(levelId, callback) {
+        this.assessmentCallback = callback;
+        this.assessmentScore = 0;
+        this.assessmentIndex = 0;
+        this.assessmentAnswered = false;
+
+        const levelQs = QUIZ_QUESTIONS[levelId] || [];
+        const generalQs = QUIZ_QUESTIONS.general || [];
+        const allQs = [...levelQs, ...generalQs];
+
+        // Group questions by spec area
+        const bySpec = {};
+        for (const q of allQs) {
+            const specId = q.specRef.match(/D[1-5]/)?.[0] || 'D1';
+            if (!bySpec[specId]) bySpec[specId] = [];
+            bySpec[specId].push(q);
+        }
+
+        // Pick questions covering as many different spec areas as possible
+        const selected = [];
+        const specKeys = Object.keys(bySpec).sort(() => Math.random() - 0.5);
+
+        // Round 1: one question from each spec area
+        for (const specId of specKeys) {
+            if (selected.length >= 3) break;
+            const pool = bySpec[specId].filter(q => !selected.includes(q));
+            if (pool.length > 0) {
+                selected.push(pool[Math.floor(Math.random() * pool.length)]);
+            }
+        }
+
+        // Round 2: fill remaining from random spec areas
+        while (selected.length < 3 && allQs.length > selected.length) {
+            const remaining = allQs.filter(q => !selected.includes(q));
+            if (remaining.length === 0) break;
+            selected.push(remaining[Math.floor(Math.random() * remaining.length)]);
+        }
+
+        // Shuffle options for each question so correct answer isn't always in the same position
+        this.assessmentQuestions = selected.map(q => this.shuffleQuestionOptions(q));
+
+        // Set up UI
+        document.getElementById('assessment-level-label').textContent = `Level ${levelId}`;
+        document.getElementById('assessment-results').classList.add('hidden');
+        document.getElementById('assessment-question-area').classList.remove('hidden');
+
+        // Render progress dots
+        this._renderAssessmentDots();
+
+        // Show first question
+        this._showAssessmentQuestion();
+        this.showModal('assessment');
+    }
+
+    _renderAssessmentDots() {
+        const container = document.getElementById('assessment-progress');
+        container.innerHTML = '';
+        for (let i = 0; i < this.assessmentQuestions.length; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'assessment-dot';
+            dot.id = `assess-dot-${i}`;
+            if (i === this.assessmentIndex) dot.classList.add('active');
+            container.appendChild(dot);
+        }
+    }
+
+    _showAssessmentQuestion() {
+        const q = this.assessmentQuestions[this.assessmentIndex];
+        if (!q) return;
+
+        this.assessmentAnswered = false;
+
+        document.getElementById('assess-spec-ref').textContent = `BTEC SPEC: ${q.specRef}`;
+        document.getElementById('assess-question').textContent = q.question;
+
+        // Build options
+        const optionsContainer = document.getElementById('assess-options');
+        optionsContainer.innerHTML = '';
+        q.options.forEach((option, index) => {
+            const btn = document.createElement('div');
+            btn.className = 'quiz-option';
+            btn.textContent = option.replace(/^[A-D]\)\s*/i, '');
+            btn.addEventListener('click', () => this._answerAssessment(index));
+            optionsContainer.appendChild(btn);
+        });
+
+        // Hide feedback and next button
+        document.getElementById('assess-feedback').classList.add('hidden');
+        document.getElementById('btn-assess-next').classList.add('hidden');
+
+        // Update dots
+        for (let i = 0; i < this.assessmentQuestions.length; i++) {
+            const dot = document.getElementById(`assess-dot-${i}`);
+            if (dot) {
+                dot.classList.toggle('active', i === this.assessmentIndex);
+            }
+        }
+    }
+
+    _answerAssessment(selectedIndex) {
+        if (this.assessmentAnswered) return;
+        this.assessmentAnswered = true;
+
+        const q = this.assessmentQuestions[this.assessmentIndex];
+        const isCorrect = selectedIndex === q.correct;
+
+        // Track mastery
+        this._recordQuizResult(q.specRef, isCorrect);
+
+        if (isCorrect) this.assessmentScore++;
+
+        // Highlight options
+        const options = document.querySelectorAll('#assess-options .quiz-option');
+        options.forEach((opt, i) => {
+            opt.classList.add('disabled');
+            if (i === q.correct) opt.classList.add('correct');
+            if (i === selectedIndex && !isCorrect) opt.classList.add('incorrect');
+        });
+
+        // Update dot
+        const dot = document.getElementById(`assess-dot-${this.assessmentIndex}`);
+        if (dot) {
+            dot.classList.remove('active');
+            dot.classList.add(isCorrect ? 'correct' : 'incorrect');
+        }
+
+        // Show feedback
+        const feedbackEl = document.getElementById('assess-feedback');
+        feedbackEl.classList.remove('hidden');
+
+        const resultIcon = document.getElementById('assess-result-icon');
+        resultIcon.textContent = isCorrect ? '\u2714 CORRECT!' : '\u2718 INCORRECT';
+        resultIcon.className = `quiz-result-icon ${isCorrect ? 'correct' : 'incorrect'}`;
+
+        // Build explanation with remediation if wrong
+        let html = `<p>${q.explanation}</p>`;
+        if (!isCorrect && q.remediation) {
+            html += `<div class="quiz-remediation">
+                <div class="quiz-remediation-label">\uD83D\uDCD6 WHY THIS IS THE CORRECT ANSWER:</div>
+                <p>${q.remediation}</p>
+            </div>`;
+        }
+        if (q.source) {
+            html += `<div class="quiz-source">Source: ${q.source}</div>`;
+        }
+        document.getElementById('assess-explanation').innerHTML = html;
+
+        // Show next button (with delay for wrong answers)
+        const nextBtn = document.getElementById('btn-assess-next');
+        const isLast = this.assessmentIndex >= this.assessmentQuestions.length - 1;
+        nextBtn.textContent = isLast ? 'SEE RESULTS' : 'NEXT QUESTION';
+
+        if (isCorrect) {
+            nextBtn.classList.remove('hidden');
+        } else {
+            nextBtn.classList.add('hidden');
+            nextBtn.textContent = isLast
+                ? 'I HAVE READ THE EXPLANATION \u2014 SEE RESULTS'
+                : 'I HAVE READ THE EXPLANATION \u2014 NEXT';
+            this._assessContinueTimer = setTimeout(() => {
+                nextBtn.classList.remove('hidden');
+            }, 4000);
+        }
+    }
+
+    advanceAssessment() {
+        // Clear timer
+        if (this._assessContinueTimer) {
+            clearTimeout(this._assessContinueTimer);
+            this._assessContinueTimer = null;
+        }
+
+        this.assessmentIndex++;
+
+        if (this.assessmentIndex >= this.assessmentQuestions.length) {
+            this._showAssessmentResults();
+        } else {
+            this._showAssessmentQuestion();
+        }
+    }
+
+    _showAssessmentResults() {
+        document.getElementById('assessment-question-area').classList.add('hidden');
+        document.getElementById('assessment-results').classList.remove('hidden');
+
+        const total = this.assessmentQuestions.length;
+        const score = this.assessmentScore;
+        const pct = Math.round((score / total) * 100);
+
+        const scoreEl = document.getElementById('assess-score-value');
+        scoreEl.textContent = `${score}/${total}`;
+        scoreEl.className = `assessment-score-value ${score >= 2 ? 'pass' : 'fail'}`;
+
+        const labelEl = document.getElementById('assess-score-label');
+        if (score === total) {
+            labelEl.textContent = 'PERFECT SCORE! You have demonstrated strong understanding of these topics.';
+        } else if (score >= 2) {
+            labelEl.textContent = 'Good understanding. Review the explanations for any questions you missed.';
+        } else {
+            labelEl.textContent = 'Keep learning! Review the explanations carefully and try the encyclopedia for more detail.';
+        }
+
+        // Show which spec areas were tested
+        const specsCovered = [...new Set(this.assessmentQuestions.map(q => q.specRef))];
+        const summaryEl = document.getElementById('assess-topics-summary');
+        summaryEl.innerHTML = `
+            <h4>SPEC AREAS ASSESSED</h4>
+            <p>${specsCovered.join(' \u2022 ')}</p>
+            <p style="margin-top:6px;">Your mastery data has been updated in the Knowledge Tracker.</p>
+        `;
+    }
+
+    closeAssessment() {
+        this.hideModal('assessment');
+        if (this._assessContinueTimer) {
+            clearTimeout(this._assessContinueTimer);
+            this._assessContinueTimer = null;
+        }
+        if (this.assessmentCallback) {
+            this.assessmentCallback(this.assessmentScore);
+            this.assessmentCallback = null;
+        }
     }
 
     closeQuiz() {
         this.hideModal('quiz');
+
+        // Clear any remediation timer
+        if (this._quizContinueTimer) {
+            clearTimeout(this._quizContinueTimer);
+            this._quizContinueTimer = null;
+        }
 
         if (this._resumeAfterQuiz) {
             this.game.resume();
@@ -811,6 +1122,44 @@ export class UIManager {
 
         document.getElementById('threat-info-defense').innerHTML = defenseHtml || '<strong>BEST DEFENSE:</strong> Multiple layered controls';
 
+        // Synergy status
+        let synergyHtml = '';
+        if (threat.synergyEffects) {
+            const activeBuffs = [];
+            if (threat.synergyEffects.credentialBreach) {
+                activeBuffs.push(`<span style="color:#f97316;">\uD83D\uDD17 Credential Breach (+50% speed)</span>`);
+            }
+            if (threat.synergyEffects.coverFire) {
+                activeBuffs.push(`<span style="color:#3b82f6;">\uD83D\uDEE1 DDoS Cover Fire (40% miss chance)</span>`);
+            }
+            if (threat.synergyEffects.snifferBuff) {
+                activeBuffs.push(`<span style="color:#d946ef;">\uD83D\uDC41 Sniffer Intel (+30% speed, 20% resist)</span>`);
+            }
+            if (threat.synergyEffects.scanned) {
+                activeBuffs.push(`<span style="color:#22d3ee;">\uD83D\uDD0D Proxy Scanned (slowed + extra damage)</span>`);
+            }
+            if (threat.inSegmentationZone) {
+                activeBuffs.push(`<span style="color:#6366f1;">\uD83D\uDDFA In Segmentation Zone (synergies blocked)</span>`);
+            }
+            if (activeBuffs.length > 0) {
+                synergyHtml = `<div style="margin-top:6px;padding-top:4px;border-top:1px solid #ffffff22;">
+                    <strong style="color:#fbbf24;font-size:0.7rem;">\u26A1 ACTIVE SYNERGIES:</strong><br>
+                    ${activeBuffs.join('<br>')}
+                </div>`;
+            }
+        }
+
+        // Insert synergy info after defense section
+        const defenseEl = document.getElementById('threat-info-defense');
+        let synergyEl = document.getElementById('threat-info-synergy');
+        if (!synergyEl) {
+            synergyEl = document.createElement('div');
+            synergyEl.id = 'threat-info-synergy';
+            synergyEl.style.fontSize = '0.72rem';
+            defenseEl.parentNode.insertBefore(synergyEl, defenseEl.nextSibling);
+        }
+        synergyEl.innerHTML = synergyHtml;
+
         panel.classList.remove('hidden');
     }
 
@@ -840,12 +1189,13 @@ export class UIManager {
 
         const tip = tips[idx];
         this.elements.dykText.textContent = tip.tip;
-        this.elements.dykSpec.textContent = `BTEC SPEC: ${tip.specRef}`;
-        this.elements.didYouKnow.classList.remove('hidden');
+        this.elements.dykSpec.textContent = `BTEC SPEC: ${tip.specRef}${tip.source ? ` \u2022 Source: ${tip.source}` : ''}`;
+        this.elements.didYouKnow.classList.remove('hidden', 'dyk-dismissed');
     }
 
     hideDYK() {
         this.elements.didYouKnow.classList.add('hidden');
+        this.elements.didYouKnow.classList.remove('dyk-dismissed');
         if (this.dykInterval) {
             clearInterval(this.dykInterval);
             this.dykInterval = null;
@@ -872,6 +1222,7 @@ export class UIManager {
         container.innerHTML = '';
 
         const completedLevels = this.game.progress.levelsCompleted;
+        const mastery = this.game.progress.mastery || {};
 
         // Overall progress header
         let totalSubs = 0;
@@ -885,7 +1236,18 @@ export class UIManager {
             }
         }
 
-        const overallPct = totalSubs > 0 ? Math.round((coveredSubs / totalSubs) * 100) : 0;
+        // Overall mastery (average across all spec areas)
+        let totalCorrect = 0;
+        let totalAttempted = 0;
+        for (const specId of ['D1', 'D2', 'D3', 'D4', 'D5']) {
+            const m = mastery[specId];
+            if (m) {
+                totalCorrect += m.correct;
+                totalAttempted += m.attempted;
+            }
+        }
+        const overallMasteryPct = totalAttempted > 0 ? Math.round((totalCorrect / totalAttempted) * 100) : 0;
+        const overallCoveredPct = totalSubs > 0 ? Math.round((coveredSubs / totalSubs) * 100) : 0;
 
         const overallDiv = document.createElement('div');
         overallDiv.className = 'knowledge-topic';
@@ -893,19 +1255,32 @@ export class UIManager {
         overallDiv.innerHTML = `
             <div class="knowledge-topic-header">
                 <div class="knowledge-topic-title">OVERALL LEARNING AIM D PROGRESS</div>
-                <div class="knowledge-progress-badge ${overallPct === 100 ? 'complete' : overallPct > 0 ? 'partial' : 'not-started'}">${overallPct}% COVERED</div>
+                <div class="knowledge-progress-badge ${overallCoveredPct === 100 ? 'complete' : overallCoveredPct > 0 ? 'partial' : 'not-started'}">${overallCoveredPct}% COVERED</div>
             </div>
-            <div class="knowledge-progress-bar">
-                <div class="knowledge-progress-fill" style="width:${overallPct}%"></div>
+            <div class="mastery-bar-container">
+                <span class="mastery-label" style="color:#00d4ff;">Covered</span>
+                <div class="mastery-bar"><div class="mastery-bar-fill covered" style="width:${overallCoveredPct}%"></div></div>
+                <span class="mastery-label">${overallCoveredPct}%</span>
             </div>
-            <p style="font-size:0.8rem;color:#94a3b8;">Complete all 6 levels to cover 100% of the Learning Aim D specification. Each level introduces new threats, defenses, and legislation relevant to the BTEC assessment.</p>
+            <div class="mastery-bar-container">
+                <span class="mastery-label" style="color:#00ff88;">Mastered</span>
+                <div class="mastery-bar"><div class="mastery-bar-fill mastered" style="width:${overallMasteryPct}%"></div></div>
+                <span class="mastery-label">${totalAttempted > 0 ? `${overallMasteryPct}% (${totalCorrect}/${totalAttempted})` : 'No questions attempted'}</span>
+            </div>
+            <p style="font-size:0.78rem;color:#94a3b8;margin-top:8px;">
+                <strong style="color:#00d4ff;">Covered</strong> = topic encountered through gameplay.
+                <strong style="color:#00ff88;">Mastered</strong> = questions answered correctly in quizzes/assessments.
+                Complete all ${LEVELS.length} levels and answer questions correctly to reach 100% in both.
+            </p>
         `;
         container.appendChild(overallDiv);
 
-        // Per-topic progress
+        // Per-topic progress with mastery
         for (const topic of SPEC_TOPICS) {
             let topicTotal = topic.subtopics.length;
             let topicCovered = 0;
+            const topicMastery = mastery[topic.id] || { correct: 0, attempted: 0 };
+            const masteryPct = topicMastery.attempted > 0 ? Math.round((topicMastery.correct / topicMastery.attempted) * 100) : 0;
 
             const subtopicHtml = topic.subtopics.map(sub => {
                 const isCovered = sub.coveredInLevels && sub.coveredInLevels.some(l => completedLevels.includes(l));
@@ -923,8 +1298,31 @@ export class UIManager {
             }).join('');
 
             const topicPct = topicTotal > 0 ? Math.round((topicCovered / topicTotal) * 100) : 0;
-            const statusClass = topicPct === 100 ? 'complete' : topicPct > 0 ? 'partial' : 'not-started';
-            const statusText = topicPct === 100 ? 'COMPLETE' : topicPct > 0 ? `${topicPct}%` : 'NOT STARTED';
+
+            // Determine status based on both coverage and mastery
+            let statusClass, statusText;
+            if (topicPct === 100 && masteryPct >= 80) {
+                statusClass = 'complete';
+                statusText = 'MASTERED';
+            } else if (topicPct === 100) {
+                statusClass = 'partial';
+                statusText = 'COVERED';
+            } else if (topicPct > 0) {
+                statusClass = 'partial';
+                statusText = `${topicPct}% COVERED`;
+            } else {
+                statusClass = 'not-started';
+                statusText = 'NOT STARTED';
+            }
+
+            // Mastery badge
+            let masteryBadge = '';
+            if (topicMastery.attempted > 0) {
+                const mClass = masteryPct >= 80 ? 'mastered' : 'in-progress';
+                masteryBadge = `<span class="mastery-badge ${mClass}">${masteryPct}% (${topicMastery.correct}/${topicMastery.attempted})</span>`;
+            } else {
+                masteryBadge = `<span class="mastery-badge not-attempted">Not assessed</span>`;
+            }
 
             const topicDiv = document.createElement('div');
             topicDiv.className = 'knowledge-topic';
@@ -933,8 +1331,15 @@ export class UIManager {
                     <div class="knowledge-topic-title">${topic.title}</div>
                     <div class="knowledge-progress-badge ${statusClass}">${statusText}</div>
                 </div>
-                <div class="knowledge-progress-bar">
-                    <div class="knowledge-progress-fill" style="width:${topicPct}%"></div>
+                <div class="mastery-bar-container">
+                    <span class="mastery-label" style="color:#00d4ff;">Covered</span>
+                    <div class="mastery-bar"><div class="mastery-bar-fill covered" style="width:${topicPct}%"></div></div>
+                    <span class="mastery-label">${topicPct}%</span>
+                </div>
+                <div class="mastery-bar-container">
+                    <span class="mastery-label" style="color:#00ff88;">Mastered</span>
+                    <div class="mastery-bar"><div class="mastery-bar-fill mastered" style="width:${masteryPct}%"></div></div>
+                    <span class="mastery-label">${masteryBadge}</span>
                 </div>
                 <div class="knowledge-subtopics">${subtopicHtml}</div>
             `;
@@ -1111,7 +1516,7 @@ export class UIManager {
                 <div class="achievement-icon">${ach.icon}</div>
                 <div class="achievement-info">
                     <h4>${ach.name}</h4>
-                    <p>${ach.description}</p>
+                    <p>${this.getAchievementDescription(ach)}</p>
                 </div>
             `;
 
@@ -1123,16 +1528,32 @@ export class UIManager {
         const p = this.game.progress;
         switch (achievement.condition) {
             case 'levels_completed >= 1': return p.levelsCompleted.length >= 1;
-            case 'levels_completed >= 6': return p.levelsCompleted.length >= 6;
+            case 'levels_completed_all': return p.levelsCompleted.length >= LEVELS.length;
             case 'no_damage_level': return Object.values(p.levelStars).some(s => s === 3);
-            case 'budget_remaining_50': return false;
-            case 'time_under_3min': return false;
+            case 'budget_remaining_50': return p.budgetRemaining50Achieved === true;
+            case 'synergy_firewall_ids': return (p.synergyPairsUsed || []).includes('firewall|ids');
+            case 'synergy_encryption_backup': return (p.synergyPairsUsed || []).includes('encryption|backup');
+            case 'synergy_proxy_encryption': return (p.synergyPairsUsed || []).includes('encryption|proxyNode');
+            case 'synergy_quarantine_backup': return (p.synergyPairsUsed || []).includes('backup|quarantine');
             case 'tower_variety_5': return p.towersEverUsed.length >= 5;
-            case 'all_towers_used': return p.towersEverUsed.length >= 9;
-            case 'all_encyclopedia_read': return p.encyclopediaRead.length >= 19;
+            case 'all_towers_used': return p.towersEverUsed.length >= Object.keys(TOWER_TYPES).length;
+            case 'all_encyclopedia_read': return (p.encyclopediaRead || []).length >= getEncyclopediaEntryCount();
             case 'score_10000': return p.highScore >= 10000;
             case 'ransomware_kills_10': return p.totalRansomwareKills >= 10;
             default: return false;
+        }
+    }
+
+    /** Returns display description for an achievement, with dynamic thresholds from LEVELS/TOWER_TYPES/ENCYCLOPEDIA. */
+    getAchievementDescription(achievement) {
+        const totalLevels = LEVELS.length;
+        const totalTowers = Object.keys(TOWER_TYPES).length;
+        const totalEncyclopedia = getEncyclopediaEntryCount();
+        switch (achievement.id) {
+            case 'all_levels': return `Complete all ${totalLevels} levels`;
+            case 'all_towers': return `Use all ${totalTowers} tower types across your games`;
+            case 'encyclopedist': return `Read all ${totalEncyclopedia} encyclopedia entries`;
+            default: return achievement.description;
         }
     }
 
@@ -1255,5 +1676,70 @@ export class UIManager {
         }
         passiveHTML += '</div>';
         passivesContainer.innerHTML = passiveHTML;
+
+        // --- 4. Render Threat Synergies Panel ---
+        const synergiesContainer = document.getElementById('intel-synergies');
+        if (!synergiesContainer) return;
+
+        let synHTML = '<div class="intel-synergy-cards">';
+        for (const [key, syn] of Object.entries(SYNERGIES)) {
+            // Gather the threat icons for the "requires" list
+            const reqIcons = syn.requires.map(tKey => {
+                const t = THREAT_TYPES[tKey];
+                return t ? `<span class="synergy-req-icon" style="background:${t.color}22;color:${t.color}" title="${t.name}">${t.symbol}</span>` : tKey;
+            }).join(' <span class="synergy-plus">+</span> ');
+
+            // Which threats benefit
+            let benefitHTML = '';
+            if (syn.target) {
+                const t = THREAT_TYPES[syn.target];
+                if (t) benefitHTML = `<span class="synergy-benefit" style="color:${t.color}">${t.symbol} ${t.name}</span>`;
+            } else if (syn.protects) {
+                benefitHTML = syn.protects.map(tKey => {
+                    const t = THREAT_TYPES[tKey];
+                    return t ? `<span class="synergy-benefit" style="color:${t.color}">${t.symbol} ${t.name}</span>` : tKey;
+                }).join(', ');
+            } else if (syn.effect === 'aura') {
+                benefitHTML = '<span class="synergy-benefit" style="color:#d946ef;">All threats in range</span>';
+            }
+
+            // Build effect summary
+            let effectLines = [];
+            if (syn.speedMultiplier && syn.speedMultiplier > 1) {
+                effectLines.push(`<span class="synergy-effect-tag speed">+${Math.round((syn.speedMultiplier - 1) * 100)}% Speed</span>`);
+            }
+            if (syn.missChance) {
+                effectLines.push(`<span class="synergy-effect-tag miss">${Math.round(syn.missChance * 100)}% Tower Miss</span>`);
+            }
+            if (syn.damageResist) {
+                effectLines.push(`<span class="synergy-effect-tag resist">${Math.round(syn.damageResist * 100)}% Damage Resist</span>`);
+            }
+            if (syn.range) {
+                effectLines.push(`<span class="synergy-effect-tag range">${syn.range}px Range</span>`);
+            }
+
+            // Counters: segmentation zone + proxy DPI
+            const counterHTML = `<div class="synergy-counter"><span class="synergy-counter-icon">\uD83D\uDDFA</span> Blocked by <strong>Segmentation Zone</strong></div>`
+                + `<div class="synergy-counter"><span class="synergy-counter-icon">\uD83C\uDF10</span> Stripped by <strong>Proxy Node</strong> (Deep Packet Inspection)</div>`;
+
+            synHTML += `<div class="intel-synergy-card" style="border-left: 3px solid ${syn.color}">`;
+            synHTML += `  <div class="synergy-card-header">`;
+            synHTML += `    <span class="synergy-card-icon" style="background:${syn.color}20;color:${syn.color}">${syn.icon}</span>`;
+            synHTML += `    <div>`;
+            synHTML += `      <h4 style="color:${syn.color}">${syn.name}</h4>`;
+            synHTML += `      <div class="synergy-requires">Requires: ${reqIcons}</div>`;
+            synHTML += `    </div>`;
+            synHTML += `  </div>`;
+            synHTML += `  <p class="synergy-desc">${syn.description}</p>`;
+            synHTML += `  <div class="synergy-effects-row">`;
+            synHTML += `    <div class="synergy-buffs-label">Buffs: ${benefitHTML}</div>`;
+            synHTML += `    <div class="synergy-effect-tags">${effectLines.join(' ')}</div>`;
+            synHTML += `  </div>`;
+            synHTML += `  ${counterHTML}`;
+            synHTML += `  <p class="synergy-edu">\uD83D\uDCDA ${syn.educationalNote}</p>`;
+            synHTML += `</div>`;
+        }
+        synHTML += '</div>';
+        synergiesContainer.innerHTML = synHTML;
     }
 }

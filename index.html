@@ -188,6 +188,36 @@
             </div>
         </div>
 
+        <!-- End-of-Level Assessment Modal -->
+        <div id="assessment-modal" class="modal hidden">
+            <div class="modal-overlay"></div>
+            <div class="modal-content assessment-content">
+                <div class="assessment-header">
+                    <div class="assessment-badge">&#127891; END-OF-LEVEL ASSESSMENT</div>
+                    <div id="assessment-level-label"></div>
+                </div>
+                <div id="assessment-progress" class="assessment-progress"></div>
+                <div id="assessment-question-area">
+                    <div class="quiz-spec-ref" id="assess-spec-ref"></div>
+                    <h3 id="assess-question"></h3>
+                    <div id="assess-options" class="quiz-options"></div>
+                    <div id="assess-feedback" class="quiz-feedback hidden">
+                        <div id="assess-result-icon" class="quiz-result-icon"></div>
+                        <div id="assess-explanation"></div>
+                    </div>
+                    <button class="btn btn-primary hidden" id="btn-assess-next">NEXT QUESTION</button>
+                </div>
+                <div id="assessment-results" class="hidden">
+                    <div class="assessment-score">
+                        <div id="assess-score-value" class="assessment-score-value">0/3</div>
+                        <div id="assess-score-label" class="assessment-score-label"></div>
+                    </div>
+                    <div id="assess-topics-summary" class="assessment-topics-covered"></div>
+                    <button class="btn btn-primary" id="btn-assess-done">CONTINUE</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Quiz Modal (between waves & post-level) -->
         <div id="quiz-modal" class="modal hidden">
             <div class="modal-overlay"></div>
@@ -265,6 +295,11 @@
                 <!-- Passive tower info -->
                 <h3 class="intel-section-title">PASSIVE DEFENSES</h3>
                 <div id="intel-passives"></div>
+
+                <!-- Threat Synergies -->
+                <h3 class="intel-section-title">THREAT SYNERGIES</h3>
+                <p class="intel-sub">Real attackers coordinate multiple threat types. When these combinations appear together, they create powerful synergy effects.</p>
+                <div id="intel-synergies"></div>
 
                 <!-- Key principle -->
                 <div class="intel-principle">

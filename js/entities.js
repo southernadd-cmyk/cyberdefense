@@ -3,7 +3,283 @@
 // Tower, Threat, Asset, Projectile classes
 // ========================================
 
-import { CELL_SIZE, THREAT_TYPES, TOWER_TYPES } from './config.js';
+import { CELL_SIZE, CANVAS_WIDTH, THREAT_TYPES, TOWER_TYPES } from './config.js';
+import { getTowerImage, getThreatImage, getAssetImage } from './iconImages.js';
+
+// --- Arcade-style icon drawing (pixel/vector shapes) - fallback when SVG not loaded ---
+const px = (n) => Math.floor(n);
+
+function drawTowerIcon(ctx, towerType, x, y, color, cellHalf = 14) {
+    const h = Math.max(8, cellHalf - 2);
+    const w = Math.max(8, cellHalf - 2);
+    ctx.fillStyle = color;
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1;
+    switch (towerType) {
+        case 'firewall': { // shield (rounded top, point bottom)
+            ctx.beginPath();
+            ctx.moveTo(px(x), px(y - h));
+            ctx.lineTo(px(x + w), px(y - h * 0.2));
+            ctx.lineTo(px(x + w * 0.6), px(y + h * 0.4));
+            ctx.lineTo(px(x), px(y + h));
+            ctx.lineTo(px(x - w * 0.6), px(y + h * 0.4));
+            ctx.lineTo(px(x - w), px(y - h * 0.2));
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            break;
+        }
+        case 'antivirus': { // plus/cross (scan)
+            const t = 2;
+            ctx.fillRect(px(x - t), px(y - h), t * 2, h * 2);
+            ctx.fillRect(px(x - w), px(y - t), w * 2, t * 2);
+            break;
+        }
+        case 'emailFilter': { // envelope with V flap
+            const ey = px(y - h * 0.4);
+            ctx.fillRect(px(x - w), ey, w * 2, px(h * 1.2));
+            ctx.strokeStyle = '#fff';
+            ctx.beginPath();
+            ctx.moveTo(px(x - w), ey);
+            ctx.lineTo(px(x), px(y + h * 0.4));
+            ctx.lineTo(px(x + w), ey);
+            ctx.stroke();
+            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            ctx.beginPath();
+            ctx.moveTo(px(x - w + 2), ey + 2);
+            ctx.lineTo(px(x), px(y + h * 0.2));
+            ctx.lineTo(px(x + w - 2), ey + 2);
+            ctx.closePath();
+            ctx.fill();
+            break;
+        }
+        case 'encryption': { // padlock: shackle + body
+            const lw = w * 0.5;
+            ctx.beginPath();
+            ctx.arc(px(x), px(y - h * 0.15), lw, 0, Math.PI);
+            ctx.fill();
+            ctx.stroke();
+            ctx.fillStyle = color;
+            ctx.fillRect(px(x - lw * 0.9), px(y), Math.floor(lw * 1.8), Math.floor(h * 0.7));
+            ctx.strokeRect(px(x - lw * 0.9), px(y), Math.floor(lw * 1.8), Math.floor(h * 0.7));
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(px(x - 2), px(y - h * 0.2), 4, 3);
+            break;
+        }
+        case 'ids': { // eye: oval + pupil
+            ctx.fillStyle = 'rgba(255,255,255,0.2)';
+            ctx.fillRect(px(x - w), px(y - 3), w * 2, 6);
+            ctx.strokeRect(px(x - w), px(y - 3), w * 2, 6);
+            ctx.fillStyle = color;
+            ctx.fillRect(px(x - 3), px(y - 2), 6, 4);
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(px(x - 1), px(y - 1), 2, 2);
+            break;
+        }
+        case 'accessControl': { // key: bow + shaft + teeth
+            ctx.fillRect(px(x - w * 1.2), px(y - 2), Math.floor(w * 0.8), 4);
+            ctx.fillRect(px(x - w * 0.5), px(y - h * 0.4), 3, Math.floor(h * 1.2));
+            ctx.fillRect(px(x - w * 0.5), px(y + h * 0.2), Math.floor(w * 0.6), 3);
+            ctx.fillRect(px(x), px(y + h * 0.4), Math.floor(w * 0.4), 3);
+            break;
+        }
+        case 'backup': { // stacked discs
+            ctx.fillRect(px(x - w), px(y - h * 0.5), w * 2, 4);
+            ctx.fillRect(px(x - w * 0.85), px(y - 2), Math.floor(w * 1.7), 4);
+            ctx.fillRect(px(x - w * 0.7), px(y + 4), Math.floor(w * 1.4), 4);
+            break;
+        }
+        case 'training': { // open book
+            ctx.fillRect(px(x - w), px(y - h * 0.6), w * 2, Math.floor(h * 1.2));
+            ctx.strokeRect(px(x - w), px(y - h * 0.6), w * 2, Math.floor(h * 1.2));
+            ctx.strokeStyle = '#fff';
+            ctx.beginPath();
+            ctx.moveTo(px(x), px(y - h * 0.6));
+            ctx.lineTo(px(x), px(y + h * 0.6));
+            ctx.stroke();
+            ctx.fillStyle = 'rgba(255,255,255,0.15)';
+            ctx.fillRect(px(x - w + 2), px(y - h * 0.5), px(w - 2), Math.floor(h));
+            break;
+        }
+        case 'patchMgmt': { // wrench
+            ctx.fillRect(px(x - w), px(y - 1), w * 2, 2);
+            ctx.fillRect(px(x + w * 0.25), px(y - h * 0.5), 2, Math.floor(h));
+            ctx.fillRect(px(x + w * 0.25), px(y - h * 0.5), Math.floor(w * 0.5), 2);
+            ctx.fillRect(px(x + w * 0.25), px(y + h * 0.3), Math.floor(w * 0.5), 2);
+            break;
+        }
+        case 'proxyNode': { // diamond (routing node)
+            ctx.beginPath();
+            ctx.moveTo(px(x), px(y - h));
+            ctx.lineTo(px(x + w), px(y));
+            ctx.lineTo(px(x), px(y + h));
+            ctx.lineTo(px(x - w), px(y));
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            ctx.fillStyle = 'rgba(255,255,255,0.25)';
+            ctx.fillRect(px(x - 2), px(y - 2), 4, 4);
+            break;
+        }
+        case 'quarantine': { // stop sign / containment
+            ctx.fillRect(px(x - w * 0.9), px(y - h * 0.7), Math.floor(w * 1.8), Math.floor(h * 1.4));
+            ctx.strokeRect(px(x - w * 0.9), px(y - h * 0.7), Math.floor(w * 1.8), Math.floor(h * 1.4));
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(px(x - 3), px(y - 2), 6, 4);
+            break;
+        }
+        case 'segmentation': { // two segments with gap
+            ctx.fillRect(px(x - w), px(y - h * 0.5), Math.floor(w * 0.85), h);
+            ctx.fillRect(px(x + 2), px(y - h * 0.5), Math.floor(w * 0.85), h);
+            ctx.fillStyle = 'rgba(255,255,255,0.2)';
+            ctx.fillRect(px(x - w + 1), px(y - h * 0.4), Math.floor(w * 0.7), 2);
+            ctx.fillRect(px(x + 3), px(y - h * 0.4), Math.floor(w * 0.7), 2);
+            break;
+        }
+        default:
+            ctx.fillRect(px(x - w * 0.5), px(y - h * 0.5), w, h);
+    }
+}
+
+function drawThreatIcon(ctx, threatType, x, y, color, size) {
+    const s = Math.max(5, Math.floor(size * 0.45));
+    ctx.fillStyle = color;
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1;
+    switch (threatType) {
+        case 'phishing': { // envelope with flap
+            ctx.fillRect(px(x - s), px(y - s), s * 2, s * 2);
+            ctx.strokeStyle = '#fff';
+            ctx.beginPath();
+            ctx.moveTo(px(x - s), px(y - s));
+            ctx.lineTo(px(x), px(y + s * 0.2));
+            ctx.lineTo(px(x + s), px(y - s));
+            ctx.stroke();
+            ctx.fillStyle = 'rgba(255,255,255,0.35)';
+            ctx.fillRect(px(x - s + 1), px(y - s + 1), s * 2 - 2, 3);
+            break;
+        }
+        case 'malware': { // blocky skull: head + eyes + mouth
+            ctx.fillRect(px(x - s), px(y - s), s * 2, s * 2);
+            ctx.strokeRect(px(x - s), px(y - s), s * 2, s * 2);
+            ctx.fillStyle = '#1a1a1a';
+            const es = Math.max(2, Math.floor(s * 0.35));
+            ctx.fillRect(px(x - s * 0.55), px(y - s * 0.35), es, es);
+            ctx.fillRect(px(x + s * 0.2), px(y - s * 0.35), es, es);
+            ctx.fillRect(px(x - s * 0.45), px(y + s * 0.25), Math.floor(s * 0.9), Math.max(1, Math.floor(s * 0.2)));
+            break;
+        }
+        case 'ransomware': { // padlock
+            ctx.fillRect(px(x - s), px(y + s * 0.2), s * 2, Math.floor(s * 0.8));
+            ctx.beginPath();
+            ctx.arc(px(x), px(y + s * 0.1), s * 0.55, 0, Math.PI);
+            ctx.fill();
+            ctx.stroke();
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(px(x - 2), px(y - s * 0.2), 4, 4);
+            break;
+        }
+        case 'ddos': { // lightning bolt
+            ctx.beginPath();
+            ctx.moveTo(px(x + s * 0.3), px(y - s));
+            ctx.lineTo(px(x - s * 0.8), px(y));
+            ctx.lineTo(px(x + s * 0.5), px(y));
+            ctx.lineTo(px(x - s * 0.3), px(y + s));
+            ctx.lineTo(px(x), px(y + s * 0.3));
+            ctx.lineTo(px(x - s * 0.5), px(y));
+            ctx.lineTo(px(x + s * 0.3), px(y - s));
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            break;
+        }
+        case 'sqlInjection': { // gear with teeth
+            const g = s * 0.5;
+            ctx.beginPath();
+            for (let i = 0; i < 8; i++) {
+                const a = (i / 8) * Math.PI * 2 - Math.PI / 8;
+                const r = i % 2 === 0 ? s : s * 0.7;
+                const nx = x + Math.cos(a) * r;
+                const ny = y + Math.sin(a) * r;
+                if (i === 0) ctx.moveTo(px(nx), px(ny));
+                else ctx.lineTo(px(nx), px(ny));
+            }
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(px(x), px(y), g, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            break;
+        }
+        case 'trojan': { // mask / disguised face
+            ctx.fillRect(px(x - s), px(y - s), s * 2, s * 2);
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(px(x - s * 0.5), px(y - s * 0.3), Math.floor(s * 0.5), 2);
+            ctx.fillRect(px(x + 2), px(y - s * 0.3), Math.floor(s * 0.5), 2);
+            ctx.fillRect(px(x - s * 0.3), px(y + s * 0.2), Math.floor(s * 0.6), 2);
+            break;
+        }
+        case 'insider': { // stick figure (head + body + arms)
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(px(x - 1), px(y - s), 2, 2);
+            ctx.fillRect(px(x - 1), px(y - s + 4), 2, Math.floor(s * 0.8));
+            ctx.beginPath();
+            ctx.moveTo(px(x - s * 0.6), px(y - s * 0.5));
+            ctx.lineTo(px(x + s * 0.6), px(y - s * 0.5));
+            ctx.stroke();
+            ctx.fillRect(px(x - 1), px(y + 2), 2, Math.floor(s * 0.6));
+            break;
+        }
+        case 'zeroDay': { // spiky hazard star
+            ctx.beginPath();
+            for (let i = 0; i < 8; i++) {
+                const a = (i / 8) * Math.PI * 2 - Math.PI / 2;
+                const r = i % 2 === 0 ? s : s * 0.45;
+                const nx = x + Math.cos(a) * r;
+                const ny = y + Math.sin(a) * r;
+                if (i === 0) ctx.moveTo(px(nx), px(ny));
+                else ctx.lineTo(px(nx), px(ny));
+            }
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            break;
+        }
+        case 'sniffer': { // eye with pupil
+            ctx.fillStyle = 'rgba(255,255,255,0.25)';
+            ctx.fillRect(px(x - s), px(y - 2), s * 2, 4);
+            ctx.strokeRect(px(x - s), px(y - 2), s * 2, 4);
+            ctx.fillStyle = color;
+            ctx.fillRect(px(x - s * 0.3), px(y - 1), Math.floor(s * 0.6), 2);
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(px(x - 1), px(y - 1), 2, 2);
+            break;
+        }
+        default:
+            ctx.fillRect(px(x - s), px(y - s), s * 2, s * 2);
+    }
+}
+
+function drawAssetIcon(ctx, assetType, x, y, color) {
+    const s = 10;
+    ctx.fillStyle = color;
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1;
+    if (assetType === 'database') {
+        ctx.fillRect(px(x - s), px(y - s * 0.8), s * 2, Math.floor(s * 0.6));
+        ctx.strokeRect(px(x - s), px(y - s * 0.8), s * 2, Math.floor(s * 0.6));
+        ctx.fillRect(px(x - s * 0.8), px(y), Math.floor(s * 1.6), Math.floor(s * 0.8));
+        ctx.strokeRect(px(x - s * 0.8), px(y), Math.floor(s * 1.6), Math.floor(s * 0.8));
+    } else {
+        // server: stack of trays
+        ctx.fillRect(px(x - s), px(y - s), s * 2, 4);
+        ctx.fillRect(px(x - s), px(y - 4), s * 2, 4);
+        ctx.fillRect(px(x - s), px(y + 2), s * 2, 4);
+    }
+}
 
 // ---- Projectile (visual effect) ----
 export class Projectile {
@@ -41,27 +317,24 @@ export class Projectile {
     render(ctx) {
         if (!this.alive) return;
 
-        // Draw trail
+        const px = (x) => Math.floor(x);
+        const pw = 2; // trail pixel width
+
+        // Blocky trail (pixel art)
         if (this.trail.length > 1) {
-            ctx.strokeStyle = this.color + '44';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(this.trail[0].x, this.trail[0].y);
-            for (let i = 1; i < this.trail.length; i++) {
-                ctx.lineTo(this.trail[i].x, this.trail[i].y);
+            ctx.fillStyle = this.color + '66';
+            for (let i = 0; i < this.trail.length; i++) {
+                const t = this.trail[i];
+                ctx.fillRect(px(t.x) - pw, px(t.y) - pw, pw * 2, pw * 2);
             }
-            ctx.lineTo(this.x, this.y);
-            ctx.stroke();
         }
 
-        // Draw projectile
+        // Projectile: small pixel block (no blur)
+        const s = 3;
         ctx.fillStyle = this.color;
-        ctx.shadowColor = this.color;
-        ctx.shadowBlur = 8;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.shadowBlur = 0;
+        ctx.fillRect(px(this.x) - s, px(this.y) - s, s * 2, s * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(px(this.x) - 1, px(this.y) - 1, 2, 2);
     }
 }
 
@@ -152,7 +425,8 @@ export class Tower {
 
     findTarget(threats) {
         // If current target is still valid AND we can still damage it, keep it
-        if (this.target && this.target.alive && !this.target.reachedEnd && this.canTarget(this.target.type)) {
+        if (this.target && this.target.alive && !this.target.reachedEnd
+            && !this.target._quarantineFrozen && this.canTarget(this.target.type)) {
             const dist = Math.hypot(this.target.x - this.x, this.target.y - this.y);
             if (dist <= this.range) return;
         }
@@ -164,6 +438,7 @@ export class Tower {
 
         for (const threat of threats) {
             if (!threat.alive || threat.reachedEnd) continue;
+            if (threat._quarantineFrozen) continue; // Frozen threats are in quarantine
             if (!this.canTarget(threat.type)) continue; // Skip threats we can't damage
 
             const dist = Math.hypot(threat.x - this.x, threat.y - this.y);
@@ -211,92 +486,104 @@ export class Tower {
 
         let damage = this.damage * effectiveness;
 
-        const killed = this.target.takeDamage(damage, this.specialEffect, this.slowAmount);
-        this.totalDamage += damage;
-        if (killed) this.totalKills++;
+        // Apply damage amplification from quarantine/segmentation zones
+        if (this.target._damageAmp && this.target._damageAmp > 0) {
+            damage *= (1 + this.target._damageAmp);
+        }
+
+        // Cover Fire synergy: DDoS causes towers to "miss" protected threats
+        let missed = false;
+        if (this.target.synergyEffects && this.target.synergyEffects.coverFire) {
+            if (Math.random() < 0.4) { // 40% miss chance
+                missed = true;
+            }
+        }
+
+        if (!missed) {
+            const killed = this.target.takeDamage(damage, this.specialEffect, this.slowAmount);
+            this.totalDamage += damage;
+            if (killed) this.totalKills++;
+        }
 
         this.cooldownTimer = 1000 / this.attackSpeed;
         this.attackFlash = 150;
 
         // Projectile color indicates effectiveness: green = strong, yellow = normal, red = weak
+        // Missed shots appear faded
         let projColor = this.color;
-        if (effectiveness >= 1.5) projColor = '#00ff88';
+        if (missed) projColor = '#ffffff33';
+        else if (effectiveness >= 1.5) projColor = '#00ff88';
         else if (effectiveness <= 0.3) projColor = '#ff475788';
 
         return new Projectile(this.x, this.y, this.target.x, this.target.y, projColor);
     }
 
     render(ctx, showRange) {
+        const px = (n) => Math.floor(n);
         const cx = this.x;
         const cy = this.y;
         const halfCell = CELL_SIZE / 2 - 4;
 
-        // Range circle
+        // Range: pixel-art square outline (no smooth circle)
         if (showRange && this.range > 0) {
-            ctx.strokeStyle = this.selected ? '#00d4ff66' : '#00d4ff22';
-            ctx.fillStyle = this.selected ? '#00d4ff11' : '#00d4ff08';
+            const r = this.range;
+            ctx.strokeStyle = this.selected ? '#00d4ff99' : '#00d4ff44';
+            ctx.fillStyle = this.selected ? '#00d4ff18' : '#00d4ff0c';
             ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.arc(cx, cy, this.range, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
+            ctx.setLineDash([4, 4]);
+            ctx.strokeRect(px(cx - r), px(cy - r), px(r * 2), px(r * 2));
+            ctx.fillRect(px(cx - r) + 1, px(cy - r) + 1, px(r * 2) - 2, px(r * 2) - 2);
+            ctx.setLineDash([]);
         }
 
-        // Tower base
+        // Tower base: blocky pixel square with dark outline
         const pulse = Math.sin(this.pulsePhase) * 0.1 + 0.9;
-        const flash = this.attackFlash > 0 ? 0.3 : 0;
+        const size = Math.max(6, Math.floor(halfCell * pulse));
+        const left = px(cx - size);
+        const top = px(cy - size);
+        const w = size * 2;
+        const h = size * 2;
 
-        ctx.fillStyle = this.color + '30';
+        ctx.fillStyle = this.color + '50';
+        ctx.fillRect(left, top, w, h);
         ctx.strokeStyle = this.color;
-        ctx.lineWidth = this.selected ? 2.5 : 1.5;
-
-        // Draw rounded square
-        const r = 6;
-        const size = halfCell * pulse;
-        ctx.beginPath();
-        ctx.moveTo(cx - size + r, cy - size);
-        ctx.lineTo(cx + size - r, cy - size);
-        ctx.quadraticCurveTo(cx + size, cy - size, cx + size, cy - size + r);
-        ctx.lineTo(cx + size, cy + size - r);
-        ctx.quadraticCurveTo(cx + size, cy + size, cx + size - r, cy + size);
-        ctx.lineTo(cx - size + r, cy + size);
-        ctx.quadraticCurveTo(cx - size, cy + size, cx - size, cy + size - r);
-        ctx.lineTo(cx - size, cy - size + r);
-        ctx.quadraticCurveTo(cx - size, cy - size, cx - size + r, cy - size);
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
+        ctx.lineWidth = 1;
+        ctx.strokeRect(left, top, w, h);
+        // Pixel highlight (top-left edge)
+        ctx.fillStyle = this.color + '99';
+        ctx.fillRect(left, top, w, 1);
+        ctx.fillRect(left, top, 1, h);
 
         // Attack flash
-        if (flash > 0) {
-            ctx.fillStyle = this.color + '55';
-            ctx.beginPath();
-            ctx.arc(cx, cy, halfCell + 4, 0, Math.PI * 2);
-            ctx.fill();
+        if (this.attackFlash > 0) {
+            ctx.fillStyle = this.color + '88';
+            ctx.fillRect(left - 2, top - 2, w + 4, h + 4);
         }
 
-        // Tower symbol
-        ctx.fillStyle = this.color;
-        ctx.font = `${16}px Arial`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(this.symbol, cx, cy);
+        // Tower icon: SVG if available, else inline
+        const towerImg = getTowerImage(this.towerType);
+        const iconSize = halfCell * 2;
+        if (towerImg && towerImg.complete) {
+            ctx.drawImage(towerImg, px(cx - iconSize / 2), px(cy - iconSize / 2), iconSize, iconSize);
+        } else {
+            drawTowerIcon(ctx, this.towerType, cx, cy, this.color, halfCell);
+        }
 
-        // Upgrade indicators
+        // Upgrade indicators: small pixel blocks
         if (this.upgradeLevel > 0) {
+            const uy = px(cy + halfCell + 2);
             for (let i = 0; i < this.upgradeLevel; i++) {
                 ctx.fillStyle = '#fbbf24';
-                ctx.beginPath();
-                ctx.arc(cx - 8 + i * 8, cy + halfCell + 4, 2.5, 0, Math.PI * 2);
-                ctx.fill();
+                const ux = px(cx - 8 + i * 8);
+                ctx.fillRect(ux, uy, 3, 3);
             }
         }
 
-        // Selection highlight
+        // Selection: pixel dashed outline
         if (this.selected) {
             ctx.strokeStyle = '#00d4ff';
-            ctx.lineWidth = 2;
-            ctx.setLineDash([4, 4]);
+            ctx.lineWidth = 1;
+            ctx.setLineDash([3, 3]);
             ctx.strokeRect(
                 this.gridX * CELL_SIZE + 1,
                 this.gridY * CELL_SIZE + 1,
@@ -310,7 +597,10 @@ export class Tower {
 
 // ---- Threat ----
 export class Threat {
+    static _nextId = 1;
+
     constructor(threatType, path, pathIndex = 0) {
+        this.id = Threat._nextId++;
         this.type = threatType;
         const config = THREAT_TYPES[threatType];
 
@@ -345,11 +635,31 @@ export class Threat {
         this.effects = {};
         this.damageFlash = 0;
 
+        // Synergy state (set per-frame by game.applySynergies)
+        this.synergyEffects = {};      // active synergy buffs, e.g. { credentialBreach: true, coverFire: true, snifferBuff: true }
+        this.synergySpeedMult = 1;     // speed multiplier from synergies
+        this.synergyDamageResist = 0;  // damage resistance from synergies (0-1)
+        this.inSegmentationZone = false; // suppresses synergies
+
         // Trojan: initially looks like safe traffic
         if (this.special === 'disguise') {
             this.visible = false;
             this.revealTimer = 2000; // Reveal after 2 seconds or when damaged
         }
+    }
+
+    /**
+     * Recalculate path after a grid change.
+     * Replaces remaining waypoints while preserving current position.
+     * @param {Array<{x:number,y:number}>} newPixelPath - New pixel waypoints from current position to asset
+     */
+    recalculatePath(newPixelPath) {
+        if (!newPixelPath || newPixelPath.length === 0) return;
+
+        // Build new path: current position + new waypoints
+        this.path = [{ x: this.x, y: this.y }, ...newPixelPath];
+        this.currentWaypoint = 0;
+        this.totalPathLength = this.calculatePathLength();
     }
 
     calculatePathLength() {
@@ -364,6 +674,14 @@ export class Threat {
     }
 
     takeDamage(amount, effect, effectAmount) {
+        // Quarantine freeze: frozen threats take no damage
+        if (this._quarantineFrozen) return false;
+
+        // Apply synergy damage resistance (sniffer buff)
+        if (this.synergyDamageResist > 0) {
+            amount *= (1 - this.synergyDamageResist);
+        }
+
         // Apply resistances
         if (effect && this.resistances[effect]) {
             amount *= (1 - this.resistances[effect]);
@@ -411,10 +729,37 @@ export class Threat {
         // Damage flash
         if (this.damageFlash > 0) this.damageFlash -= dt;
 
-        // Calculate speed with effects
-        let currentSpeed = this.baseSpeed;
+        // Update proxy scan slow
+        if (this.effects.proxyScan) {
+            this.effects.proxyScan.duration -= dt;
+            if (this.effects.proxyScan.duration <= 0) {
+                delete this.effects.proxyScan;
+            }
+        }
+
+        // Update segmentation slow
+        if (this.effects.segmentSlow) {
+            this.effects.segmentSlow.duration -= dt;
+            if (this.effects.segmentSlow.duration <= 0) {
+                delete this.effects.segmentSlow;
+            }
+        }
+
+        // Quarantine freeze: skip all movement while frozen
+        if (this._quarantineFrozen) {
+            return; // Completely frozen - no movement
+        }
+
+        // Calculate speed with effects and synergies
+        let currentSpeed = this.baseSpeed * this.synergySpeedMult;
         if (this.effects.slow) {
             currentSpeed *= (1 - this.effects.slow.amount);
+        }
+        if (this.effects.proxyScan) {
+            currentSpeed *= (1 - this.effects.proxyScan.amount);
+        }
+        if (this.effects.segmentSlow) {
+            currentSpeed *= (1 - this.effects.segmentSlow.amount);
         }
 
         // Move toward next waypoint
@@ -462,79 +807,121 @@ export class Threat {
     render(ctx) {
         if (!this.alive) return;
 
+        const px = (n) => Math.floor(n);
         const cx = this.x;
         const cy = this.y;
+        const s = Math.max(4, Math.floor(this.size)); // pixel block size (even for symmetry)
+        const left = px(cx - s);
+        const top = px(cy - s);
+        const w = s * 2;
+        const h = s * 2;
 
-        // Disguised trojan appearance
+        // Disguised trojan: pixel block + arcade "safe" icon
         if (!this.visible) {
-            ctx.fillStyle = '#4ade8044';
-            ctx.beginPath();
-            ctx.arc(cx, cy, this.size * 0.8, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.fillStyle = '#4ade8066';
+            ctx.fillRect(left, top, w, h);
+            ctx.strokeStyle = '#4ade80';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(left, top, w, h);
             ctx.fillStyle = '#4ade80';
-            ctx.font = '10px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('\u2714', cx, cy);
+            ctx.fillRect(px(cx - 2), px(cy - 2), 4, 4);
+            ctx.strokeStyle = '#fff';
+            ctx.strokeRect(px(cx - 2), px(cy - 2), 4, 4);
             return;
         }
 
-        // Slow effect indicator
+        // Slow effect: pixel outline
         if (this.effects.slow) {
-            ctx.strokeStyle = '#a855f744';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.arc(cx, cy, this.size + 4, 0, Math.PI * 2);
-            ctx.stroke();
+            ctx.strokeStyle = '#a855f788';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(left - 3, top - 3, w + 6, h + 6);
         }
 
-        // Main body
-        const flashAlpha = this.damageFlash > 0 ? 'ff' : 'cc';
+        // Quarantine freeze: pixel frame + label
+        if (this._quarantineFrozen) {
+            const freezePulse = 0.6 + 0.4 * Math.sin(Date.now() / 200);
+            ctx.strokeStyle = `rgba(249, 115, 22, ${freezePulse * 0.9})`;
+            ctx.lineWidth = 1;
+            ctx.strokeRect(left - 4, top - 4, w + 8, h + 8);
+            ctx.fillStyle = `rgba(249, 115, 22, ${0.2})`;
+            ctx.fillRect(left - 2, top - 2, w + 4, h + 4);
+            ctx.fillStyle = `rgba(249, 115, 22, ${0.8})`;
+            ctx.font = 'bold 6px monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText('FROZEN', px(cx), top - 6);
+        }
+
+        // Synergy indicators: small pixel blocks above threat
+        if (this.synergyEffects) {
+            let iconY = px(cy - s - 6);
+            if (this.synergyEffects.credentialBreach) {
+                ctx.fillStyle = '#f97316';
+                ctx.fillRect(px(cx) - 4, iconY, 4, 4);
+                iconY -= 6;
+            }
+            if (this.synergyEffects.coverFire) {
+                ctx.fillStyle = '#3b82f6';
+                ctx.fillRect(px(cx), iconY, 4, 4);
+                iconY -= 6;
+            }
+            if (this.synergyEffects.snifferBuff) {
+                ctx.fillStyle = '#d946ef';
+                ctx.fillRect(px(cx) - 2, iconY, 4, 4);
+                iconY -= 6;
+            }
+            if (this.synergyEffects.scanned) {
+                ctx.strokeStyle = '#22d3ee';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(px(cx) - 3, iconY, 6, 6);
+                iconY -= 6;
+            }
+            if (this.inSegmentationZone) {
+                ctx.strokeStyle = '#6366f1';
+                ctx.setLineDash([2, 2]);
+                ctx.strokeRect(left - 2, top - 2, w + 4, h + 4);
+                ctx.setLineDash([]);
+            }
+        }
+
+        // Main body: pixel block with highlight
+        const flashAlpha = this.damageFlash > 0 ? 'ff' : 'dd';
         ctx.fillStyle = this.color + flashAlpha;
-        ctx.shadowColor = this.color;
-        ctx.shadowBlur = this.damageFlash > 0 ? 12 : 4;
-        ctx.beginPath();
-        ctx.arc(cx, cy, this.size, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.shadowBlur = 0;
+        ctx.fillRect(left, top, w, h);
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = 1;
+        ctx.strokeRect(left, top, w, h);
+        // Top-left pixel highlight
+        ctx.fillStyle = this.color + 'cc';
+        ctx.fillRect(left, top, w, 1);
+        ctx.fillRect(left, top, 1, h);
 
-        // Inner glow
-        ctx.fillStyle = this.color + '33';
-        ctx.beginPath();
-        ctx.arc(cx, cy, this.size * 0.6, 0, Math.PI * 2);
-        ctx.fill();
+        // Threat icon: SVG if available, else inline
+        const threatImg = getThreatImage(this.type);
+        const threatIconSize = s * 2;
+        if (threatImg && threatImg.complete) {
+            ctx.drawImage(threatImg, px(cx - threatIconSize / 2), px(cy - threatIconSize / 2), threatIconSize, threatIconSize);
+        } else {
+            drawThreatIcon(ctx, this.type, cx, cy, '#ffffff', s);
+        }
 
-        // Symbol
-        ctx.fillStyle = '#ffffff';
-        ctx.font = `${Math.max(10, this.size - 2)}px Arial`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(this.symbol, cx, cy);
-
-        // Health bar (only if damaged)
+        // Health bar (pixel blocks)
         if (this.health < this.maxHealth) {
-            const barWidth = this.size * 2 + 4;
-            const barHeight = 3;
-            const barX = cx - barWidth / 2;
-            const barY = cy - this.size - 8;
+            const barW = Math.max(16, w + 4);
+            const barH = 3;
+            const barX = px(cx - barW / 2);
+            const barY = px(cy - s - 7);
             const healthPct = this.health / this.maxHealth;
 
-            // Background
-            ctx.fillStyle = '#00000088';
-            ctx.fillRect(barX, barY, barWidth, barHeight);
-
-            // Health fill
+            ctx.fillStyle = '#000000cc';
+            ctx.fillRect(barX, barY, barW, barH);
             let barColor = '#00ff88';
             if (healthPct < 0.3) barColor = '#ff4757';
             else if (healthPct < 0.6) barColor = '#fbbf24';
-
             ctx.fillStyle = barColor;
-            ctx.fillRect(barX, barY, barWidth * healthPct, barHeight);
-
-            // Border
-            ctx.strokeStyle = '#ffffff44';
-            ctx.lineWidth = 0.5;
-            ctx.strokeRect(barX, barY, barWidth, barHeight);
+            ctx.fillRect(barX, barY, Math.max(0, Math.floor(barW * healthPct)), barH);
+            ctx.strokeStyle = '#ffffff66';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(barX, barY, barW, barH);
         }
     }
 }
@@ -602,77 +989,89 @@ export class Asset {
     }
 
     render(ctx) {
+        const px = (n) => Math.floor(n);
         const cx = this.x;
         const cy = this.y;
-        const size = CELL_SIZE / 2 - 2;
+        const size = Math.floor(CELL_SIZE / 2 - 2);
 
-        // Background glow
-        const glowColor = this.compromised ? '#ff475733' : '#00ff8833';
-        ctx.fillStyle = glowColor;
-        ctx.beginPath();
-        ctx.arc(cx, cy, size + 6, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Asset body
+        // Pixel diamond (integer points)
         const bodyColor = this.compromised ? '#ff4757' : (this.damageFlash > 0 ? '#fbbf24' : '#00ff88');
-        ctx.fillStyle = bodyColor + '44';
-        ctx.strokeStyle = bodyColor;
-        ctx.lineWidth = 2;
-
-        // Draw diamond shape for assets
+        ctx.fillStyle = bodyColor + '99';
         ctx.beginPath();
-        ctx.moveTo(cx, cy - size);
-        ctx.lineTo(cx + size, cy);
-        ctx.lineTo(cx, cy + size);
-        ctx.lineTo(cx - size, cy);
+        ctx.moveTo(px(cx), px(cy - size));
+        ctx.lineTo(px(cx + size), px(cy));
+        ctx.lineTo(px(cx), px(cy + size));
+        ctx.lineTo(px(cx - size), px(cy));
         ctx.closePath();
         ctx.fill();
+        ctx.strokeStyle = bodyColor;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        // Top edge highlight (pixel style)
+        ctx.strokeStyle = bodyColor + 'ee';
+        ctx.beginPath();
+        ctx.moveTo(px(cx), px(cy - size));
+        ctx.lineTo(px(cx + size), px(cy));
         ctx.stroke();
 
-        // Asset icon
-        const icon = this.type === 'database' ? '\uD83D\uDDC4' : '\uD83D\uDDA5';
-        ctx.fillStyle = bodyColor;
-        ctx.font = '16px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(icon, cx, cy);
+        // Asset icon: SVG if available (by name), else inline
+        const assetImg = getAssetImage(this.name);
+        const assetIconSize = Math.floor(size * 1.2);
+        if (assetImg && assetImg.complete) {
+            ctx.drawImage(assetImg, px(cx - assetIconSize / 2), px(cy - assetIconSize / 2), assetIconSize, assetIconSize);
+        } else {
+            drawAssetIcon(ctx, this.type, cx, cy, bodyColor);
+        }
 
-        // Health bar
+        // Health bar (pixel blocks)
         const barWidth = CELL_SIZE - 8;
         const barHeight = 4;
-        const barX = cx - barWidth / 2;
-        const barY = cy + size + 8;
+        const barX = px(cx - barWidth / 2);
+        const barY = px(cy + size + 6);
         const healthPct = this.health / this.maxHealth;
 
-        ctx.fillStyle = '#00000088';
+        ctx.fillStyle = '#000000cc';
         ctx.fillRect(barX, barY, barWidth, barHeight);
-
         let barColor = '#00ff88';
         if (healthPct < 0.3) barColor = '#ff4757';
         else if (healthPct < 0.6) barColor = '#fbbf24';
-
         ctx.fillStyle = barColor;
-        ctx.fillRect(barX, barY, barWidth * healthPct, barHeight);
-
-        ctx.strokeStyle = '#ffffff44';
-        ctx.lineWidth = 0.5;
+        ctx.fillRect(barX, barY, Math.max(0, Math.floor(barWidth * healthPct)), barHeight);
+        ctx.strokeStyle = '#ffffff66';
+        ctx.lineWidth = 1;
         ctx.strokeRect(barX, barY, barWidth, barHeight);
 
-        // Asset name
+        // Asset name (clamped so it doesn't overflow right edge)
         ctx.fillStyle = '#e2e8f0';
         ctx.font = 'bold 9px Rajdhani, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(this.name, cx, barY + barHeight + 12);
+        const maxNameW = CANVAS_WIDTH - 20;
+        let label = this.name;
+        if (ctx.measureText(label).width > maxNameW) {
+            while (label.length > 2 && ctx.measureText(label + '\u2026').width > maxNameW) label = label.slice(0, -1);
+            label = label + '\u2026';
+        }
+        const nameW = ctx.measureText(label).width;
+        const pad = 10;
+        const textX = Math.max(pad + nameW / 2, Math.min(cx, CANVAS_WIDTH - pad - nameW / 2));
+        ctx.fillText(label, textX, barY + barHeight + 12);
 
-        // Protection indicators
-        let indicators = [];
-        if (this.hasEncryption) indicators.push({ text: '\uD83D\uDD12', color: '#10b981' });
-        if (this.hasBackup) indicators.push({ text: '\uD83D\uDCBE', color: '#06b6d4' });
-
-        indicators.forEach((ind, i) => {
-            ctx.fillStyle = ind.color;
-            ctx.font = '10px Arial';
-            ctx.fillText(ind.text, cx - 10 + i * 20, cy - size - 8);
-        });
+        // Protection indicators (arcade: small lock / layers)
+        let ix = px(cx) - (this.hasEncryption && this.hasBackup ? 10 : 0);
+        if (this.hasEncryption) {
+            ctx.fillStyle = '#10b981';
+            ctx.fillRect(ix - 3, px(cy - size - 10), 6, 4);
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(ix - 3, px(cy - size - 10), 6, 4);
+            ctx.fillRect(ix - 2, px(cy - size - 9), 4, 2);
+            ix += 14;
+        }
+        if (this.hasBackup) {
+            ctx.fillStyle = '#06b6d4';
+            ctx.fillRect(ix - 4, px(cy - size - 9), 8, 2);
+            ctx.fillRect(ix - 3, px(cy - size - 6), 6, 2);
+            ctx.fillRect(ix - 2, px(cy - size - 3), 4, 2);
+        }
     }
 }

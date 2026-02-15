@@ -314,6 +314,7 @@ html, body {
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    height: 32vh;
 }
 
 .level-card::before {
@@ -489,6 +490,9 @@ html, body {
     flex: 1;
     overflow: hidden;
     position: relative;
+    padding: 16px 16px 0 16px; /* no bottom padding so canvas reaches bottom and receives events */
+    box-sizing: border-box;
+    cursor: crosshair;
 }
 
 #game-canvas {
@@ -496,6 +500,10 @@ html, body {
     display: block;
     background: var(--bg-primary);
     cursor: crosshair;
+    border-radius: 4px;
+    /* Pixel-art: crisp scaling when canvas is stretched */
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
 }
 
 /* --- Tower Sidebar --- */
@@ -663,7 +671,6 @@ html, body {
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
     padding: 40px;
-    max-width: 560px;
     width: 90%;
     max-height: 85vh;
     overflow-y: auto;
@@ -1292,6 +1299,212 @@ html, body {
     font-size: 0.9rem;
 }
 
+.quiz-remediation {
+    margin-top: 12px;
+    padding: 12px;
+    background: rgba(239, 68, 68, 0.08);
+    border-left: 3px solid var(--accent-red);
+    border-radius: 6px;
+}
+
+.quiz-remediation-label {
+    color: var(--accent-red);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+
+.quiz-remediation p {
+    color: #e2e8f0;
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
+.quiz-source {
+    margin-top: 10px;
+    font-size: 0.7rem;
+    color: #64748b;
+    font-style: italic;
+}
+
+/* --- Assessment Modal (end-of-level) --- */
+.assessment-content {
+    text-align: left;
+    max-width: 680px;
+}
+
+.assessment-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.assessment-badge {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(0, 255, 136, 0.15));
+    border: 1px solid rgba(168, 85, 247, 0.4);
+    color: #a855f7;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.assessment-progress {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+
+.assessment-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(100, 116, 139, 0.3);
+    border: 2px solid #475569;
+    transition: all 0.3s;
+}
+
+.assessment-dot.active {
+    border-color: var(--accent-cyan);
+    background: rgba(0, 212, 255, 0.3);
+    box-shadow: 0 0 8px rgba(0, 212, 255, 0.4);
+}
+
+.assessment-dot.correct {
+    border-color: var(--accent-green);
+    background: var(--accent-green);
+}
+
+.assessment-dot.incorrect {
+    border-color: var(--accent-red);
+    background: var(--accent-red);
+}
+
+.assessment-score {
+    text-align: center;
+    padding: 20px;
+    background: rgba(15, 23, 42, 0.6);
+    border-radius: 10px;
+    margin-bottom: 16px;
+}
+
+.assessment-score-value {
+    font-size: 2.5rem;
+    font-weight: 900;
+    font-family: var(--font-heading);
+}
+
+.assessment-score-value.pass {
+    color: var(--accent-green);
+}
+
+.assessment-score-value.fail {
+    color: var(--accent-red);
+}
+
+.assessment-score-label {
+    color: #94a3b8;
+    font-size: 0.85rem;
+    margin-top: 4px;
+}
+
+.assessment-topics-covered {
+    background: rgba(0, 255, 136, 0.05);
+    border: 1px solid rgba(0, 255, 136, 0.15);
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 12px;
+}
+
+.assessment-topics-covered h4 {
+    color: var(--accent-green);
+    font-size: 0.8rem;
+    margin: 0 0 6px 0;
+    letter-spacing: 0.5px;
+}
+
+.assessment-topics-covered p {
+    color: #94a3b8;
+    font-size: 0.78rem;
+    line-height: 1.4;
+}
+
+/* --- Mastery indicators in Knowledge Tracker --- */
+.knowledge-mastery {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+    font-size: 0.65rem;
+}
+
+.mastery-badge {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.6rem;
+    letter-spacing: 0.3px;
+}
+
+.mastery-badge.mastered {
+    background: rgba(0, 255, 136, 0.15);
+    color: #00ff88;
+    border: 1px solid rgba(0, 255, 136, 0.3);
+}
+
+.mastery-badge.in-progress {
+    background: rgba(251, 191, 36, 0.12);
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.25);
+}
+
+.mastery-badge.not-attempted {
+    background: rgba(100, 116, 139, 0.1);
+    color: #64748b;
+    border: 1px solid rgba(100, 116, 139, 0.2);
+}
+
+.mastery-bar-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+    padding: 6px 0;
+}
+
+.mastery-bar {
+    flex: 1;
+    height: 6px;
+    background: rgba(100, 116, 139, 0.15);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.mastery-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+
+.mastery-bar-fill.covered {
+    background: rgba(0, 212, 255, 0.5);
+}
+
+.mastery-bar-fill.mastered {
+    background: #00ff88;
+}
+
+.mastery-label {
+    font-size: 0.68rem;
+    color: #94a3b8;
+    min-width: 60px;
+    text-align: right;
+}
+
 /* --- Threat Info Panel --- */
 #threat-info-panel {
     position: absolute;
@@ -1305,10 +1518,17 @@ html, body {
     z-index: 30;
     box-shadow: var(--shadow);
     animation: modalFadeIn 0.2s ease;
+    /* Let clicks pass through to canvas so bottom row stays selectable */
+    pointer-events: none;
 }
-
 #threat-info-panel.hidden {
     display: none;
+}
+#threat-info-panel .threat-info-header,
+#threat-info-panel .threat-info-stats,
+#threat-info-panel .threat-info-edu,
+#threat-info-panel .threat-info-defense {
+    pointer-events: auto; /* allow text selection / interaction if needed */
 }
 
 .threat-info-header {
@@ -1396,6 +1616,13 @@ html, body {
     gap: 14px;
     z-index: 20;
     animation: dykSlide 0.5s ease;
+    transition: opacity 0.25s ease;
+}
+
+/* Dismissed by hover: stays hidden until next tip (class toggled by JS to avoid flash) */
+.did-you-know.dyk-dismissed {
+    opacity: 0;
+    pointer-events: none;
 }
 
 .did-you-know.hidden {
@@ -1907,6 +2134,163 @@ html, body {
     font-size: 0.78rem;
     margin: 0;
     line-height: 1.4;
+}
+
+/* --- Synergy Cards --- */
+.intel-synergy-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+.intel-synergy-card {
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(100, 116, 139, 0.2);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.synergy-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.synergy-card-icon {
+    font-size: 1.4rem;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.synergy-card-header h4 {
+    margin: 0 0 2px 0;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.synergy-requires {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.72rem;
+    color: #94a3b8;
+}
+
+.synergy-req-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+.synergy-plus {
+    color: #64748b;
+    font-weight: 700;
+    font-size: 0.8rem;
+}
+
+.synergy-desc {
+    color: #cbd5e1;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    margin: 0;
+}
+
+.synergy-effects-row {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.synergy-buffs-label {
+    font-size: 0.72rem;
+    color: #94a3b8;
+}
+
+.synergy-benefit {
+    font-weight: 600;
+    font-size: 0.76rem;
+}
+
+.synergy-effect-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.synergy-effect-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.synergy-effect-tag.speed {
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.25);
+}
+
+.synergy-effect-tag.miss {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+    border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+.synergy-effect-tag.resist {
+    background: rgba(217, 70, 239, 0.15);
+    color: #d946ef;
+    border: 1px solid rgba(217, 70, 239, 0.25);
+}
+
+.synergy-effect-tag.range {
+    background: rgba(100, 116, 139, 0.15);
+    color: #94a3b8;
+    border: 1px solid rgba(100, 116, 139, 0.25);
+}
+
+.synergy-counter {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(99, 102, 241, 0.08);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 0.72rem;
+    color: #a5b4fc;
+}
+
+.synergy-counter-icon {
+    font-size: 0.9rem;
+}
+
+.synergy-counter strong {
+    color: #818cf8;
+}
+
+.synergy-edu {
+    color: #7c3aed;
+    font-size: 0.72rem;
+    font-style: italic;
+    line-height: 1.4;
+    margin: 0;
+    padding-top: 6px;
+    border-top: 1px solid rgba(100, 116, 139, 0.15);
 }
 
 /* --- Key Principle Box --- */
