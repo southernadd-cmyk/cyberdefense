@@ -1,0 +1,157 @@
+[
+  {
+    "type": "Tower",
+    "name": "Firewall",
+    "file": "tower_firewall.svg"
+  },
+  {
+    "type": "Tower",
+    "name": "Antivirus",
+    "file": "tower_antivirus.svg"
+  },
+  {
+    "type": "Tower",
+    "name": "Email Filter",
+    "file": "tower_email_filter.svg"
+  },
+  {
+    "type": "Tower",
+    "name": "Encryption",
+    "file": "tower_encryption.svg"
+  },
+  {
+    "type": "Tower",
+    "name": "IDS/IPS",
+    "file": "tower_ids_ips.svg"
+  },
+  {
+    "type": "Tower",
+    "name": "Access Control",
+    "file": "tower_access_control.svg"
+  },
+  {
+    "type": "Tower",
+    "name": "Backup System",
+    "file": "tower_backup_system.svg"
+  },
+  {
+    "type": "Tower",
+    "name": "Security Training",
+    "file": "tower_security_training.svg"
+  },
+  {
+    "type": "Tower",
+    "name": "Patch Management",
+    "file": "tower_patch_management.svg"
+  },
+  {
+    "type": "Threat",
+    "name": "Phishing Email",
+    "file": "threat_phishing_email.svg"
+  },
+  {
+    "type": "Threat",
+    "name": "Malware",
+    "file": "threat_malware.svg"
+  },
+  {
+    "type": "Threat",
+    "name": "Ransomware",
+    "file": "threat_ransomware.svg"
+  },
+  {
+    "type": "Threat",
+    "name": "DDoS Attack",
+    "file": "threat_ddos_attack.svg"
+  },
+  {
+    "type": "Threat",
+    "name": "SQL Injection",
+    "file": "threat_sql_injection.svg"
+  },
+  {
+    "type": "Threat",
+    "name": "Trojan Horse",
+    "file": "threat_trojan_horse.svg"
+  },
+  {
+    "type": "Threat",
+    "name": "Insider Threat",
+    "file": "threat_insider_threat.svg"
+  },
+  {
+    "type": "Threat",
+    "name": "Zero-Day Exploit",
+    "file": "threat_zero_day_exploit.svg"
+  },
+  {
+    "type": "Asset",
+    "name": "File Server",
+    "file": "asset_file_server.svg"
+  },
+  {
+    "type": "Asset",
+    "name": "Student Database",
+    "file": "asset_student_database.svg"
+  },
+  {
+    "type": "Asset",
+    "name": "Staff Systems",
+    "file": "asset_staff_systems.svg"
+  },
+  {
+    "type": "Asset",
+    "name": "Patient Records",
+    "file": "asset_patient_records.svg"
+  },
+  {
+    "type": "Asset",
+    "name": "Medical Systems",
+    "file": "asset_medical_systems.svg"
+  },
+  {
+    "type": "Asset",
+    "name": "Payment Database",
+    "file": "asset_payment_database.svg"
+  },
+  {
+    "type": "Asset",
+    "name": "Customer Portal",
+    "file": "asset_customer_portal.svg"
+  },
+  {
+    "type": "Asset",
+    "name": "Order System",
+    "file": "asset_order_system.svg"
+  },
+  {
+    "type": "Asset",
+    "name": "Classified Data",
+    "file": "asset_classified_data.svg"
+  },
+  {
+    "type": "Asset",
+    "name": "Citizen Portal",
+    "file": "asset_citizen_portal.svg"
+  },
+  {
+    "type": "Asset",
+    "name": "Email System",
+    "file": "asset_email_system.svg"
+  },
+  {
+    "type": "Asset",
+    "name": "SCADA Control",
+    "file": "asset_scada_control.svg"
+  },
+  {
+    "type": "Asset",
+    "name": "Power Grid DB",
+    "file": "asset_power_grid_db.svg"
+  },
+  {
+    "type": "Asset",
+    "name": "Monitoring System",
+    "file": "asset_monitoring_system.svg"
+  }
+]
