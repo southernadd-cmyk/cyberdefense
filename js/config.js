@@ -1,5 +1,5 @@
 // ========================================
-// CYBER DEFENSE SIMULATOR - GAME CONFIG
+// CYBER DEFENCE SIMULATOR - GAME CONFIG
 // All game data, constants, and definitions
 // ========================================
 
@@ -38,6 +38,11 @@ export const STATE = {
 export const PLANNING_DURATION = 30000; // 30 seconds
 export const WAVE_BREAK_DURATION = 10000; // 10 seconds between waves
 
+/** Quiz reward scales by level and wave so later quizzes stay meaningful. */
+export function getQuizReward(levelId, currentWave) {
+    return 100 + (levelId * 40) + (currentWave * 50);
+}
+
 // --- Colors ---
 export const COLORS = {
     gridLine: '#1a2332',
@@ -64,7 +69,7 @@ export const THREAT_TYPES = {
         health: 50,
         damage: 10,
         reward: 50,
-        color: '#fbbf24',
+        color: '#1244dd',
         symbol: '\u2709',
         size: 12,
         description: 'Social engineering attack via email. Bypasses firewalls.',
@@ -77,7 +82,7 @@ export const THREAT_TYPES = {
         health: 100,
         damage: 20,
         reward: 100,
-        color: '#a855f7',
+        color: '#dddd22',
         symbol: '\u2623',
         size: 14,
         description: 'Malicious software that can spread to adjacent systems.',
@@ -90,12 +95,12 @@ export const THREAT_TYPES = {
         health: 200,
         damage: 100,
         reward: 200,
-        color: '#ff4757',
+        color: '#FAA0A0',
         symbol: '\uD83D\uDD12',
         size: 16,
         description: 'Encrypts data for ransom. Instant critical damage without backup.',
         special: 'encrypt',
-        educationalNote: 'Ransomware encrypts victim data and demands payment. Backup systems are the primary defense. GDPR requires reporting breaches within 72 hours.'
+        educationalNote: 'Ransomware encrypts victim data and demands payment. Backup systems are the primary defence. GDPR requires reporting breaches within 72 hours.'
     },
     ddos: {
         name: 'DDoS Attack',
@@ -121,7 +126,7 @@ export const THREAT_TYPES = {
         size: 13,
         description: 'Targets databases with malicious queries. Extra damage to data assets.',
         special: 'dbDamage',
-        educationalNote: 'SQL injection exploits vulnerabilities in database-driven applications. Input validation and parameterized queries are key defenses. Under GDPR, database breaches can result in significant fines.'
+        educationalNote: 'SQL injection exploits vulnerabilities in database-driven applications. Input validation and parameterized queries are key defences. Under GDPR, database breaches can result in significant fines.'
     },
     trojan: {
         name: 'Trojan Horse',
@@ -145,7 +150,7 @@ export const THREAT_TYPES = {
         color: '#ef4444',
         symbol: '\uD83D\uDC64',
         size: 15,
-        description: 'Spawns inside the network. Bypasses perimeter defenses.',
+        description: 'Spawns inside the network. Bypasses perimeter defences.',
         special: 'spawnInside',
         educationalNote: 'Insider threats come from employees, contractors, or partners with authorized access. Access control, monitoring, and security training are essential countermeasures.'
     },
@@ -161,7 +166,7 @@ export const THREAT_TYPES = {
         description: 'Exploits unknown vulnerabilities. Highly resistant to antivirus.',
         special: 'resistant',
         resistances: { antivirus: 0.8 },
-        educationalNote: 'Zero-day exploits target unknown vulnerabilities before patches exist. Patch management and AI-based detection help mitigate risk. Defense in depth is crucial since no single control can stop them.'
+        educationalNote: 'Zero-day exploits target unknown vulnerabilities before patches exist. Patch management and AI-based detection help mitigate risk. Defence in depth is crucial since no single control can stop them.'
     },
     sniffer: {
         name: 'Network Sniffer',
@@ -169,7 +174,7 @@ export const THREAT_TYPES = {
         health: 40,
         damage: 0,
         reward: 150,
-        color: '#d946ef',
+        color: '#ffffff',
         symbol: '\uD83D\uDC41',
         size: 10,
         description: 'Support unit. Buffs nearby threats with +30% speed and 20% damage resistance.',
@@ -255,7 +260,7 @@ export const TOWER_TYPES = {
             { name: 'Hardware Firewall', damage: 30, range: 140, cost: 400 },
             { name: 'Next-Gen Firewall', damage: 45, range: 160, cost: 600 }
         ],
-        educationalNote: 'Firewalls monitor and control incoming/outgoing network traffic based on security rules. They form the first line of defense in network security but CANNOT stop threats that bypass the network (phishing, insiders).'
+        educationalNote: 'Firewalls monitor and control incoming/outgoing network traffic based on security rules. They form the first line of defence in network security but CANNOT stop threats that bypass the network (phishing, insiders).'
     },
     antivirus: {
         name: 'Antivirus',
@@ -321,7 +326,7 @@ export const TOWER_TYPES = {
             { name: 'Advanced Sandbox', damage: 60, range: 100, cost: 400 },
             { name: 'AI Email Security', damage: 80, range: 120, cost: 550 }
         ],
-        educationalNote: 'Email filters scan incoming messages for phishing attempts, malicious attachments, and spam. Over 90% of cyber attacks start with an email, making this a critical first defense against social engineering.'
+        educationalNote: 'Email filters scan incoming messages for phishing attempts, malicious attachments, and spam. Over 90% of cyber attacks start with an email, making this a critical first defence against social engineering.'
     },
     encryption: {
         name: 'Encryption',
@@ -400,7 +405,7 @@ export const TOWER_TYPES = {
             ddos: 0,            // Access control can't prevent network flooding
             sqlInjection: 1.0,  // Database access controls limit SQL injection impact
             trojan: 0.8,        // Access restrictions limit what trojans can do
-            insider: 2.0,       // Primary defense: limits what insiders can access
+            insider: 2.0,       // Primary defence: limits what insiders can access
             zeroDay: 0.3,       // Some protection through least privilege
             sniffer: 0.3        // Access control doesn't directly stop passive sniffing
         },
@@ -430,7 +435,7 @@ export const TOWER_TYPES = {
             { name: 'Real-time Backup', cost: 400 },
             { name: 'Offsite + Cloud Backup', cost: 600 }
         ],
-        educationalNote: 'Regular backups are essential for business continuity. The 3-2-1 rule recommends 3 copies, 2 different media types, 1 offsite. Backups are the PRIMARY defense against ransomware \u2013 they remove the attacker\'s leverage.'
+        educationalNote: 'Regular backups are essential for business continuity. The 3-2-1 rule recommends 3 copies, 2 different media types, 1 offsite. Backups are the PRIMARY defence against ransomware \u2013 they remove the attacker\'s leverage.'
     },
     training: {
         name: 'Security Training',
@@ -471,7 +476,7 @@ export const TOWER_TYPES = {
             { name: 'Automated Patching', range: 160, cost: 400 },
             { name: 'AI Vulnerability Scanning', range: 200, cost: 550 }
         ],
-        educationalNote: 'Patch management ensures software is up-to-date with security fixes. Unpatched systems are the most common attack vector. It is the PRIMARY defense against zero-day exploits once patches are available.'
+        educationalNote: 'Patch management ensures software is up-to-date with security fixes. Unpatched systems are the most common attack vector. It is the PRIMARY defence against zero-day exploits once patches are available.'
     },
 
     // --- PATH CONTROL TOWERS ---
@@ -560,16 +565,79 @@ export const THREAT_COUNTERS = {
     sniffer:       { strongCounters: ['ids', 'firewall'], weakCounters: ['antivirus'], immune: ['emailFilter', 'accessControl'] }
 };
 
+// --- Level objectives (mechanical, tracked for stars) ---
+// type: noRansomwareBreach | healthPercent | quizCorrect
+export const OBJECTIVE_TYPES = {
+    noRansomwareBreach: { id: 'no_ransomware_breach', labelKey: 'No asset encrypted by ransomware' },
+    healthPercent:      { id: 'health_pct', labelKey: 'Finish with ≥{target}% overall asset health' },
+    quizCorrect:         { id: 'quiz_correct', labelKey: 'Answer at least {target} quiz question(s) correctly' }
+};
+
+/** Resolve objectives for a level (uses level.objectives if defined, else defaults). */
+export function getLevelObjectives(level) {
+    if (level.objectives && level.objectives.length > 0) {
+        return level.objectives.map(o => {
+            const target = o.target != null ? o.target : (o.type === 'healthPercent' ? 50 : o.type === 'quizCorrect' ? 1 : null);
+            return {
+                type: o.type,
+                target,
+                label: o.label || getObjectiveLabel({ type: o.type, target })
+            };
+        });
+    }
+    const numWaves = level.waves ? level.waves.length : 0;
+    const hasRansomware = level.waves && level.waves.some(w => w.threats && w.threats.some(t => t.type === 'ransomware'));
+    const defaults = [
+        { type: 'healthPercent', target: Math.min(50 + level.difficulty * 5, 90), label: null },
+        { type: 'quizCorrect', target: Math.min(1 + Math.floor(numWaves / 4), 3), label: null }
+    ];
+    if (hasRansomware) defaults.unshift({ type: 'noRansomwareBreach', target: null, label: OBJECTIVE_TYPES.noRansomwareBreach.labelKey });
+    return defaults.map(o => ({ ...o, label: o.label || getObjectiveLabel(o) }));
+}
+
+function getObjectiveLabel(obj) {
+    if (obj.type === 'noRansomwareBreach') return OBJECTIVE_TYPES.noRansomwareBreach.labelKey;
+    if (obj.type === 'healthPercent') return OBJECTIVE_TYPES.healthPercent.labelKey.replace('{target}', obj.target);
+    if (obj.type === 'quizCorrect') return OBJECTIVE_TYPES.quizCorrect.labelKey.replace('{target}', obj.target);
+    return '';
+}
+
+/** Return 5 possible insider spawn points (grid {x,y}) for a level. Uses level.insiderSpawnPoints if defined, else derives from path interior waypoints. */
+export function getInsiderSpawnPoints(level) {
+    if (level.insiderSpawnPoints && level.insiderSpawnPoints.length >= 5) {
+        return level.insiderSpawnPoints.slice(0, 5);
+    }
+    const seen = new Set();
+    const points = [];
+    for (const path of level.paths || []) {
+        for (let i = 1; i < path.length - 1; i++) {
+            const p = path[i];
+            const key = `${p.x},${p.y}`;
+            if (!seen.has(key)) {
+                seen.add(key);
+                points.push({ x: p.x, y: p.y });
+            }
+        }
+    }
+    if (points.length >= 5) {
+        return points.slice(0, 5);
+    }
+    while (points.length < 5 && points.length > 0) {
+        points.push(points[points.length % points.length]);
+    }
+    return points.length ? points : [{ x: 5, y: 5 }];
+}
+
 // --- Level Definitions ---
 export const LEVELS = [
     {
         id: 1,
         name: 'Small Business Network',
         description: 'A local shop needs basic network protection. Learn the fundamentals of firewalls and antivirus.',
-        scenario: 'You have been hired as the IT security consultant for a small retail business. They have a basic network with a file server, point-of-sale system, and employee workstations. Recent phishing emails have worried the owner. Set up basic defenses to protect their network.',
+        scenario: 'You have been hired as the IT security consultant for a small retail business. They have a basic network with a file server, point-of-sale system, and employee workstations. Recent phishing emails have worried the owner. Set up basic defences to protect their network.',
         difficulty: 1,
-        startingBudget: 2000,
-        availableTowers: ['firewall', 'antivirus', 'emailFilter'],
+        startingBudget: 2500,
+        availableTowers: ['firewall', 'antivirus', 'emailFilter', 'backup'],
         paths: [
             [
                 { x: 0, y: 5 }, { x: 4, y: 5 }, { x: 4, y: 2 },
@@ -577,37 +645,44 @@ export const LEVELS = [
                 { x: 16, y: 5 }, { x: 19, y: 5 }
             ]
         ],
+        insiderSpawnPoints: [{ x: 4, y: 5 }, { x: 4, y: 2 }, { x: 10, y: 2 }, { x: 10, y: 8 }, { x: 16, y: 8 }],
+        objectives: [
+            { type: 'noRansomwareBreach' },
+            { type: 'healthPercent', target: 50 },
+            { type: 'quizCorrect', target: 1 }
+        ],
         assets: [
-            { x: 19, y: 5, name: 'File Server', type: 'server', health: 100 }
+            { x: 19, y: 5, name: 'File Server', type: 'server', health: 100, critical: true }
         ],
         waves: [
-            { threats: [{ type: 'phishing', count: 5, interval: 1500 }] },
-            { threats: [{ type: 'phishing', count: 4, interval: 1200 }, { type: 'malware', count: 2, interval: 2000 }] },
-            { threats: [{ type: 'phishing', count: 6, interval: 1000 }, { type: 'malware', count: 4, interval: 1500 }] },
-            { threats: [{ type: 'malware', count: 6, interval: 1200 }, { type: 'phishing', count: 8, interval: 800 }] }
+            { threats: [{ type: 'phishing', count: 7, interval: 1200 }, { type: 'malware', count: 2, interval: 2200 }] },
+            { threats: [{ type: 'phishing', count: 5, interval: 1000 }, { type: 'malware', count: 4, interval: 1600 }, { type: 'trojan', count: 2, interval: 2500 }] },
+            { threats: [{ type: 'phishing', count: 8, interval: 900 }, { type: 'malware', count: 5, interval: 1300 }, { type: 'trojan', count: 3, interval: 2000 }] },
+            { threats: [{ type: 'phishing', count: 6, interval: 800 }, { type: 'ransomware', count: 3, interval: 2800 }, { type: 'malware', count: 4, interval: 1400 }], synergy: 'credentialBreach' }
         ],
         learningSummary: {
             title: 'Small Business Security Fundamentals',
             points: [
-                'Firewalls provide the first line of defense by filtering network traffic.',
+                'Firewalls provide the first line of defence by filtering network traffic.',
                 'Antivirus software detects known malware using signature databases.',
                 'Email filters are critical for blocking phishing attempts, the most common attack vector.',
-                'Even small businesses need layered security - no single defense is sufficient.'
+                'Even small businesses need layered security - no single defence is sufficient.'
             ],
             legislation: 'Under GDPR, even small businesses handling personal data must implement appropriate security measures. Failure can result in fines up to 4% of annual turnover.'
         },
         eduPopups: [
-            { wave: 1, title: 'Phishing Attacks', text: 'Phishing emails try to trick recipients into clicking malicious links or revealing sensitive information. Email filters help catch these before they reach employees.', legislation: 'Data Protection Act 2018 requires organizations to protect personal data from unauthorized access.' }
+            { wave: 1, title: 'Phishing Attacks', text: 'Phishing emails try to trick recipients into clicking malicious links or revealing sensitive information. Email filters help catch these before they reach employees.', legislation: 'Data Protection Act 2018 requires organizations to protect personal data from unauthorized access.' },
+            { wave: 4, title: 'Credential Breach', text: 'In this wave, phishing and ransomware work together: stolen credentials let ransomware spread faster. Place a Backup to prevent instant data loss and use your Email Filter to reduce the phishing stream.', legislation: 'GDPR requires the ability to restore access to personal data in a timely manner (Article 32).' }
         ]
     },
     {
         id: 2,
         name: 'School Network',
-        description: 'Protect a school network with student data. Multiple entry points require layered defenses.',
+        description: 'Protect a school network with student data. Multiple entry points require layered defences.',
         scenario: 'A secondary school stores sensitive student data including names, addresses, and medical records. The network has multiple access points for staff and students. Implement layered security to protect against increasing threats while maintaining compliance with data protection laws.',
         difficulty: 2,
-        startingBudget: 3000,
-        availableTowers: ['firewall', 'antivirus', 'emailFilter', 'accessControl', 'encryption'],
+        startingBudget: 3500,
+        availableTowers: ['firewall', 'antivirus', 'emailFilter', 'accessControl', 'encryption', 'ids', 'backup'],
         paths: [
             [
                 { x: 0, y: 2 }, { x: 5, y: 2 }, { x: 5, y: 5 },
@@ -618,38 +693,46 @@ export const LEVELS = [
                 { x: 12, y: 6 }, { x: 12, y: 9 }, { x: 19, y: 9 }
             ]
         ],
+        insiderSpawnPoints: [{ x: 5, y: 2 }, { x: 5, y: 5 }, { x: 12, y: 5 }, { x: 5, y: 9 }, { x: 12, y: 6 }],
+        objectives: [
+            { type: 'noRansomwareBreach' },
+            { type: 'healthPercent', target: 60 },
+            { type: 'quizCorrect', target: 1 }
+        ],
         assets: [
-            { x: 19, y: 2, name: 'Student Database', type: 'database', health: 100 },
+            { x: 19, y: 2, name: 'Student Database', type: 'database', health: 100, critical: true },
             { x: 19, y: 9, name: 'Staff Systems', type: 'server', health: 100 }
         ],
         waves: [
-            { threats: [{ type: 'phishing', count: 6, interval: 1200, path: 0 }, { type: 'phishing', count: 4, interval: 1400, path: 1 }] },
-            { threats: [{ type: 'malware', count: 4, interval: 1500, path: 0 }, { type: 'trojan', count: 3, interval: 2000, path: 1 }] },
-            { threats: [{ type: 'phishing', count: 8, interval: 800, path: 0 }, { type: 'malware', count: 5, interval: 1200, path: 1 }, { type: 'ddos', count: 10, interval: 500, path: 0 }] },
-            { threats: [{ type: 'insider', count: 2, interval: 3000, path: 1 }, { type: 'malware', count: 6, interval: 1000, path: 0 }, { type: 'trojan', count: 4, interval: 1500, path: 1 }] },
-            { threats: [{ type: 'phishing', count: 10, interval: 600, path: 0 }, { type: 'insider', count: 3, interval: 2500, path: 1 }, { type: 'malware', count: 8, interval: 900, path: 0 }] }
+            { threats: [{ type: 'phishing', count: 7, interval: 1100, path: 0 }, { type: 'phishing', count: 5, interval: 1300, path: 1 }, { type: 'malware', count: 2, interval: 2200, path: 0 }] },
+            // Combo: Trojan disguise + Insider bypass — Best: Antivirus + AccessControl. Alternative: AccessControl + Training.
+            { threats: [{ type: 'trojan', count: 4, interval: 2000, path: 0 }, { type: 'insider', count: 3, interval: 2800, path: 1 }], combo: 'trojanInsider' },
+            { threats: [{ type: 'ddos', count: 14, interval: 400, path: 0 }, { type: 'malware', count: 4, interval: 1800, path: 0 }, { type: 'trojan', count: 3, interval: 2000, path: 1 }], synergy: 'coverFire' },
+            { threats: [{ type: 'phishing', count: 7, interval: 700, path: 0 }, { type: 'ransomware', count: 3, interval: 2800, path: 0 }, { type: 'insider', count: 2, interval: 3200, path: 1 }, { type: 'malware', count: 4, interval: 1300, path: 1 }], synergy: 'credentialBreach' },
+            { threats: [{ type: 'phishing', count: 10, interval: 600, path: 0 }, { type: 'insider', count: 3, interval: 2500, path: 1 }, { type: 'malware', count: 7, interval: 1000, path: 0 }, { type: 'trojan', count: 4, interval: 1600, path: 1 }] }
         ],
         learningSummary: {
             title: 'Educational Data Protection',
             points: [
                 'Schools hold sensitive personal data (student records, medical info) requiring strong protection.',
-                'Multiple network entry points require defense in depth - layered security controls.',
+                'Multiple network entry points require defence in depth - layered security controls.',
                 'Access control ensures only authorized users can reach sensitive data.',
-                'Encryption protects data even if other defenses are breached.',
+                'Encryption protects data even if other defences are breached.',
                 'Insider threats highlight the need for access controls and monitoring.'
             ],
             legislation: 'Schools must comply with GDPR and the Data Protection Act 2018. Children\'s data requires extra protection. ICO can investigate breaches and impose fines.'
         },
         eduPopups: [
-            { wave: 2, title: 'Defense in Depth', text: 'Using multiple layers of security (firewalls + antivirus + access control) means that if one defense fails, others still protect your data. This is called defense in depth.', legislation: 'GDPR Article 32 requires "appropriate technical and organisational measures" - this means layered security.' },
-            { wave: 4, title: 'Insider Threats', text: 'Not all threats come from outside. Insider threats include malicious employees or those who accidentally cause breaches. Access control limits what each user can access.', legislation: 'The Computer Misuse Act 1990 makes unauthorized access to computer systems a criminal offence, even for employees exceeding their access rights.' }
+            { wave: 2, title: 'Trojan + Insider Combo', text: 'Trojans are disguised until halfway across the grid (unattackable until then). Insiders bypass the perimeter. Best counters: Antivirus + Access Control. Alternative: Access Control + Training. Cover both paths!', legislation: 'GDPR Article 32 requires appropriate technical measures; access control is key for insider risk.' },
+            { wave: 3, title: 'DDoS Cover Fire', text: 'DDoS traffic can overwhelm defences so malware and trojans slip through — towers have a 40% chance to miss when DDoS is nearby. Use IDS/IPS to handle the flood and cover both paths.', legislation: 'NIS and sector guidance expect appropriate measures against availability attacks.' },
+            { wave: 4, title: 'Credential Breach & Insider Threats', text: 'Phishing plus ransomware creates a credential breach: ransomware moves 50% faster. Access control counters insiders. Use backup to survive ransomware and email filter to cut phishing.', legislation: 'The Computer Misuse Act 1990 makes unauthorized access a criminal offence, including employees exceeding their rights.' }
         ]
     },
     {
         id: 3,
         name: 'Healthcare Organization',
         description: 'Protect patient records and medical systems. Ransomware is a critical threat.',
-        scenario: 'A healthcare trust stores highly sensitive patient records including medical histories and treatment plans. Ransomware attacks on healthcare organizations have increased dramatically. You must implement comprehensive defenses including backup systems to ensure business continuity.',
+        scenario: 'A healthcare trust stores highly sensitive patient records including medical histories and treatment plans. Ransomware attacks on healthcare organizations have increased dramatically. You must implement comprehensive defences including backup systems to ensure business continuity.',
         difficulty: 3,
         startingBudget: 4000,
         availableTowers: ['firewall', 'antivirus', 'emailFilter', 'encryption', 'ids', 'accessControl', 'backup', 'proxyNode'],
@@ -665,17 +748,25 @@ export const LEVELS = [
                 { x: 15, y: 8 }, { x: 19, y: 8 }
             ]
         ],
+        insiderSpawnPoints: [{ x: 3, y: 3 }, { x: 9, y: 1 }, { x: 9, y: 5 }, { x: 3, y: 8 }, { x: 9, y: 10 }],
+        objectives: [
+            { type: 'noRansomwareBreach' },
+            { type: 'healthPercent', target: 65 },
+            { type: 'quizCorrect', target: 1 }
+        ],
         assets: [
-            { x: 19, y: 3, name: 'Patient Records', type: 'database', health: 120 },
+            { x: 19, y: 3, name: 'Patient Records', type: 'database', health: 120, critical: true },
             { x: 19, y: 8, name: 'Medical Systems', type: 'server', health: 100 }
         ],
         waves: [
-            { threats: [{ type: 'phishing', count: 8, interval: 1000, path: 0 }, { type: 'malware', count: 4, interval: 1500, path: 1 }] },
-            { threats: [{ type: 'trojan', count: 4, interval: 1800, path: 0 }, { type: 'ddos', count: 12, interval: 400, path: 1 }] },
+            { threats: [{ type: 'phishing', count: 9, interval: 950, path: 0 }, { type: 'malware', count: 5, interval: 1400, path: 1 }, { type: 'trojan', count: 2, interval: 2200, path: 0 }] },
+            // Combo: DDoS screen + Ransomware payload — Best: IDS + Backup. Alternative: Firewall + Backup.
+            { threats: [{ type: 'ddos', count: 18, interval: 320, path: 0 }, { type: 'ransomware', count: 4, interval: 2600, path: 1 }], synergy: 'coverFire', combo: 'ddosRansomware' },
             // Wave 3: CREDENTIAL BREACH SYNERGY - phishing opens the door for ransomware
-            { threats: [{ type: 'phishing', count: 6, interval: 800, path: 0 }, { type: 'ransomware', count: 3, interval: 2500, path: 0 }, { type: 'malware', count: 4, interval: 1200, path: 1 }], synergy: 'credentialBreach' },
-            { threats: [{ type: 'insider', count: 3, interval: 2500, path: 0 }, { type: 'ransomware', count: 3, interval: 2500, path: 1 }, { type: 'phishing', count: 8, interval: 700, path: 0 }] },
-            { threats: [{ type: 'ransomware', count: 4, interval: 2000, path: 0 }, { type: 'zeroDay', count: 2, interval: 3000, path: 1 }, { type: 'malware', count: 8, interval: 800, path: 0 }] }
+            { threats: [{ type: 'phishing', count: 7, interval: 750, path: 0 }, { type: 'ransomware', count: 3, interval: 2500, path: 0 }, { type: 'malware', count: 5, interval: 1100, path: 1 }], synergy: 'credentialBreach' },
+            { threats: [{ type: 'insider', count: 3, interval: 2500, path: 0 }, { type: 'ransomware', count: 3, interval: 2400, path: 1 }, { type: 'phishing', count: 9, interval: 650, path: 0 }, { type: 'ddos', count: 10, interval: 450, path: 1 }] },
+            // Combo: Sniffer (stealth intel) then Zero-day (burst) — Best: IDS + PatchMgmt. Alternative: Firewall + IDS.
+            { threats: [{ type: 'sniffer', count: 2, interval: 3800, path: 0 }, { type: 'zeroDay', count: 4, interval: 2200, path: 1 }], combo: 'snifferZeroDay' }
         ],
         learningSummary: {
             title: 'Healthcare Data Security & Business Continuity',
@@ -684,12 +775,14 @@ export const LEVELS = [
                 'Ransomware can prevent access to critical patient records, potentially endangering lives.',
                 'Backup systems are essential for business continuity - they allow recovery after ransomware attacks.',
                 'IDS/IPS provides early warning of attacks, giving time to respond.',
-                'Defense in depth is critical: no single control can protect against all threats.'
+                'Defence in depth is critical: no single control can protect against all threats.'
             ],
             legislation: 'Healthcare organizations must comply with GDPR Article 9 (special category data), the Data Protection Act 2018, and NHS-specific data security standards. Breaches must be reported to the ICO within 72 hours.'
         },
         eduPopups: [
-            { wave: 3, title: 'Credential Breach Synergy', text: 'This wave demonstrates a coordinated attack: phishing emails steal credentials, which ransomware operators then use for faster network penetration. When both threats are active, ransomware moves 50% faster! Use the Proxy Node to route traffic through chokepoints where your defences are strongest.', legislation: 'GDPR requires organizations to ensure the ability to restore access to personal data in a timely manner (Article 32). The Data Protection Act 2018 reinforces this requirement.' }
+            { wave: 2, title: 'DDoS Screen + Ransomware Payload', text: 'DDoS floods one path to distract; ransomware hits the other. Best counters: IDS/IPS to handle the flood + Backup to survive encryption. Alternative: Firewall + Backup. Cover both paths!', legislation: 'Healthcare must maintain availability; DDoS is often used to hide the real payload.' },
+            { wave: 3, title: 'Credential Breach Synergy', text: 'This wave demonstrates a coordinated attack: phishing emails steal credentials, which ransomware operators then use for faster network penetration. When both threats are active, ransomware moves 50% faster! Use the Proxy Node to route traffic through chokepoints where your defences are strongest.', legislation: 'GDPR requires organizations to ensure the ability to restore access to personal data in a timely manner (Article 32). The Data Protection Act 2018 reinforces this requirement.' },
+            { wave: 5, title: 'Sniffer + Zero-day Combo', text: 'Sniffers gather intel first (stealth); then zero-days exploit unknown flaws (burst). Best counters: IDS to detect + Patch Management to close vulnerabilities. Alternative: Firewall + IDS.', legislation: 'Defence in depth: no single control stops both reconnaissance and zero-day exploitation.' }
         ]
     },
     {
@@ -714,16 +807,22 @@ export const LEVELS = [
                 { x: 16, y: 8 }, { x: 16, y: 10 }, { x: 19, y: 10 }
             ]
         ],
+        insiderSpawnPoints: [{ x: 6, y: 1 }, { x: 6, y: 5 }, { x: 13, y: 5 }, { x: 4, y: 6 }, { x: 10, y: 10 }],
+        objectives: [
+            { type: 'noRansomwareBreach' },
+            { type: 'healthPercent', target: 65 },
+            { type: 'quizCorrect', target: 2 }
+        ],
         assets: [
-            { x: 19, y: 1, name: 'Payment Database', type: 'database', health: 100 },
+            { x: 19, y: 1, name: 'Payment Database', type: 'database', health: 100, critical: true },
             { x: 19, y: 6, name: 'Customer Portal', type: 'server', health: 100 },
             { x: 19, y: 10, name: 'Order System', type: 'server', health: 80 }
         ],
         waves: [
             { threats: [{ type: 'phishing', count: 6, interval: 1000, path: 0 }, { type: 'ddos', count: 15, interval: 400, path: 1 }] },
             { threats: [{ type: 'sqlInjection', count: 4, interval: 2000, path: 0 }, { type: 'malware', count: 6, interval: 1200, path: 2 }] },
-            // Wave 3: DDOS COVER FIRE SYNERGY - DDoS overwhelms while malware slips through
-            { threats: [{ type: 'ddos', count: 15, interval: 300, path: 1 }, { type: 'malware', count: 4, interval: 2000, path: 1 }, { type: 'trojan', count: 3, interval: 1800, path: 0 }], synergy: 'coverFire' },
+            // Combo: DDoS screen + Ransomware payload — Best: IDS + Backup. Alternative: Firewall + Backup.
+            { threats: [{ type: 'ddos', count: 18, interval: 280, path: 1 }, { type: 'ransomware', count: 4, interval: 2800, path: 0 }], synergy: 'coverFire', combo: 'ddosRansomware' },
             // Wave 4: CREDENTIAL BREACH SYNERGY + insider
             { threats: [{ type: 'phishing', count: 8, interval: 700, path: 0 }, { type: 'ransomware', count: 3, interval: 3000, path: 0 }, { type: 'insider', count: 3, interval: 2500, path: 1 }, { type: 'sqlInjection', count: 4, interval: 1500, path: 2 }], synergy: 'credentialBreach' },
             { threats: [{ type: 'zeroDay', count: 3, interval: 2500, path: 0 }, { type: 'ransomware', count: 3, interval: 2500, path: 1 }, { type: 'ddos', count: 20, interval: 300, path: 2 }, { type: 'sqlInjection', count: 6, interval: 1200, path: 0 }] }
@@ -733,15 +832,15 @@ export const LEVELS = [
             points: [
                 'SQL injection can expose entire databases of customer information and payment details.',
                 'Payment card data requires PCI DSS compliance in addition to GDPR.',
-                'Multiple attack vectors (email, web, database) require diverse defense strategies.',
+                'Multiple attack vectors (email, web, database) require diverse defence strategies.',
                 'Patch management prevents exploitation of known vulnerabilities.',
                 'Business impact of breaches includes financial loss, fines, and reputational damage.'
             ],
             legislation: 'E-commerce businesses must comply with GDPR for personal data, PCI DSS for payment card data, and the Computer Misuse Act 1990. Data breaches involving payment data can result in fines of millions of pounds.'
         },
         eduPopups: [
-            { wave: 2, title: 'SQL Injection Attacks', text: 'SQL injection inserts malicious database commands through web forms. This can expose, modify, or delete entire databases. Input validation and parameterized queries are essential defenses.', legislation: 'Under GDPR, organizations must implement appropriate technical measures to protect data. Failure to prevent SQL injection may be considered negligence.' },
-            { wave: 3, title: 'DDoS Cover Fire', text: 'In this wave, a massive DDoS flood provides "cover fire" for malware payloads. Towers have a 40% chance to miss DDoS-protected threats! Use Quarantine Barriers to slow and weaken threats, and IDS/IPS to handle the DDoS traffic.', legislation: 'PCI DSS Requirement 11 mandates regular testing of security systems, including DDoS response procedures.' }
+            { wave: 2, title: 'SQL Injection Attacks', text: 'SQL injection inserts malicious database commands through web forms. This can expose, modify, or delete entire databases. Input validation and parameterized queries are essential defences.', legislation: 'Under GDPR, organizations must implement appropriate technical measures to protect data. Failure to prevent SQL injection may be considered negligence.' },
+            { wave: 3, title: 'DDoS Screen + Ransomware Payload', text: 'DDoS floods one path to distract; ransomware hits another. Best: IDS to handle the flood + Backup to survive encryption. Alternative: Firewall + Backup. Use Quarantine to slow threats.', legislation: 'PCI DSS requires DDoS response procedures; backup is critical for ransomware recovery.' }
         ]
     },
     {
@@ -767,8 +866,14 @@ export const LEVELS = [
                 { x: 12, y: 7 }, { x: 12, y: 10 }, { x: 19, y: 10 }
             ]
         ],
+        insiderSpawnPoints: [{ x: 4, y: 1 }, { x: 10, y: 4 }, { x: 3, y: 5 }, { x: 8, y: 8 }, { x: 6, y: 10 }],
+        objectives: [
+            { type: 'noRansomwareBreach' },
+            { type: 'healthPercent', target: 70 },
+            { type: 'quizCorrect', target: 2 }
+        ],
         assets: [
-            { x: 19, y: 1, name: 'Classified Data', type: 'database', health: 120 },
+            { x: 19, y: 1, name: 'Classified Data', type: 'database', health: 120, critical: true },
             { x: 19, y: 8, name: 'Citizen Portal', type: 'server', health: 100 },
             { x: 19, y: 10, name: 'Email System', type: 'server', health: 80 }
         ],
@@ -787,21 +892,21 @@ export const LEVELS = [
                 'Government agencies face sophisticated, state-sponsored cyber threats.',
                 'Business continuity plans ensure critical public services continue during attacks.',
                 'Security training reduces social engineering success rates by up to 70%.',
-                'Multiple layers of defense (physical, technical, procedural) are essential.',
+                'Multiple layers of defence (physical, technical, procedural) are essential.',
                 'Regular disaster recovery testing ensures backup systems work when needed.'
             ],
             legislation: 'Government agencies must comply with GDPR, the Data Protection Act 2018, the Computer Misuse Act 1990, and sector-specific regulations like the Network and Information Systems Regulations 2018.'
         },
         eduPopups: [
             { wave: 1, title: 'Security Training', text: 'Security awareness training is one of the most cost-effective security measures. Educated employees are 70% less likely to fall for social engineering attacks.', legislation: 'GDPR Article 39 requires the Data Protection Officer to promote awareness and training of staff involved in processing operations.' },
-            { wave: 3, title: 'Sniffer Intelligence & Coordinated Attacks', text: 'Network Sniffers are support units that buff nearby threats with extra speed and damage resistance. Combined with Credential Breach synergy, this wave represents a sophisticated coordinated attack. Use Segmentation Zones to block synergy effects!', legislation: 'The Network and Information Systems Regulations 2018 require operators of essential services to have appropriate measures for business continuity.' }
+            { wave: 3, title: 'Sniffer + Zero-day Combo (Stealth then Burst)', text: 'Sniffers gather intel first; zero-days then exploit unknown flaws. Best counters: IDS + Patch Management. Alternative: Firewall + IDS. Use Segmentation to block sniffer buffs.', legislation: 'NIS Regulations require appropriate measures for business continuity and incident response.' }
         ]
     },
     {
         id: 6,
         name: 'Critical Infrastructure',
-        description: 'Protect power grid control systems. The ultimate test of your cyber defense skills.',
-        scenario: 'You are tasked with defending a critical national infrastructure provider. Their systems control power distribution for millions of people. All known threat types are active, and attackers are highly sophisticated. Deploy every defense at your disposal and demonstrate mastery of layered security.',
+        description: 'Protect power grid control systems. The ultimate test of your cyber defence skills.',
+        scenario: 'You are tasked with defending a critical national infrastructure provider. Their systems control power distribution for millions of people. All known threat types are active, and attackers are highly sophisticated. Deploy every defence at your disposal and demonstrate mastery of layered security.',
         difficulty: 6,
         startingBudget: 7500,
         availableTowers: ['firewall', 'antivirus', 'emailFilter', 'encryption', 'ids', 'accessControl', 'backup', 'training', 'patchMgmt', 'proxyNode', 'quarantine', 'segmentation'],
@@ -822,15 +927,22 @@ export const LEVELS = [
                 { x: 14, y: 9 }, { x: 19, y: 9 }
             ]
         ],
+        insiderSpawnPoints: [{ x: 3, y: 3 }, { x: 8, y: 3 }, { x: 5, y: 5 }, { x: 10, y: 8 }, { x: 4, y: 11 }],
+        objectives: [
+            { type: 'noRansomwareBreach' },
+            { type: 'healthPercent', target: 70 },
+            { type: 'quizCorrect', target: 2 }
+        ],
         assets: [
-            { x: 19, y: 3, name: 'SCADA Control', type: 'server', health: 100 },
+            { x: 19, y: 3, name: 'SCADA Control', type: 'server', health: 100, critical: true },
             { x: 19, y: 8, name: 'Power Grid DB', type: 'database', health: 100 },
             { x: 19, y: 9, name: 'Monitoring System', type: 'server', health: 80 }
         ],
         waves: [
             // Wave 1: DDoS COVER FIRE - DDoS hides malware approach
             { threats: [{ type: 'ddos', count: 20, interval: 300, path: 0 }, { type: 'malware', count: 4, interval: 1500, path: 0 }, { type: 'phishing', count: 10, interval: 700, path: 1 }], synergy: 'coverFire' },
-            { threats: [{ type: 'trojan', count: 6, interval: 1500, path: 0 }, { type: 'insider', count: 4, interval: 2000, path: 1 }, { type: 'sqlInjection', count: 5, interval: 1500, path: 2 }] },
+            // Combo: Trojan disguise + Insider bypass — Best: Antivirus + AccessControl. Alternative: AccessControl + Training.
+            { threats: [{ type: 'trojan', count: 6, interval: 1500, path: 0 }, { type: 'insider', count: 4, interval: 2000, path: 1 }, { type: 'sqlInjection', count: 5, interval: 1500, path: 2 }], combo: 'trojanInsider' },
             // Wave 3: CREDENTIAL BREACH + SNIFFER - combined coordinated assault
             { threats: [{ type: 'sniffer', count: 3, interval: 3000, path: 1 }, { type: 'phishing', count: 10, interval: 600, path: 0 }, { type: 'ransomware', count: 5, interval: 2000, path: 0 }, { type: 'zeroDay', count: 3, interval: 2500, path: 2 }], synergy: 'credentialBreach' },
             // Wave 4: ALL SYNERGIES ACTIVE - full spectrum assault
@@ -842,15 +954,16 @@ export const LEVELS = [
             title: 'Critical Infrastructure Protection',
             points: [
                 'Critical infrastructure requires the highest level of cyber security measures.',
-                'All defense types working together demonstrate true defense in depth.',
+                'All defence types working together demonstrate true defence in depth.',
                 'A single point of failure can have catastrophic real-world consequences.',
                 'Continuous monitoring (IDS/IPS) provides early warning of sophisticated attacks.',
-                'Combining technical controls with staff training creates the strongest defense.'
+                'Combining technical controls with staff training creates the strongest defence.'
             ],
             legislation: 'Critical infrastructure is protected under the Network and Information Systems Regulations 2018, GDPR, the Computer Misuse Act 1990, and sector-specific regulations. Operators must report incidents within 72 hours and maintain robust business continuity plans.'
         },
         eduPopups: [
             { wave: 1, title: 'DDoS Cover Fire in Critical Infrastructure', text: 'This wave uses DDoS traffic as "cover fire" for malware. In real infrastructure attacks (like Stuxnet), diversionary attacks distracted defenders while the real payload was delivered. Use path control towers to create chokepoints and Segmentation Zones to neutralise synergies.', legislation: 'The Network and Information Systems Regulations 2018 specifically address security for operators of essential services and digital service providers.' },
+            { wave: 2, title: 'Trojan + Insider Combo', text: 'Trojans stay disguised until halfway across the grid; insiders bypass the perimeter. Best: Antivirus + Access Control. Alternative: Access Control + Training. Cover all three paths!', legislation: 'Critical infrastructure requires defence in depth against both external and internal threats.' },
             { wave: 3, title: 'Full Spectrum Cyber Attack', text: 'This is a coordinated multi-vector assault: sniffers gather intelligence, phishing steals credentials, and ransomware exploits the breach. This mirrors real advanced persistent threats (APTs). Network segmentation is your best defence against coordinated synergies.', legislation: 'NCSC guidance recommends network segmentation as a key defence for critical national infrastructure.' }
         ]
     },
@@ -859,7 +972,7 @@ export const LEVELS = [
         id: 7,
         name: 'Financial Services',
         description: 'Defend banking systems and payment infrastructure. Compliance with PCI-DSS is critical.',
-        scenario: 'A major financial services firm processes millions of transactions daily. They hold customer account data, payment card information, and trading records. Attackers are financially motivated and highly skilled. You must implement PCI-DSS compliant defenses and prepare incident response procedures.',
+        scenario: 'A major financial services firm processes millions of transactions daily. They hold customer account data, payment card information, and trading records. Attackers are financially motivated and highly skilled. You must implement PCI-DSS compliant defences and prepare incident response procedures.',
         difficulty: 7,
         startingBudget: 8500,
         availableTowers: ['firewall', 'antivirus', 'emailFilter', 'encryption', 'ids', 'accessControl', 'backup', 'training', 'patchMgmt', 'proxyNode', 'quarantine', 'segmentation'],
@@ -878,8 +991,14 @@ export const LEVELS = [
                 { x: 13, y: 8 }, { x: 13, y: 11 }, { x: 19, y: 11 }
             ]
         ],
+        insiderSpawnPoints: [{ x: 5, y: 1 }, { x: 11, y: 4 }, { x: 4, y: 6 }, { x: 9, y: 9 }, { x: 6, y: 11 }],
+        objectives: [
+            { type: 'noRansomwareBreach' },
+            { type: 'healthPercent', target: 75 },
+            { type: 'quizCorrect', target: 2 }
+        ],
         assets: [
-            { x: 19, y: 1, name: 'Transaction Database', type: 'database', health: 120 },
+            { x: 19, y: 1, name: 'Transaction Database', type: 'database', health: 120, critical: true },
             { x: 19, y: 9, name: 'ATM Network', type: 'server', health: 100 },
             { x: 19, y: 11, name: 'Trading Platform', type: 'server', health: 90 }
         ],
@@ -939,11 +1058,17 @@ export const LEVELS = [
                 { x: 13, y: 9 }, { x: 13, y: 11 }, { x: 19, y: 11 }
             ]
         ],
+        insiderSpawnPoints: [{ x: 4, y: 2 }, { x: 3, y: 4 }, { x: 8, y: 6 }, { x: 5, y: 8 }, { x: 7, y: 11 }],
+        objectives: [
+            { type: 'noRansomwareBreach' },
+            { type: 'healthPercent', target: 75 },
+            { type: 'quizCorrect', target: 2 }
+        ],
         assets: [
             { x: 19, y: 0, name: 'Cloud Storage', type: 'database', health: 110 },
             { x: 19, y: 6, name: 'API Gateway', type: 'server', health: 100 },
             { x: 19, y: 8, name: 'Customer VMs', type: 'server', health: 100 },
-            { x: 19, y: 11, name: 'Admin Console', type: 'database', health: 80 }
+            { x: 19, y: 11, name: 'Admin Console', type: 'database', health: 80, critical: true }
         ],
         waves: [
             { threats: [{ type: 'sqlInjection', count: 8, interval: 1000, path: 1 }, { type: 'phishing', count: 10, interval: 600, path: 0 }, { type: 'malware', count: 5, interval: 1500, path: 2 }] },
@@ -1001,25 +1126,31 @@ export const LEVELS = [
                 { x: 14, y: 9 }, { x: 14, y: 11 }, { x: 19, y: 11 }
             ]
         ],
+        insiderSpawnPoints: [{ x: 3, y: 3 }, { x: 7, y: 0 }, { x: 5, y: 7 }, { x: 9, y: 10 }, { x: 6, y: 9 }],
+        objectives: [
+            { type: 'noRansomwareBreach' },
+            { type: 'healthPercent', target: 75 },
+            { type: 'quizCorrect', target: 2 }
+        ],
         assets: [
-            { x: 19, y: 3, name: 'Intelligence Database', type: 'database', health: 130 },
+            { x: 19, y: 3, name: 'Intelligence Database', type: 'database', health: 130, critical: true },
             { x: 19, y: 5, name: 'Secure Comms Network', type: 'server', health: 110 },
             { x: 19, y: 10, name: 'Threat Alert System', type: 'server', health: 100 },
             { x: 19, y: 11, name: 'Research Laboratory', type: 'server', health: 90 }
         ],
         waves: [
-            // Wave 1: Reconnaissance phase - sniffers and phishing probes
-            { threats: [{ type: 'sniffer', count: 4, interval: 2500, path: 0 }, { type: 'phishing', count: 12, interval: 500, path: 1 }, { type: 'malware', count: 6, interval: 1200, path: 2 }, { type: 'ddos', count: 10, interval: 500, path: 3 }] },
-            // Wave 2: Weaponisation - exploits delivered via multiple vectors
-            { threats: [{ type: 'trojan', count: 6, interval: 1200, path: 0 }, { type: 'sqlInjection', count: 8, interval: 900, path: 1 }, { type: 'zeroDay', count: 4, interval: 2000, path: 2 }, { type: 'insider', count: 3, interval: 2500, path: 3 }], synergy: 'coverFire' },
-            // Wave 3: Exploitation - credential breach + sniffer intelligence
-            { threats: [{ type: 'sniffer', count: 3, interval: 3000, path: 0 }, { type: 'phishing', count: 15, interval: 400, path: 0 }, { type: 'ransomware', count: 6, interval: 1500, path: 1 }, { type: 'ddos', count: 20, interval: 200, path: 2 }, { type: 'malware', count: 8, interval: 800, path: 3 }], synergy: 'credentialBreach' },
-            // Wave 4: Installation and C2 - persistent threats
-            { threats: [{ type: 'trojan', count: 8, interval: 1000, path: 0 }, { type: 'sniffer', count: 3, interval: 3500, path: 1 }, { type: 'zeroDay', count: 6, interval: 1500, path: 1 }, { type: 'ransomware', count: 6, interval: 1200, path: 2 }, { type: 'insider', count: 5, interval: 1500, path: 3 }, { type: 'malware', count: 10, interval: 700, path: 0 }] },
-            // Wave 5: Actions on objectives - full APT assault
-            { threats: [{ type: 'sniffer', count: 4, interval: 2500, path: 0 }, { type: 'ddos', count: 25, interval: 180, path: 1 }, { type: 'phishing', count: 15, interval: 350, path: 0 }, { type: 'ransomware', count: 8, interval: 1000, path: 2 }, { type: 'zeroDay', count: 8, interval: 1200, path: 3 }, { type: 'trojan', count: 6, interval: 1200, path: 1 }] },
-            // Wave 6: Exfiltration attempt - massive coordinated final push
-            { threats: [{ type: 'sniffer', count: 4, interval: 2000, path: 0 }, { type: 'insider', count: 6, interval: 1200, path: 0 }, { type: 'ddos', count: 30, interval: 150, path: 1 }, { type: 'ransomware', count: 8, interval: 900, path: 2 }, { type: 'zeroDay', count: 8, interval: 1000, path: 3 }, { type: 'malware', count: 12, interval: 600, path: 1 }, { type: 'sqlInjection', count: 8, interval: 800, path: 3 }] }
+            // Wave 1: Reconnaissance - lighter probe, decision: where to place first towers
+            { threats: [{ type: 'sniffer', count: 3, interval: 2800, path: 0 }, { type: 'phishing', count: 9, interval: 600, path: 1 }, { type: 'malware', count: 5, interval: 1400, path: 2 }, { type: 'ddos', count: 8, interval: 600, path: 3 }] },
+            // Wave 2: Weaponisation - cover fire spike, fewer but tankier (elite)
+            { threats: [{ type: 'trojan', count: 5, interval: 1400, path: 0 }, { type: 'sqlInjection', count: 6, interval: 1100, path: 1 }, { type: 'zeroDay', count: 3, interval: 2400, path: 2 }, { type: 'insider', count: 2, interval: 3000, path: 3 }], synergy: 'coverFire', hpMult: 1.2 },
+            // Wave 3: Exploitation - credential breach spike, reduced volume
+            { threats: [{ type: 'sniffer', count: 2, interval: 3500, path: 0 }, { type: 'phishing', count: 10, interval: 500, path: 0 }, { type: 'ransomware', count: 4, interval: 1800, path: 1 }, { type: 'ddos', count: 14, interval: 280, path: 2 }, { type: 'malware', count: 6, interval: 1000, path: 3 }], synergy: 'credentialBreach', hpMult: 1.15 },
+            // Wave 4: Installation and C2 - synergy spike, elite persistence
+            { threats: [{ type: 'trojan', count: 6, interval: 1200, path: 0 }, { type: 'sniffer', count: 2, interval: 4000, path: 1 }, { type: 'zeroDay', count: 4, interval: 1800, path: 1 }, { type: 'ransomware', count: 4, interval: 1500, path: 2 }, { type: 'insider', count: 4, interval: 1800, path: 3 }, { type: 'malware', count: 7, interval: 900, path: 0 }], synergy: 'coverFire', hpMult: 1.2 },
+            // Wave 5: Actions on objectives - decision spike, prioritise synergies
+            { threats: [{ type: 'sniffer', count: 3, interval: 2800, path: 0 }, { type: 'ddos', count: 18, interval: 220, path: 1 }, { type: 'phishing', count: 10, interval: 450, path: 0 }, { type: 'ransomware', count: 6, interval: 1200, path: 2 }, { type: 'zeroDay', count: 6, interval: 1400, path: 3 }, { type: 'trojan', count: 5, interval: 1400, path: 1 }], synergy: 'credentialBreach', hpMult: 1.2 },
+            // Wave 6: Exfiltration - final spike, fewer units but elite HP
+            { threats: [{ type: 'sniffer', count: 3, interval: 2400, path: 0 }, { type: 'insider', count: 4, interval: 1500, path: 0 }, { type: 'ddos', count: 22, interval: 200, path: 1 }, { type: 'ransomware', count: 6, interval: 1100, path: 2 }, { type: 'zeroDay', count: 6, interval: 1200, path: 3 }, { type: 'malware', count: 9, interval: 700, path: 1 }, { type: 'sqlInjection', count: 6, interval: 1000, path: 3 }], synergy: 'coverFire', hpMult: 1.25 }
         ],
         learningSummary: {
             title: 'Advanced Persistent Threats & the Cyber Kill Chain',
@@ -1028,7 +1159,7 @@ export const LEVELS = [
                 'The Cyber Kill Chain has 7 stages: Reconnaissance, Weaponisation, Delivery, Exploitation, Installation, Command & Control, Actions on Objectives.',
                 'Defending at each kill chain stage provides multiple opportunities to detect and stop attacks.',
                 'Threat intelligence sharing between organisations improves collective defence.',
-                'Zero-day exploits require defense-in-depth since signature-based detection fails.',
+                'Zero-day exploits require defence-in-depth since signature-based detection fails.',
                 'Incident response must include forensic analysis to understand the full scope of compromise.'
             ],
             legislation: 'National security systems are governed by the Official Secrets Act 1989, NIS Regulations 2018, GDPR, and sector-specific classified information handling procedures. The NCSC provides guidance under the Cyber Assessment Framework (CAF).'
@@ -1070,27 +1201,33 @@ export const LEVELS = [
                 { x: 16, y: 9 }, { x: 19, y: 9 }
             ]
         ],
+        insiderSpawnPoints: [{ x: 2, y: 2 }, { x: 6, y: 0 }, { x: 4, y: 6 }, { x: 7, y: 10 }, { x: 5, y: 9 }],
+        objectives: [
+            { type: 'noRansomwareBreach' },
+            { type: 'healthPercent', target: 80 },
+            { type: 'quizCorrect', target: 3 }
+        ],
         assets: [
             { x: 19, y: 0, name: 'Satellite Uplink', type: 'server', health: 120 },
-            { x: 19, y: 6, name: 'Command Centre', type: 'database', health: 130 },
+            { x: 19, y: 6, name: 'Command Centre', type: 'database', health: 130, critical: true },
             { x: 19, y: 10, name: 'Defence Grid', type: 'server', health: 110 },
             { x: 19, y: 9, name: 'Intel Hub', type: 'database', health: 100 }
         ],
         waves: [
-            // Wave 1: Probing attacks across all paths
-            { threats: [{ type: 'phishing', count: 15, interval: 400, path: 0 }, { type: 'malware', count: 8, interval: 900, path: 1 }, { type: 'ddos', count: 15, interval: 300, path: 2 }, { type: 'sqlInjection', count: 6, interval: 1200, path: 3 }] },
-            // Wave 2: Coordinated synergy assault - cover fire + sniffer
-            { threats: [{ type: 'ddos', count: 25, interval: 200, path: 0 }, { type: 'sniffer', count: 3, interval: 3000, path: 1 }, { type: 'malware', count: 8, interval: 800, path: 1 }, { type: 'trojan', count: 6, interval: 1200, path: 2 }, { type: 'insider', count: 4, interval: 2000, path: 3 }], synergy: 'coverFire' },
-            // Wave 3: Credential breach + zero-day combo
-            { threats: [{ type: 'phishing', count: 15, interval: 350, path: 0 }, { type: 'ransomware', count: 8, interval: 1200, path: 0 }, { type: 'sniffer', count: 3, interval: 2500, path: 1 }, { type: 'zeroDay', count: 6, interval: 1500, path: 2 }, { type: 'sqlInjection', count: 8, interval: 800, path: 3 }], synergy: 'credentialBreach' },
-            // Wave 4: All synergies active across all paths
-            { threats: [{ type: 'sniffer', count: 4, interval: 2000, path: 0 }, { type: 'ddos', count: 20, interval: 200, path: 1 }, { type: 'phishing', count: 12, interval: 400, path: 0 }, { type: 'ransomware', count: 6, interval: 1200, path: 2 }, { type: 'malware', count: 10, interval: 600, path: 1 }, { type: 'insider', count: 5, interval: 1500, path: 3 }, { type: 'zeroDay', count: 5, interval: 1500, path: 3 }] },
-            // Wave 5: Overwhelming force on every front
-            { threats: [{ type: 'sniffer', count: 4, interval: 2500, path: 0 }, { type: 'ddos', count: 30, interval: 150, path: 0 }, { type: 'ransomware', count: 8, interval: 900, path: 1 }, { type: 'zeroDay', count: 8, interval: 1000, path: 2 }, { type: 'trojan', count: 8, interval: 900, path: 1 }, { type: 'insider', count: 6, interval: 1200, path: 3 }, { type: 'sqlInjection', count: 8, interval: 800, path: 2 }] },
-            // Wave 6: Apocalypse wave - every threat type at maximum intensity
-            { threats: [{ type: 'sniffer', count: 5, interval: 2000, path: 0 }, { type: 'phishing', count: 20, interval: 300, path: 0 }, { type: 'ransomware', count: 10, interval: 800, path: 1 }, { type: 'ddos', count: 30, interval: 150, path: 1 }, { type: 'zeroDay', count: 10, interval: 900, path: 2 }, { type: 'malware', count: 15, interval: 500, path: 2 }, { type: 'insider', count: 8, interval: 1000, path: 3 }, { type: 'trojan', count: 8, interval: 900, path: 3 }, { type: 'sqlInjection', count: 10, interval: 700, path: 3 }] },
-            // Wave 7: The Final Stand - impossible without mastery
-            { threats: [{ type: 'sniffer', count: 5, interval: 1500, path: 0 }, { type: 'ddos', count: 35, interval: 120, path: 0 }, { type: 'phishing', count: 20, interval: 250, path: 1 }, { type: 'ransomware', count: 12, interval: 700, path: 1 }, { type: 'zeroDay', count: 12, interval: 800, path: 2 }, { type: 'insider', count: 8, interval: 900, path: 2 }, { type: 'malware', count: 15, interval: 400, path: 3 }, { type: 'trojan', count: 10, interval: 700, path: 3 }, { type: 'sqlInjection', count: 10, interval: 600, path: 0 }] }
+            // Wave 1: Probing - lighter opener, decision spike on placement
+            { threats: [{ type: 'phishing', count: 11, interval: 500, path: 0 }, { type: 'malware', count: 6, interval: 1100, path: 1 }, { type: 'ddos', count: 12, interval: 380, path: 2 }, { type: 'sqlInjection', count: 5, interval: 1500, path: 3 }] },
+            // Wave 2: Cover fire synergy spike - fewer units, clearer decision
+            { threats: [{ type: 'ddos', count: 18, interval: 260, path: 0 }, { type: 'sniffer', count: 3, interval: 3500, path: 1 }, { type: 'malware', count: 6, interval: 1000, path: 1 }, { type: 'trojan', count: 5, interval: 1400, path: 2 }, { type: 'insider', count: 3, interval: 2400, path: 3 }], synergy: 'coverFire', hpMult: 1.15 },
+            // Wave 3: Credential breach spike - elite HP, prioritise phishing/ransomware
+            { threats: [{ type: 'phishing', count: 11, interval: 450, path: 0 }, { type: 'ransomware', count: 6, interval: 1400, path: 0 }, { type: 'sniffer', count: 2, interval: 3000, path: 1 }, { type: 'zeroDay', count: 5, interval: 1800, path: 2 }, { type: 'sqlInjection', count: 6, interval: 1000, path: 3 }], synergy: 'credentialBreach', hpMult: 1.2 },
+            // Wave 4: Multi-path pressure - synergy wave, reduced volume
+            { threats: [{ type: 'sniffer', count: 3, interval: 2400, path: 0 }, { type: 'ddos', count: 16, interval: 260, path: 1 }, { type: 'phishing', count: 9, interval: 500, path: 0 }, { type: 'ransomware', count: 5, interval: 1400, path: 2 }, { type: 'malware', count: 8, interval: 700, path: 1 }, { type: 'insider', count: 4, interval: 1800, path: 3 }, { type: 'zeroDay', count: 4, interval: 1800, path: 3 }], synergy: 'coverFire' },
+            // Wave 5: Decision spike - cover fire + credential mix, elite
+            { threats: [{ type: 'sniffer', count: 3, interval: 2800, path: 0 }, { type: 'ddos', count: 22, interval: 200, path: 0 }, { type: 'ransomware', count: 6, interval: 1100, path: 1 }, { type: 'zeroDay', count: 6, interval: 1200, path: 2 }, { type: 'trojan', count: 6, interval: 1100, path: 1 }, { type: 'insider', count: 5, interval: 1400, path: 3 }, { type: 'sqlInjection', count: 6, interval: 1000, path: 2 }], synergy: 'credentialBreach', hpMult: 1.2 },
+            // Wave 6: Apocalypse - every type but reduced count, synergy spike
+            { threats: [{ type: 'sniffer', count: 4, interval: 2400, path: 0 }, { type: 'phishing', count: 14, interval: 400, path: 0 }, { type: 'ransomware', count: 7, interval: 1000, path: 1 }, { type: 'ddos', count: 22, interval: 200, path: 1 }, { type: 'zeroDay', count: 8, interval: 1100, path: 2 }, { type: 'malware', count: 11, interval: 600, path: 2 }, { type: 'insider', count: 5, interval: 1200, path: 3 }, { type: 'trojan', count: 6, interval: 1100, path: 3 }, { type: 'sqlInjection', count: 7, interval: 900, path: 3 }], synergy: 'coverFire', hpMult: 1.15 },
+            // Wave 7: Final Stand - fewer units, elite HP, decision spike
+            { threats: [{ type: 'sniffer', count: 4, interval: 2000, path: 0 }, { type: 'ddos', count: 26, interval: 160, path: 0 }, { type: 'phishing', count: 14, interval: 320, path: 1 }, { type: 'ransomware', count: 9, interval: 900, path: 1 }, { type: 'zeroDay', count: 9, interval: 1000, path: 2 }, { type: 'insider', count: 6, interval: 1100, path: 2 }, { type: 'malware', count: 11, interval: 500, path: 3 }, { type: 'trojan', count: 8, interval: 900, path: 3 }, { type: 'sqlInjection', count: 8, interval: 800, path: 0 }], synergy: 'credentialBreach', hpMult: 1.25 }
         ],
         learningSummary: {
             title: 'Comprehensive Cyber Defence Mastery',
@@ -1127,7 +1264,7 @@ export const ENCYCLOPEDIA = {
             }
         }))
     },
-    defenses: {
+    defences: {
         title: 'Security Controls',
         entries: Object.entries(TOWER_TYPES).map(([key, t]) => ({
             id: key,
@@ -1199,14 +1336,14 @@ export function getEncyclopediaEntryCount() {
 
 function getPreventionText(threatType) {
     const preventions = {
-        phishing: 'Email filters, security training, and multi-factor authentication are key defenses against phishing.',
+        phishing: 'Email filters, security training, and multi-factor authentication are key defences against phishing.',
         malware: 'Antivirus software, firewalls, and regular system updates help prevent malware infections.',
-        ransomware: 'Regular backups, email filtering, and user training are the best defenses. Never pay the ransom.',
+        ransomware: 'Regular backups, email filtering, and user training are the best defences. Never pay the ransom.',
         ddos: 'IDS/IPS systems, firewalls, and traffic analysis can detect and mitigate DDoS attacks.',
         sqlInjection: 'Input validation, parameterized queries, patch management, and web application firewalls prevent SQL injection.',
         trojan: 'Antivirus software, access controls, and user training help detect and prevent trojans.',
         insider: 'Access controls, user monitoring, security training, and the principle of least privilege reduce insider threat risk.',
-        zeroDay: 'Patch management, AI-based detection, IDS/IPS, and defense in depth provide the best protection against zero-days.',
+        zeroDay: 'Patch management, AI-based detection, IDS/IPS, and defence in depth provide the best protection against zero-days.',
         sniffer: 'IDS/IPS systems detect packet capture activity. Encryption limits what sniffers can read. Network segmentation restricts lateral movement.'
     };
     return preventions[threatType] || '';
@@ -1282,13 +1419,13 @@ export const QUIZ_QUESTIONS = {
             question: 'An insider threat is particularly dangerous because:',
             options: [
                 'A) Insiders have weaker passwords than external attackers',
-                'B) Insiders already have authorised access, bypassing perimeter defenses like firewalls',
+                'B) Insiders already have authorised access, bypassing perimeter defences like firewalls',
                 'C) Insider threats only happen in large organisations',
                 'D) Antivirus software is designed to detect insider activity'
             ],
             correct: 1,
             explanation: 'Insiders (employees, contractors) already have legitimate network access. They bypass firewalls and perimeter controls because they are already inside the network. This makes detection harder.',
-            remediation: 'Insider threats are not about weak passwords — they exploit existing legitimate access. They occur in organisations of all sizes. Antivirus detects malware, not suspicious user behaviour. Access control, monitoring (IDS), and the principle of least privilege are the primary defenses.',
+            remediation: 'Insider threats are not about weak passwords — they exploit existing legitimate access. They occur in organisations of all sizes. Antivirus detects malware, not suspicious user behaviour. Access control, monitoring (IDS), and the principle of least privilege are the primary defences.',
             specRef: 'D1',
             source: 'Verizon DBIR, 2023'
         },
@@ -1302,7 +1439,7 @@ export const QUIZ_QUESTIONS = {
             ],
             correct: 1,
             explanation: 'Ransomware encrypts critical business files and demands payment (usually in cryptocurrency) for the decryption key. Without backups, the business faces permanent data loss or paying the ransom with no guarantee of recovery.',
-            remediation: 'Ransomware targets servers, shared drives, and databases — not just personal PCs. Restarting does not decrypt files. It targets the most valuable data. The only reliable defense after encryption is having tested, offsite backups (the 3-2-1 rule).',
+            remediation: 'Ransomware targets servers, shared drives, and databases — not just personal PCs. Restarting does not decrypt files. It targets the most valuable data. The only reliable defence after encryption is having tested, offsite backups (the 3-2-1 rule).',
             specRef: 'D1',
             source: 'NCSC Ransomware Guidance, 2023'
         },
@@ -1345,7 +1482,7 @@ export const QUIZ_QUESTIONS = {
             ],
             correct: 1,
             explanation: 'An IDS monitors network traffic for patterns that may indicate an attack and raises alerts. An IPS goes further by automatically blocking detected threats.',
-            remediation: 'Key distinction: IDS detects and alerts (passive), while IPS detects and blocks (active). Neither replaces a firewall — they work alongside firewalls as part of defense in depth. IDS cannot encrypt data; that is the role of encryption protocols.',
+            remediation: 'Key distinction: IDS detects and alerts (passive), while IPS detects and blocks (active). Neither replaces a firewall — they work alongside firewalls as part of defence in depth. IDS cannot encrypt data; that is the role of encryption protocols.',
             specRef: 'D2',
             source: 'NIST SP 800-94, 2007 (revised 2012)'
         },
@@ -1383,12 +1520,12 @@ export const QUIZ_QUESTIONS = {
             question: 'Which security principle involves using multiple layers of different security controls?',
             options: [
                 'A) Least privilege — giving users minimal access',
-                'B) Defense in depth — layering controls so one failure doesn\'t compromise everything',
+                'B) Defence in depth — layering controls so one failure doesn\'t compromise everything',
                 'C) Security by obscurity — hiding systems from attackers',
                 'D) Single sign-on — one password for all systems'
             ],
             correct: 1,
-            explanation: 'Defense in depth layers multiple controls (firewalls, IDS, encryption, training, backups) so that if one fails, others still provide protection.',
+            explanation: 'Defence in depth layers multiple controls (firewalls, IDS, encryption, training, backups) so that if one fails, others still provide protection.',
             remediation: 'Least privilege limits user permissions (important, but a single control). Security by obscurity is considered a weak strategy because it relies on secrecy rather than strength. Single sign-on is an authentication convenience, not a security layering approach.',
             specRef: 'D4',
             source: 'NCSC 10 Steps to Cyber Security, 2021'
@@ -1464,7 +1601,7 @@ export const QUIZ_QUESTIONS = {
                 'D) Firewalls block all traffic, including legitimate users'
             ],
             correct: 1,
-            explanation: 'Phishing emails travel through legitimate email channels. Firewalls allow normal email traffic, so phishing passes straight through. This is why defense in depth (multiple layers) is essential.',
+            explanation: 'Phishing emails travel through legitimate email channels. Firewalls allow normal email traffic, so phishing passes straight through. This is why defence in depth (multiple layers) is essential.',
             remediation: 'Firewalls are NOT outdated — they are essential for network security. But they operate at the network level and cannot analyse email content for social engineering. This demonstrates a core D4 principle: no single control protects against all threats.',
             specRef: 'D4',
             source: 'NCSC 10 Steps to Cyber Security, 2021'
@@ -2034,7 +2171,7 @@ export const QUIZ_QUESTIONS = {
             source: 'NAO Investigation: WannaCry, Oct 2017'
         },
         {
-            question: 'Which security control is the LAST line of defense against ransomware — allowing recovery even if all other controls fail?',
+            question: 'Which security control is the LAST line of defence against ransomware — allowing recovery even if all other controls fail?',
             options: [
                 'A) A firewall with stricter rules',
                 'B) Antivirus with the latest signatures',
@@ -2076,7 +2213,7 @@ export const QUIZ_QUESTIONS = {
             source: 'Department of Health & Social Care, 2018'
         },
         {
-            question: 'Defense in depth in a healthcare setting means:',
+            question: 'Defence in depth in a healthcare setting means:',
             options: [
                 'A) Installing the most expensive single security product',
                 'B) Layering firewalls, antivirus, IDS, encryption, access control, backups and training together',
@@ -2084,8 +2221,8 @@ export const QUIZ_QUESTIONS = {
                 'D) Using one very strong password for all systems'
             ],
             correct: 1,
-            explanation: 'Defense in depth combines multiple overlapping controls at different levels. If ransomware bypasses the email filter and antivirus, encryption protects data, backups enable recovery, and training may have caught the phishing email.',
-            remediation: 'No single product — however expensive — can stop all threats. Using one password for all systems is a critical vulnerability, not a defense. Restricting access to doctors only would prevent the hospital from functioning. True defense in depth uses diverse, overlapping controls.',
+            explanation: 'Defence in depth combines multiple overlapping controls at different levels. If ransomware bypasses the email filter and antivirus, encryption protects data, backups enable recovery, and training may have caught the phishing email.',
+            remediation: 'No single product — however expensive — can stop all threats. Using one password for all systems is a critical vulnerability, not a defence. Restricting access to doctors only would prevent the hospital from functioning. True defence in depth uses diverse, overlapping controls.',
             specRef: 'D4',
             source: 'NCSC 10 Steps to Cyber Security, 2021'
         },
@@ -2358,7 +2495,7 @@ export const QUIZ_QUESTIONS = {
             source: 'NCSC Vulnerability Management Guidance, 2023'
         },
         {
-            question: 'Which combination BEST protects an e-commerce database? Choose the defense-in-depth answer.',
+            question: 'Which combination BEST protects an e-commerce database? Choose the defence-in-depth answer.',
             options: [
                 'A) A single next-generation firewall',
                 'B) Encryption + input validation + IDS/IPS + access control + regular patching',
@@ -2366,8 +2503,8 @@ export const QUIZ_QUESTIONS = {
                 'D) Moving the database to a different country'
             ],
             correct: 1,
-            explanation: 'Defense in depth layers: encryption (protects stored data), input validation (prevents SQL injection), IDS/IPS (detects attacks), access control (limits who reaches the database), and patching (fixes known vulnerabilities).',
-            remediation: 'A single firewall, however advanced, is one point of failure. Password rotation alone doesn\'t address SQL injection, unpatched vulnerabilities, or lack of encryption. Moving data to another country doesn\'t improve security — it just changes jurisdiction. True defense in depth uses multiple different control types together.',
+            explanation: 'Defence in depth layers: encryption (protects stored data), input validation (prevents SQL injection), IDS/IPS (detects attacks), access control (limits who reaches the database), and patching (fixes known vulnerabilities).',
+            remediation: 'A single firewall, however advanced, is one point of failure. Password rotation alone doesn\'t address SQL injection, unpatched vulnerabilities, or lack of encryption. Moving data to another country doesn\'t improve security — it just changes jurisdiction. True defence in depth uses multiple different control types together.',
             specRef: 'D4',
             source: 'NCSC 10 Steps to Cyber Security, 2021'
         },
@@ -2649,7 +2786,7 @@ export const QUIZ_QUESTIONS = {
             ],
             correct: 1,
             explanation: 'Firewalls and encryption stop technical attacks, but policies govern how staff handle data, respond to incidents, and follow security procedures. Effective security requires both.',
-            remediation: 'A firewall cannot teach an employee not to share passwords. A policy cannot block a DDoS attack. Technical controls and organisational measures address different threat vectors. This is the essence of defense in depth — combining technological, procedural, and human elements.',
+            remediation: 'A firewall cannot teach an employee not to share passwords. A policy cannot block a DDoS attack. Technical controls and organisational measures address different threat vectors. This is the essence of defence in depth — combining technological, procedural, and human elements.',
             specRef: 'D4',
             source: 'NCSC Cyber Assessment Framework, 2022'
         },
@@ -2894,16 +3031,16 @@ export const QUIZ_QUESTIONS = {
             source: 'ICS-CERT Alert, SANS ICS Analysis, 2016'
         },
         {
-            question: 'Defense in depth means:',
+            question: 'Defence in depth means:',
             options: [
                 'A) Investing all budget in the single strongest control available',
                 'B) Multiple overlapping security layers at different levels, so that if one fails, others still provide protection',
                 'C) Using as many copies of the same security product as possible',
-                'D) Focusing all resources on perimeter defense'
+                'D) Focusing all resources on perimeter defence'
             ],
             correct: 1,
-            explanation: 'Defense in depth layers diverse controls: perimeter (firewalls), detection (IDS/IPS), prevention (antivirus, email filters), access (authentication), protection (encryption, backups), and people (training).',
-            remediation: 'Duplicating the same product is NOT defense in depth — it creates the same blind spots multiple times. Perimeter-only defense fails when threats bypass the perimeter (e.g. phishing). True defense in depth uses diverse, complementary controls at multiple layers.',
+            explanation: 'Defence in depth layers diverse controls: perimeter (firewalls), detection (IDS/IPS), prevention (antivirus, email filters), access (authentication), protection (encryption, backups), and people (training).',
+            remediation: 'Duplicating the same product is NOT defence in depth — it creates the same blind spots multiple times. Perimeter-only defence fails when threats bypass the perimeter (e.g. phishing). True defence in depth uses diverse, complementary controls at multiple layers.',
             specRef: 'D4',
             source: 'NCSC 10 Steps to Cyber Security, 2021'
         },
@@ -3199,7 +3336,7 @@ export const QUIZ_QUESTIONS = {
             ],
             correct: 1,
             explanation: 'Segmentation creates zones so that a breach in one area (e.g. a contractor\'s access) cannot easily reach the payment system. The Target breach succeeded partly because the attacker moved laterally from a non-segmented HVAC contractor connection to the payment network.',
-            remediation: 'Segmentation is a PCI-DSS requirement for any organisation handling card data. It works alongside firewalls, encryption, and access control — it does not replace them. Defense in depth requires multiple controls.',
+            remediation: 'Segmentation is a PCI-DSS requirement for any organisation handling card data. It works alongside firewalls, encryption, and access control — it does not replace them. Defence in depth requires multiple controls.',
             specRef: 'D2, D4',
             source: 'PCI-DSS Requirement 1; NCSC Network Segmentation Guidance'
         },
@@ -3512,6 +3649,244 @@ export const QUIZ_QUESTIONS = {
             remediation: 'Data stored in the cloud remains subject to the Data Protection Act 2018 and GDPR. Controllers must choose processors and regions that meet legal requirements and document data flows.',
             specRef: 'D3',
             source: 'GDPR Chapter V; ICO International Transfers Guidance'
+        },
+        {
+            question: 'Who is responsible for securing the customer\'s data and applications in the cloud shared responsibility model?',
+            options: [
+                'A) Only the cloud provider',
+                'B) The customer is responsible for their data, identity, access, and application security; the provider for the underlying infrastructure',
+                'C) Only the customer',
+                'D) No one — the cloud is inherently secure'
+            ],
+            correct: 1,
+            explanation: 'The customer secures their data, access, applications, and configuration. The provider secures the physical infrastructure, hypervisor, and core services. Misunderstanding this leads to gaps.',
+            remediation: 'D2/D4: Know your responsibilities — identity, encryption, config, patching. D3: Data protection obligations remain with the controller.',
+            specRef: 'D2',
+            source: 'NCSC Cloud Security; AWS/CSP shared responsibility'
+        },
+        {
+            question: 'Why is identity and access management (IAM) critical in the cloud?',
+            options: [
+                'A) Only for large organisations',
+                'B) Cloud services are accessed over the internet; strong IAM (MFA, least privilege, centralised identity) prevents unauthorised access to data and systems',
+                'C) IAM is the cloud provider\'s responsibility only',
+                'D) Passwords are enough'
+            ],
+            correct: 1,
+            explanation: 'Cloud resources are internet-accessible. Compromised credentials can expose data and systems at scale. IAM with MFA and least privilege is a primary control.',
+            remediation: 'D2: IAM, MFA, least privilege. D1: Credential theft. D4: Identity as a control layer.',
+            specRef: 'D2',
+            source: 'NCSC Cloud; CIS Cloud Benchmarks'
+        },
+        {
+            question: 'What should a customer do before storing personal data in a cloud service?',
+            options: [
+                'A) Nothing — the provider handles compliance',
+                'B) Ensure a compliant contract (DPA/processor terms), know where data is processed, and that security measures are appropriate (GDPR Article 28)',
+                'C) Only encrypt the data',
+                'D) Only notify the ICO'
+            ],
+            correct: 1,
+            explanation: 'Under GDPR, the controller must use processors that provide sufficient guarantees and have a contract meeting Article 28. Data location and sub-processors must be known and documented.',
+            remediation: 'D3: Processor contracts, Article 28, international transfers. D2: Contract should specify security and breach notification.',
+            specRef: 'D3',
+            source: 'GDPR Article 28'
+        },
+        {
+            question: 'Why might misconfiguration of cloud storage (e.g. S3 buckets) cause a data breach?',
+            options: [
+                'A) Buckets are always private',
+                'B) Default or mistaken "public" settings can expose data to the internet; many breaches are due to misconfiguration, not hacking',
+                'C) Only the provider can change settings',
+                'D) Encryption prevents access'
+            ],
+            correct: 1,
+            explanation: 'Misconfigured storage (e.g. public read access) has led to many real breaches. Configuration is the customer\'s responsibility in the shared model.',
+            remediation: 'D2: Secure configuration, least privilege, auditing. D1: Threat of exposure. D4: Configuration as a control layer.',
+            specRef: 'D2',
+            source: 'NCSC Cloud; numerous S3 breach reports'
+        },
+        {
+            question: 'What is defence in depth in a cloud context?',
+            options: [
+                'A) Using only one cloud provider',
+                'B) Layering controls: identity, network segmentation, encryption, monitoring, and secure configuration so that failure of one does not mean full compromise',
+                'C) Only using a firewall',
+                'D) Relying on the provider for everything'
+            ],
+            correct: 1,
+            explanation: 'Defence in depth means multiple layers (identity, network, data, monitoring). In the cloud, this includes IAM, VPC/network design, encryption, and logging.',
+            remediation: 'D4: Apply defence in depth across your responsibility boundary. D2: Multiple control types.',
+            specRef: 'D4',
+            source: 'NCSC Cloud Security'
+        },
+        {
+            question: 'Why should cloud backup and recovery procedures be tested regularly?',
+            options: [
+                'A) Backups in the cloud never fail',
+                'B) Configuration changes and provider issues can affect recovery; testing ensures you can actually restore when needed',
+                'C) Only once when first set up',
+                'D) The provider tests for you'
+            ],
+            correct: 1,
+            explanation: 'Backup and restore can fail due to misconfiguration, region issues, or retention mistakes. Regular testing validates that recovery works and meets RTO/RPO.',
+            remediation: 'D5: Business continuity. D2: Backup as a control. Test restores and document results.',
+            specRef: 'D5',
+            source: 'NCSC Cloud; BCP best practice'
+        },
+        {
+            question: 'What does "encryption at rest" in the cloud typically mean for the customer?',
+            options: [
+                'A) Only the provider can enable it',
+                'B) Data stored in cloud services (e.g. disks, databases) is encrypted; the customer may need to enable it and manage keys',
+                'C) Data is only encrypted in transit',
+                'D) It is not available in the cloud'
+            ],
+            correct: 1,
+            explanation: 'Encryption at rest protects data on storage. Many cloud services offer it; the customer must enable it and decide on key management (provider-managed vs customer-managed keys).',
+            remediation: 'D2: Encryption. D3: Appropriate security for personal data. Key management is part of the customer\'s responsibility.',
+            specRef: 'D2',
+            source: 'NCSC Cloud; CSP documentation'
+        },
+        {
+            question: 'Why is logging and monitoring important when using cloud services?',
+            options: [
+                'A) Only for compliance reports',
+                'B) To detect misuse, unauthorised access, and misconfiguration; supports incident response and accountability',
+                'C) The provider monitors everything',
+                'D) Logs are not available'
+            ],
+            correct: 1,
+            explanation: 'Customer must enable and protect logs (access, config changes, data access). Logs support detection, investigation, and compliance. Provider logs may not cover customer-side activity.',
+            remediation: 'D2: Monitoring. D5: Incident response. D3: Accountability and evidence.',
+            specRef: 'D5',
+            source: 'NCSC Cloud; NIST SP 800-61'
+        },
+        {
+            question: 'Supply chain risk in the cloud includes:',
+            options: [
+                'A) Only the physical hardware',
+                'B) Third-party software (e.g. marketplace images, SaaS integrations), sub-processors, and dependency vulnerabilities that can compromise your data',
+                'C) Only the main cloud provider',
+                'D) There is no supply chain risk'
+            ],
+            correct: 1,
+            explanation: 'Supply chain includes the provider, sub-processors, software you run (e.g. AMIs, containers), and integrations. Compromise of any can affect your security.',
+            remediation: 'D1: Supply chain as threat. D3: Sub-processor and vendor assessment. D4: Assess and monitor the chain.',
+            specRef: 'D1',
+            source: 'NCSC Supply Chain; SolarWinds lessons'
+        },
+        {
+            question: 'Under GDPR, if a cloud processor has a breach affecting your data, who must notify the ICO?',
+            options: [
+                'A) Only the processor',
+                'B) The processor must notify you (the controller) without undue delay; you are responsible for assessing and notifying the ICO within 72 hours if it is a personal data breach',
+                'C) No one',
+                'D) Only if customers complain'
+            ],
+            correct: 1,
+            explanation: 'Processors must notify the controller. The controller decides whether the breach is notifiable and notifies the ICO and data subjects as required.',
+            remediation: 'D3: Processor contract should require prompt breach notification. D5: Your incident response must include processor incidents.',
+            specRef: 'D3',
+            source: 'GDPR Articles 33, 34; Article 28(3)'
+        },
+        {
+            question: 'Why might a cloud customer use a "zero trust" approach?',
+            options: [
+                'A) Zero trust means trusting no cloud provider',
+                'B) Verify every access request (identity, device, context) rather than trusting the network; suits cloud where the "network" is often the internet',
+                'C) It blocks all access',
+                'D) Only for government'
+            ],
+            correct: 1,
+            explanation: 'Zero trust assumes the network may be hostile. Access is granted based on identity and context, not location. This aligns with cloud and remote access.',
+            remediation: 'D2: Identity and access. D4: Defence in depth. Reduces impact of stolen credentials and lateral movement (D1).',
+            specRef: 'D4',
+            source: 'NCSC Zero Trust; NIST'
+        },
+        {
+            question: 'What is the main benefit of segmenting cloud workloads (e.g. using separate VPCs or subscriptions)?',
+            options: [
+                'A) To reduce cost',
+                'B) To limit the blast radius of a compromise — if one workload is breached, others in different segments are not automatically exposed',
+                'C) Only for very large organisations',
+                'D) It replaces the need for firewalls'
+            ],
+            correct: 1,
+            explanation: 'Segmentation isolates workloads. A breach in one segment (e.g. web tier) does not automatically give access to data or admin systems in another.',
+            remediation: 'D4: Defence in depth. D2: Network and access control. D1: Limits lateral movement.',
+            specRef: 'D4',
+            source: 'NCSC Cloud; CIS Benchmarks'
+        },
+        {
+            question: 'When moving data to the cloud, what should the customer do with existing security policies?',
+            options: [
+                'A) Discard them — the cloud is different',
+                'B) Adapt and extend them to cover cloud use: acceptable use, access control, data classification, and incident response for cloud assets',
+                'C) Only the IT team needs policies',
+                'D) The provider\'s policies are sufficient'
+            ],
+            correct: 1,
+            explanation: 'Policies should cover how the organisation uses the cloud: who can use what, how data is classified, how incidents are reported. Provider policies do not replace organisational policy.',
+            remediation: 'D2: Policies and procedures. D3: Accountability. D5: Incident response and BCP in the cloud.',
+            specRef: 'D2',
+            source: 'NCSC Cloud; ISO 27001'
+        },
+        {
+            question: 'Ransomware in a cloud environment can still affect the customer because:',
+            options: [
+                'A) Ransomware cannot run in the cloud',
+                'B) Customer data and workloads (VMs, SaaS data) can be encrypted or deleted by ransomware; backup and recovery remain the customer\'s responsibility',
+                'C) Only on-premises is at risk',
+                'D) The provider pays the ransom'
+            ],
+            correct: 1,
+            explanation: 'Ransomware can encrypt customer data in VMs, sync to cloud storage, or affect SaaS data. Customer must have backup, recovery, and response procedures.',
+            remediation: 'D1: Ransomware. D5: Backup and IR. D2: Backup, access control, and monitoring in the cloud.',
+            specRef: 'D5',
+            source: 'NCSC Ransomware; Cloud Ransomware incidents'
+        },
+        {
+            question: 'What does "right to erasure" (GDPR) mean when data is stored with a cloud provider?',
+            options: [
+                'A) The provider deletes it automatically',
+                'B) As controller, you must be able to ensure deletion of personal data when the right is exercised; your contract and processes must support this',
+                'C) Only for EU citizens',
+                'D) It does not apply to cloud data'
+            ],
+            correct: 1,
+            explanation: 'Data subjects can request erasure in certain circumstances. The controller must have processes (and processor cooperation) to delete or anonymise data across systems, including cloud.',
+            remediation: 'D3: GDPR Article 17. Processor contract should require assistance. D2: Data lifecycle and retention in the cloud.',
+            specRef: 'D3',
+            source: 'GDPR Article 17'
+        },
+        {
+            question: 'Why is patch management still the customer\'s responsibility for many cloud services?',
+            options: [
+                'A) The provider patches everything',
+                'B) The provider patches the platform; the customer is responsible for patching OS, applications, and dependencies in their workloads (e.g. VMs, containers)',
+                'C) Patching is not needed in the cloud',
+                'D) Only for IaaS'
+            ],
+            correct: 1,
+            explanation: 'In IaaS and often PaaS, the customer manages the OS and application stack. Unpatched systems in the cloud are as vulnerable as on-premises.',
+            remediation: 'D2: Patch management. D1: Exploitation of known vulnerabilities. D4: Part of secure configuration.',
+            specRef: 'D2',
+            source: 'NCSC Cloud; Shared responsibility'
+        },
+        {
+            question: 'How can a cloud customer improve resilience against provider outages or region failure?',
+            options: [
+                'A) Rely on a single region',
+                'B) Design for failure: multi-region or multi-provider where critical, tested backup and failover, and clear recovery procedures (RTO/RPO)',
+                'C) Only the provider can do this',
+                'D) Outages never affect customers'
+            ],
+            correct: 1,
+            explanation: 'Provider outages happen. Resilience may require replication, failover, and tested procedures. Business continuity planning should include cloud dependency.',
+            remediation: 'D5: Business continuity. RTO/RPO drive architecture. Test failover and document dependencies.',
+            specRef: 'D5',
+            source: 'NCSC Cloud; BCP'
         }
     ],
     9: [
@@ -3525,7 +3900,7 @@ export const QUIZ_QUESTIONS = {
             ],
             correct: 1,
             explanation: 'APTs use sustained campaigns, custom malware, and the full kill chain. They are typically nation-state or highly organised groups with the resources to develop zero-days and evade detection.',
-            remediation: 'Defense in depth, threat intelligence, and detection at multiple kill chain stages are essential. Signature-based antivirus is insufficient; behavioural detection, segmentation, and incident response are critical.',
+            remediation: 'Defence in depth, threat intelligence, and detection at multiple kill chain stages are essential. Signature-based antivirus is insufficient; behavioural detection, segmentation, and incident response are critical.',
             specRef: 'D1, D4',
             source: 'NCSC APT Guidance; MITRE ATT&CK'
         },
@@ -3584,6 +3959,244 @@ export const QUIZ_QUESTIONS = {
             remediation: 'Wiping without evidence preservation loses forensic value and may miss reinfection. Notification obligations (GDPR, NIS, FCA) often require early reporting. Incident response plans must be tested and include forensics and communication.',
             specRef: 'D5',
             source: 'NIST SP 800-61; NCSC Incident Management'
+        },
+        {
+            question: 'What role does the NCSC play in UK cyber security?',
+            options: [
+                'A) It only advises government',
+                'B) It provides guidance, threat intelligence, and services (e.g. Active Cyber Defence) to help UK organisations protect themselves',
+                'C) It replaces the need for in-house security',
+                'D) It only deals with critical infrastructure'
+            ],
+            correct: 1,
+            explanation: 'The NCSC offers public guidance, alerts, and services to reduce harm from cyber threats. It supports all sectors while having a special role for critical national infrastructure.',
+            remediation: 'D2/D5: Use NCSC guidance and alerts. D3: NCSC supports compliance and resilience. Sign up for alerts and follow recommended controls.',
+            specRef: 'D2',
+            source: 'NCSC About'
+        },
+        {
+            question: 'Why do APT (Advanced Persistent Threat) actors use living-off-the-land techniques?',
+            options: [
+                'A) They prefer simple malware',
+                'B) Using built-in OS and admin tools (e.g. PowerShell, WMI) is harder to detect than custom malware and may bypass whitelisting',
+                'C) They cannot write code',
+                'D) Antivirus always detects them'
+            ],
+            correct: 1,
+            explanation: 'Living-off-the-land uses legitimate tools already on the system. This blends with normal activity and can evade signature-based detection. Detection requires behavioural and log analysis.',
+            remediation: 'D1: APT tactics. D2: EDR, logging, and behavioural detection. D4: Defence in depth and monitoring.',
+            specRef: 'D1',
+            source: 'NCSC APT; MITRE ATT&CK'
+        },
+        {
+            question: 'What is threat intelligence and how can it help an organisation?',
+            options: [
+                'A) Only classified government information',
+                'B) Analysed information about threats (TTPs, IOCs) that can inform detection, response, and risk decisions',
+                'C) It is only for large companies',
+                'D) It replaces the need for firewalls'
+            ],
+            correct: 1,
+            explanation: 'Threat intelligence includes indicators of compromise (IOCs), tactics and techniques (TTPs), and context. It helps prioritise defences and detect known threat activity.',
+            remediation: 'D2: Use intelligence to tune detection and response. D5: Incident response and hunting. D1: Understanding threat actors.',
+            specRef: 'D1',
+            source: 'NCSC Threat Intelligence'
+        },
+        {
+            question: 'Why is credential theft a common objective in APT campaigns?',
+            options: [
+                'A) APTs do not care about credentials',
+                'B) Stolen credentials allow persistent access, lateral movement, and privilege escalation without deploying more malware',
+                'C) Only for financial gain',
+                'D) Passwords are always encrypted'
+            ],
+            correct: 1,
+            explanation: 'APT actors harvest credentials (e.g. via phishing, mimikatz) to move through the network and maintain access. MFA and credential protection are critical.',
+            remediation: 'D1: Credential theft. D2: MFA, credential guard, least privilege, monitoring. D4: Layered identity and access controls.',
+            specRef: 'D1',
+            source: 'MITRE ATT&CK; NCSC'
+        },
+        {
+            question: 'What is "defence in depth" in the context of nation-state or APT threats?',
+            options: [
+                'A) Using only one strong control',
+                'B) Multiple layers (perimeter, network, host, identity, data) so that compromise of one layer does not mean full breach',
+                'C) Only for military',
+                'D) It means doubling the firewall'
+            ],
+            correct: 1,
+            explanation: 'Against sophisticated attackers, no single control is sufficient. Multiple layers ensure that bypassing one (e.g. perimeter) does not automatically grant access to critical assets.',
+            remediation: 'D4: Implement and maintain multiple control layers. D2: Combine technical and procedural controls.',
+            specRef: 'D4',
+            source: 'NCSC Defence in Depth'
+        },
+        {
+            question: 'Why might an organisation engage with the NCSC after a serious incident?',
+            options: [
+                'A) Only to get legal advice',
+                'B) For guidance, incident response support, and to share (where appropriate) to help others and national resilience',
+                'C) The NCSC does not help with incidents',
+                'D) Only if ordered by court'
+            ],
+            correct: 1,
+            explanation: 'The NCSC can provide advice and support during incidents. Reporting (e.g. via the Cyber Security Incident Reporting scheme) helps the NCSC understand threats and support the wider community.',
+            remediation: 'D5: Incident response. D3: Reporting may be required (NIS, etc.). Know how to contact NCSC and your sector regulator.',
+            specRef: 'D5',
+            source: 'NCSC Incident Management'
+        },
+        {
+            question: 'What is the purpose of the Cyber Assessment Framework (CAF)?',
+            options: [
+                'A) Only for government systems',
+                'B) A framework to assess and improve cyber resilience, used by regulators (e.g. under NIS) and organisations to structure their security approach',
+                'C) It replaces ISO 27001',
+                'D) Only for critical infrastructure'
+            ],
+            correct: 1,
+            explanation: 'The CAF provides a structured set of principles and outcomes for managing cyber risk. It is used in NIS regulation and can be used voluntarily to assess resilience.',
+            remediation: 'D2/D4: Use CAF to structure and assess controls. D3: NIS and sector regimes may reference CAF. D5: Resilience and continuity.',
+            specRef: 'D4',
+            source: 'NCSC CAF'
+        },
+        {
+            question: 'Why is network segmentation important when defending against APT-style attacks?',
+            options: [
+                'A) It slows the network',
+                'B) It limits lateral movement — an attacker in one segment cannot easily reach critical systems in another without further exploitation',
+                'C) APTs cannot move laterally',
+                'D) Only for large networks'
+            ],
+            correct: 1,
+            explanation: 'Segmentation creates boundaries. Compromise of one zone (e.g. user workstations) does not automatically give access to sensitive data or control systems.',
+            remediation: 'D4: Segmentation as a layer. D2: Network design and access control. D1: Limits impact of intrusion.',
+            specRef: 'D4',
+            source: 'NCSC Network Design'
+        },
+        {
+            question: 'What is "assume breach" and why is it recommended?',
+            options: [
+                'A) Assume you will never be breached',
+                'B) Assume attackers may already be inside; design detection, response, and containment accordingly',
+                'C) Only for critical infrastructure',
+                'D) It means giving up on prevention'
+            ],
+            correct: 1,
+            explanation: '"Assume breach" means planning for the possibility that defences have been bypassed. It emphasises detection, response, and limiting damage rather than relying only on prevention.',
+            remediation: 'D5: Incident response and detection. D4: Defence in depth. D2: Monitoring, logging, and segmentation.',
+            specRef: 'D5',
+            source: 'NCSC; Microsoft Assume Breach'
+        },
+        {
+            question: 'How can supply chain compromise (e.g. SolarWinds-style) affect an organisation?',
+            options: [
+                'A) Only the direct vendor is affected',
+                'B) Compromised software or updates can give attackers trusted access to many organisations at once; vetting and monitoring suppliers is essential',
+                'C) Supply chain attacks are rare',
+                'D) Only open source is at risk'
+            ],
+            correct: 1,
+            explanation: 'Attackers compromise a supplier to push malicious updates or components. Victims install them in trust. This bypasses many perimeter defences.',
+            remediation: 'D1: Supply chain as threat. D3: Vendor and contract assurance. D4: Assume breach and monitor for anomalies.',
+            specRef: 'D1',
+            source: 'NCSC Supply Chain; SolarWinds'
+        },
+        {
+            question: 'Why is preserving evidence important during a serious cyber incident?',
+            options: [
+                'A) Only for criminal prosecution',
+                'B) For forensics (understanding what happened, finding all compromise), legal/regulatory requirements, and improving defences',
+                'C) It slows down recovery',
+                'D) Only the police need evidence'
+            ],
+            correct: 1,
+            explanation: 'Evidence supports root cause analysis, eradication (finding all footholds), and may be required for regulators or law enforcement. Wiping systems too early can lose this.',
+            remediation: 'D5: Incident response plan should include evidence preservation. D3: Regulatory and legal obligations. Balance with containment and recovery.',
+            specRef: 'D5',
+            source: 'NIST SP 800-61; NCSC'
+        },
+        {
+            question: 'What does the NIS Regulations (UK) require of relevant digital service providers?',
+            options: [
+                'A) Nothing beyond GDPR',
+                'B) Appropriate security measures and incident reporting to the competent authority; exact duties depend on designation',
+                'C) Only to pay fines',
+                'D) Only for cloud providers'
+            ],
+            correct: 1,
+            explanation: 'NIS requires operators of essential services and relevant digital service providers to take appropriate and proportionate security measures and to report significant incidents.',
+            remediation: 'D3: NIS obligations. D5: Incident reporting. D2: Security measures and resilience.',
+            specRef: 'D3',
+            source: 'NIS Regulations (UK)'
+        },
+        {
+            question: 'Why is user and entity behaviour analytics (UEBA) relevant to detecting APT activity?',
+            options: [
+                'A) APTs do not behave differently',
+                'B) APT activity can look like normal admin behaviour; UEBA spots anomalies (e.g. unusual login time, data access volume) that may indicate compromise',
+                'C) Only for insider threats',
+                'D) It replaces IDS'
+            ],
+            correct: 1,
+            explanation: 'Behavioural analytics baseline "normal" and flag deviations. Sophisticated attackers who use valid credentials can be detected by anomalous behaviour.',
+            remediation: 'D2: Detection and monitoring. D5: Incident response. D1: Insider and credential abuse.',
+            specRef: 'D2',
+            source: 'NCSC Monitoring; Gartner UEBA'
+        },
+        {
+            question: 'What is the value of tabletop or live exercises for incident response?',
+            options: [
+                'A) Only for compliance',
+                'B) They test plans and people under pressure, find gaps, and improve readiness without a real incident',
+                'C) They are not useful',
+                'D) Only the IT team need to participate'
+            ],
+            correct: 1,
+            explanation: 'Exercises reveal whether plans work, roles are clear, and contacts are correct. They improve response when a real incident occurs.',
+            remediation: 'D5: Business continuity and incident response. Run regular exercises and update plans from lessons learned.',
+            specRef: 'D5',
+            source: 'NCSC Exercising; NIST SP 800-61'
+        },
+        {
+            question: 'Why might an APT group target a seemingly non-critical organisation?',
+            options: [
+                'A) APTs only target government',
+                'B) To reach supply chain or partners, steal IP, or use the organisation as a stepping stone to a higher-value target',
+                'C) They do not',
+                'D) Only for ransom'
+            ],
+            correct: 1,
+            explanation: 'APT actors target suppliers, partners, and less-secure organisations to reach their true target or to steal data. Any organisation can be a vector or target.',
+            remediation: 'D1: Threat landscape. D4: Assume breach and protect crown jewels. D3: Supply chain and partner assurance.',
+            specRef: 'D1',
+            source: 'NCSC; Supply chain attacks'
+        },
+        {
+            question: 'What is "least privilege" and why does it matter against APT-style attacks?',
+            options: [
+                'A) Giving minimal access to guests only',
+                'B) Users and processes have only the access needed for their role; limits what an attacker can do with stolen credentials',
+                'C) Only for admins',
+                'D) It blocks all access'
+            ],
+            correct: 1,
+            explanation: 'Least privilege limits the damage from a compromised account. An attacker with a low-privilege user account cannot directly access sensitive systems without further exploitation.',
+            remediation: 'D2: Access control. D4: Defence in depth. D1: Credential theft and lateral movement.',
+            specRef: 'D2',
+            source: 'NCSC Access Control'
+        },
+        {
+            question: 'How does encryption help when defending against sophisticated attackers?',
+            options: [
+                'A) It prevents all attacks',
+                'B) It protects data confidentiality so that even if systems are compromised, stolen data may be unreadable without the key',
+                'C) Only in transit',
+                'D) APTs can always decrypt'
+            ],
+            correct: 1,
+            explanation: 'Encryption (at rest and in transit) protects data from being read if access is gained. Key management is critical — stolen keys undermine the protection.',
+            remediation: 'D2: Encryption and key management. D4: Data as a layer. D3: Appropriate security for personal data.',
+            specRef: 'D2',
+            source: 'NCSC Encryption'
         }
     ],
     10: [
@@ -3656,6 +4269,230 @@ export const QUIZ_QUESTIONS = {
             remediation: 'UK organisations must still comply with DPA 2018, GDPR, NIS, and sector regulation. International frameworks are tools to achieve that — they do not replace legal obligations. They aid consistency when operating across jurisdictions.',
             specRef: 'D3, D4',
             source: 'ISO/IEC 27001; NIST CSF 2.0'
+        },
+        {
+            question: 'Why is cross-border incident coordination important for global defence?',
+            options: [
+                'A) Incidents never cross borders',
+                'B) Attacks and threat actors operate across jurisdictions; sharing indicators and response helps contain harm and improve defences',
+                'C) Only governments need to coordinate',
+                'D) It replaces the need for technical controls'
+            ],
+            correct: 1,
+            explanation: 'Cyber incidents often span countries. Coordination between CERTs, regulators, and organisations supports faster containment and learning.',
+            remediation: 'D5: Incident response. D3: International cooperation and reporting. D4: Part of resilience.',
+            specRef: 'D5',
+            source: 'NCSC; EU NIS2; ENISA'
+        },
+        {
+            question: 'What is the purpose of a Business Impact Analysis (BIA) in critical or global contexts?',
+            options: [
+                'A) Only for insurance',
+                'B) To identify critical processes and systems and the impact of their failure, so that recovery priorities (RTO/RPO) can be set',
+                'C) It is the same as a risk assessment',
+                'D) Only for finance'
+            ],
+            correct: 1,
+            explanation: 'BIA identifies what must be restored first and how quickly. It drives backup, redundancy, and business continuity planning.',
+            remediation: 'D5: Business continuity. BIA informs RTO/RPO and exercise priorities.',
+            specRef: 'D5',
+            source: 'NCSC BCP; ISO 22301'
+        },
+        {
+            question: 'Why might nation-state actors target critical national infrastructure (CNI)?',
+            options: [
+                'A) They only target military',
+                'B) To disrupt society, gather intelligence, or gain leverage; CNI (energy, health, transport) has high impact',
+                'C) CNI is too well protected',
+                'D) Only for ransom'
+            ],
+            correct: 1,
+            explanation: 'CNI is attractive for espionage, disruption, and geopolitical leverage. Defence requires both technical resilience and regulatory oversight (e.g. NIS).',
+            remediation: 'D1: Threat landscape. D3: NIS and sector regulation. D4/D5: Defence in depth and BCP.',
+            specRef: 'D1',
+            source: 'NCSC CNI; NIS Regulations'
+        },
+        {
+            question: 'How does the UK NIS Regulations framework support global defence?',
+            options: [
+                'A) It only applies in the UK',
+                'B) It sets baseline security and reporting for essential services and key digital providers, aligning with EU NIS2 and international expectations',
+                'C) It replaces GDPR',
+                'D) Only for energy and transport'
+            ],
+            correct: 1,
+            explanation: 'NIS creates a common baseline and incident reporting. This supports consistency and information sharing across sectors and with international partners.',
+            remediation: 'D3: NIS compliance. D5: Incident reporting. D4: Security measures.',
+            specRef: 'D3',
+            source: 'NIS Regulations 2018; NIS2'
+        },
+        {
+            question: 'What is the value of sharing threat intelligence internationally?',
+            options: [
+                'A) It is only for governments',
+                'B) Attackers reuse TTPs and infrastructure; shared IOCs and context help many organisations detect and respond faster',
+                'C) Sharing is illegal',
+                'D) It replaces the need for firewalls'
+            ],
+            correct: 1,
+            explanation: 'Threat intelligence sharing (e.g. through ISACs, CERTs) helps the community benefit from others’ discoveries and reduce harm.',
+            remediation: 'D1: Understanding threats. D2/D5: Informing detection and response.',
+            specRef: 'D1',
+            source: 'NCSC; FIRST; ENISA'
+        },
+        {
+            question: 'Why should critical infrastructure operators test incident response and BCP with partners and regulators?',
+            options: [
+                'A) Only internal testing is needed',
+                'B) Real incidents involve multiple parties; joint exercises find communication and coordination gaps',
+                'C) Regulators do not participate',
+                'D) Testing is optional'
+            ],
+            correct: 1,
+            explanation: 'Incidents often require coordination with suppliers, customers, and regulators. Tabletop and live exercises with partners improve readiness.',
+            remediation: 'D5: Business continuity and incident response. D3: Regulatory expectations.',
+            specRef: 'D5',
+            source: 'NCSC Exercising; NIS'
+        },
+        {
+            question: 'What does "resilience" mean in a global or critical infrastructure context?',
+            options: [
+                'A) Only having a firewall',
+                'B) The ability to prevent, detect, contain, and recover from incidents while maintaining or restoring essential functions',
+                'C) Only backup',
+                'D) Only for large organisations'
+            ],
+            correct: 1,
+            explanation: 'Resilience combines prevention, detection, response, and recovery. For CNI, maintaining essential services during and after an incident is the goal.',
+            remediation: 'D4: Defence in depth. D5: BCP and incident response. D2: Multiple controls.',
+            specRef: 'D5',
+            source: 'NCSC CAF; NIST CSF'
+        },
+        {
+            question: 'Why is supply chain security important for global defence?',
+            options: [
+                'A) Only the prime contractor matters',
+                'B) Compromise of a supplier can affect many organisations; assessing and contracting for security across the chain reduces systemic risk',
+                'C) Supply chain is only a physical concern',
+                'D) It cannot be managed'
+            ],
+            correct: 1,
+            explanation: 'Supply chain attacks (e.g. SolarWinds) show that one compromised vendor can impact many. Contractual and assurance requirements spread resilience.',
+            remediation: 'D1: Supply chain threats. D3: Contract and vendor management. D4: Assume breach and monitor.',
+            specRef: 'D1',
+            source: 'NCSC Supply Chain'
+        },
+        {
+            question: 'How can encryption support data protection when operating across multiple countries?',
+            options: [
+                'A) Encryption is illegal in some countries',
+                'B) Strong encryption protects data in transit and at rest so that even if data is stored or processed in different jurisdictions, confidentiality can be maintained',
+                'C) Only in the UK',
+                'D) It replaces the need for access control'
+            ],
+            correct: 1,
+            explanation: 'Encryption protects data regardless of location. With proper key management, it supports compliance with data protection laws when data crosses borders.',
+            remediation: 'D2: Encryption. D3: GDPR and international transfers. D4: Data as a control layer.',
+            specRef: 'D2',
+            source: 'NCSC Encryption; GDPR Chapter V'
+        },
+        {
+            question: 'What is the role of the NCSC in supporting UK organisations against global threats?',
+            options: [
+                'A) Only to advise government',
+                'B) To provide guidance, alerts, and services (e.g. ACD) so UK organisations can better defend against threats from anywhere',
+                'C) It only deals with domestic threats',
+                'D) It replaces in-house security teams'
+            ],
+            correct: 1,
+            explanation: 'The NCSC provides threat intelligence, guidance, and services that help UK organisations defend against global threat actors.',
+            remediation: 'D2/D5: Use NCSC guidance and sign up for alerts. D3: Supports compliance and resilience.',
+            specRef: 'D2',
+            source: 'NCSC'
+        },
+        {
+            question: 'Why might a global organisation need to consider different legal requirements (e.g. breach notification) in different countries?',
+            options: [
+                'A) One policy fits all',
+                'B) Jurisdictions have different deadlines, thresholds, and authorities; compliance requires knowing and meeting each relevant regime',
+                'C) Only UK law applies to UK companies',
+                'D) There are no differences'
+            ],
+            correct: 1,
+            explanation: 'Breach notification and other obligations vary (e.g. 72 hours in GDPR, different rules in US states). Multinationals must map and comply with each.',
+            remediation: 'D3: Legislation and regulation. D5: Incident response and communication. Legal advice for multinationals.',
+            specRef: 'D3',
+            source: 'GDPR; ICO; various national DPAs'
+        },
+        {
+            question: 'What does "defence in depth" mean when defending against global or state-level threats?',
+            options: [
+                'A) Only using one strong control',
+                'B) Multiple independent layers (perimeter, network, host, identity, data, monitoring) so that compromise of one does not grant full access',
+                'C) Only for military networks',
+                'D) Doubling the budget'
+            ],
+            correct: 1,
+            explanation: 'Sophisticated attackers will bypass some controls. Multiple layers ensure that bypassing one (e.g. phishing) does not automatically expose critical assets.',
+            remediation: 'D4: Implement layered controls. D2: Technical and procedural. D5: Response as a layer.',
+            specRef: 'D4',
+            source: 'NCSC 10 Steps; Defence in Depth'
+        },
+        {
+            question: 'Why is it important to define and protect "crown jewels" in global or critical infrastructure?',
+            options: [
+                'A) Only governments have crown jewels',
+                'B) Prioritising protection of the most critical assets ensures limited resources focus on what would cause the most harm if lost or disrupted',
+                'C) All systems are equally important',
+                'D) It is only a metaphor'
+            ],
+            correct: 1,
+            explanation: 'Not all systems are equally critical. Identifying crown jewels (e.g. control systems, key data) allows focused defence and recovery priority.',
+            remediation: 'D4: Defence in depth and prioritisation. D5: BIA and recovery order. D2: Stronger controls on critical assets.',
+            specRef: 'D4',
+            source: 'NCSC; Risk management'
+        },
+        {
+            question: 'How can organisations balance "security" and "availability" in critical infrastructure?',
+            options: [
+                'A) Only security matters',
+                'B) Through risk-based decisions: appropriate controls that protect without unnecessarily disrupting essential operations; BCP and resilience support both',
+                'C) Only availability matters',
+                'D) They cannot be balanced'
+            ],
+            correct: 1,
+            explanation: 'Overly restrictive controls can harm operations; weak controls can lead to breach and disruption. Risk assessment and BCP help balance both.',
+            remediation: 'D5: Business continuity. D2: Appropriate technical and organisational measures. D4: Proportional defence.',
+            specRef: 'D5',
+            source: 'NCSC CAF; ISO 27001'
+        },
+        {
+            question: 'What is the benefit of having a defined incident response team with clear roles?',
+            options: [
+                'A) Only for large organisations',
+                'B) In a crisis, clear roles and contacts ensure faster containment, communication, and recovery; avoids confusion and delay',
+                'C) The IT team handles everything',
+                'D) Roles are not needed'
+            ],
+            correct: 1,
+            explanation: 'A defined team with roles (incident manager, technical lead, comms, legal) ensures coordinated response and meets regulatory and stakeholder expectations.',
+            remediation: 'D5: Incident response planning. D3: Notification and accountability. Test the team in exercises.',
+            specRef: 'D5',
+            source: 'NIST SP 800-61; NCSC'
+        },
+        {
+            question: 'Why should critical infrastructure consider physical security as part of cyber defence?',
+            options: [
+                'A) Physical security is separate from cyber',
+                'B) Attackers can use physical access (e.g. USB, on-site access) to bypass network defences; physical and cyber controls should be aligned',
+                'C) Only data centres need it',
+                'D) It is not important'
+            ],
+            correct: 1,
+            explanation: 'Physical access can enable malware installation, device theft, or tampering. Defence in depth includes physical controls.',
+            remediation: 'D2: Physical security. D4: Multiple control types. D1: Insider and physical threat.',
+            specRef: 'D2',
+            source: 'NCSC Physical Security'
         }
     ]
 };
@@ -3665,14 +4502,14 @@ export const CASE_STUDIES = {
     1: {
         title: 'Real Case: 2020 Twitter Social Engineering Attack',
         summary: 'In July 2020, attackers used phone-based social engineering to trick Twitter employees into providing access to internal tools. They hijacked 130 high-profile accounts (including Barack Obama and Elon Musk) and stole over $100,000 in Bitcoin.',
-        lesson: 'Even the world\'s largest tech companies are vulnerable to social engineering. Email filters and security training are essential defenses.',
+        lesson: 'Even the world\'s largest tech companies are vulnerable to social engineering. Email filters and security training are essential defences.',
         specLink: 'D1: Social engineering is a key threat type; D2: Training and email filters are critical controls'
     },
     2: {
         title: 'Real Case: 2023 MOVEit School Data Breach',
         summary: 'A vulnerability in MOVEit file transfer software allowed attackers to access data from thousands of organisations including UK schools. Student personal information including names, addresses, and special educational needs data was compromised.',
         lesson: 'Schools hold sensitive special category data about children. Multiple entry points and third-party software create additional risks that require layered security.',
-        specLink: 'D1: Supply chain attacks; D3: Special category data under DPA 2018; D4: Defense in depth'
+        specLink: 'D1: Supply chain attacks; D3: Special category data under DPA 2018; D4: Defence in depth'
     },
     3: {
         title: 'Real Case: 2017 WannaCry NHS Attack',
@@ -3689,53 +4526,53 @@ export const CASE_STUDIES = {
     5: {
         title: 'Real Case: 2020 SolarWinds Government Hack',
         summary: 'State-sponsored attackers compromised SolarWinds\' software update system, embedding malware that was distributed to 18,000 organisations including multiple US government agencies. The attack went undetected for 9 months.',
-        lesson: 'Sophisticated attackers target supply chains to bypass perimeter defenses. Continuous monitoring (IDS/IPS), security training, and defense in depth are essential for government agencies.',
-        specLink: 'D1: Advanced persistent threats; D2: IDS/IPS and monitoring; D4: Defense in depth; D5: Business continuity'
+        lesson: 'Sophisticated attackers target supply chains to bypass perimeter defences. Continuous monitoring (IDS/IPS), security training, and defence in depth are essential for government agencies.',
+        specLink: 'D1: Advanced persistent threats; D2: IDS/IPS and monitoring; D4: Defence in depth; D5: Business continuity'
     },
     6: {
         title: 'Real Case: 2015 Ukraine Power Grid Attack',
         summary: 'Attackers used phishing emails to gain access to Ukrainian power company networks. They then used the access to remotely switch off power substations, leaving 230,000 people without electricity for up to 6 hours. This was the first confirmed cyber attack on a power grid.',
-        lesson: 'Critical infrastructure attacks can affect millions and have physical consequences. Every layer of defense matters \u2013 the initial access was through a simple phishing email.',
-        specLink: 'D1: All threat types; D2: All security controls; D3: NIS Regulations; D4: Defense in depth; D5: Business continuity'
+        lesson: 'Critical infrastructure attacks can affect millions and have physical consequences. Every layer of defence matters \u2013 the initial access was through a simple phishing email.',
+        specLink: 'D1: All threat types; D2: All security controls; D3: NIS Regulations; D4: Defence in depth; D5: Business continuity'
     },
     7: {
         title: 'Real Case: 2013 Target Payment Card Breach',
         summary: 'Attackers stole 40 million credit and debit card numbers and 70 million customer records from Target by first compromising a heating contractor with network access, then moving laterally to the payment system. The breach went undetected for weeks.',
         lesson: 'Financial and payment data require PCI-DSS controls: network segmentation to isolate cardholder data, encryption, access control, and continuous monitoring. Third-party access creates additional entry points that must be secured.',
-        specLink: 'D1: Malware, SQL injection; D2: Segmentation, encryption, access control, IDS; D3: PCI-DSS; D4: Defense in depth; D5: Incident response'
+        specLink: 'D1: Malware, SQL injection; D2: Segmentation, encryption, access control, IDS; D3: PCI-DSS; D4: Defence in depth; D5: Incident response'
     },
     8: {
         title: 'Real Case: 2019 Capital One Cloud Misconfiguration',
         summary: 'A single misconfigured firewall on a cloud-hosted web application allowed an attacker to access over 100 million customer records stored in an AWS S3 bucket. The attacker exploited a server-side request forgery (SSRF) vulnerability to obtain IAM credentials.',
         lesson: 'In the cloud, the shared responsibility model means customers must secure their data and access controls. Misconfigured firewalls, over-privileged IAM roles, and insufficient network segmentation can expose entire tenant environments.',
-        specLink: 'D1: Unauthorised access; D2: Access control, encryption, segmentation; D3: DPA 2018, GDPR; D4: Defense in depth; D5: Incident response'
+        specLink: 'D1: Unauthorised access; D2: Access control, encryption, segmentation; D3: DPA 2018, GDPR; D4: Defence in depth; D5: Incident response'
     },
     9: {
         title: 'Real Case: 2017 NotPetya Destructive Malware',
         summary: 'NotPetya, attributed to state-sponsored actors, spread globally through a compromised software update. It encrypted and destroyed data across Maersk, Merck, FedEx and others, causing over $10 billion in damage. It was designed to disrupt, not to ransom.',
-        lesson: 'Advanced persistent threats use the full kill chain: supply chain compromise for delivery, credential theft, lateral movement, and destructive payloads. Defense in depth, segmentation, backup, and threat intelligence are essential to detect and contain APT activity.',
-        specLink: 'D1: Malware, ransomware-style, zero-day; D2: Patch management, backup, IDS; D4: Defense in depth; D5: Business continuity, incident response'
+        lesson: 'Advanced persistent threats use the full kill chain: supply chain compromise for delivery, credential theft, lateral movement, and destructive payloads. Defence in depth, segmentation, backup, and threat intelligence are essential to detect and contain APT activity.',
+        specLink: 'D1: Malware, ransomware-style, zero-day; D2: Patch management, backup, IDS; D4: Defence in depth; D5: Business continuity, incident response'
     },
     10: {
         title: 'Real Case: 2021 Colonial Pipeline Ransomware',
         summary: 'A ransomware attack on Colonial Pipeline, which supplies 45% of fuel to the US East Coast, forced the company to shut down 5,500 miles of pipeline. Panic buying and fuel shortages followed. The company paid a ransom; recovery still took days and required coordination across government and industry.',
         lesson: 'Critical national infrastructure is a high-value target. A single point of failure can have international impact. Layered defences, segmentation, backup, and tested incident response and business continuity plans are essential for operators of essential services.',
-        specLink: 'D1: Ransomware, all threat types; D2: All controls; D3: NIS Regulations, GDPR; D4: Defense in depth; D5: Business continuity, incident response'
+        specLink: 'D1: Ransomware, all threat types; D2: All controls; D3: NIS Regulations, GDPR; D4: Defence in depth; D5: Business continuity, incident response'
     }
 };
 
 // --- "Did You Know?" Educational Tips ---
 export const DID_YOU_KNOW_TIPS = [
     // D1 — Threats
-    { tip: '91% of cyber attacks begin with a phishing email. Email filters and staff training are your best first defenses.', specRef: 'D1, D2', source: 'Deloitte Cyber Review, 2020' },
-    { tip: 'Insider threats account for 25% of data breaches. Access control and the principle of least privilege are key defenses.', specRef: 'D1, D2', source: 'Verizon DBIR, 2023' },
+    { tip: '91% of cyber attacks begin with a phishing email. Email filters and staff training are your best first defences.', specRef: 'D1, D2', source: 'Deloitte Cyber Review, 2020' },
+    { tip: 'Insider threats account for 25% of data breaches. Access control and the principle of least privilege are key defences.', specRef: 'D1, D2', source: 'Verizon DBIR, 2023' },
     { tip: '"Zero-day" means zero days to fix the vulnerability before exploitation. Patch management reduces your exposure window once a fix exists.', specRef: 'D1, D2', source: 'NCSC Glossary, 2024' },
     { tip: 'Social engineering exploits human psychology rather than technical vulnerabilities. Even the best technology can\'t fully prevent it without training.', specRef: 'D1, D2', source: 'NCSC Social Engineering Guidance, 2023' },
     { tip: 'SQL injection is in the OWASP Top 10 most critical web vulnerabilities. Input validation and parameterised queries prevent it entirely.', specRef: 'D1, D2', source: 'OWASP Top 10, 2021' },
-    { tip: 'DDoS attacks can generate over 1 Tbps of traffic. Cloud-based mitigation and IDS/IPS are the primary defenses.', specRef: 'D1, D2', source: 'Cloudflare DDoS Report, 2023' },
+    { tip: 'DDoS attacks can generate over 1 Tbps of traffic. Cloud-based mitigation and IDS/IPS are the primary defences.', specRef: 'D1, D2', source: 'Cloudflare DDoS Report, 2023' },
     // D2 — Security Controls
     { tip: 'Multi-factor authentication (MFA) blocks 99.9% of automated account compromise attacks.', specRef: 'D2', source: 'Microsoft Security Blog, 2019' },
-    { tip: 'A firewall examines network packets and allows or blocks them based on predefined security rules. It is the first line of network defense.', specRef: 'D2', source: 'NCSC Cyber Essentials, 2024' },
+    { tip: 'A firewall examines network packets and allows or blocks them based on predefined security rules. It is the first line of network defence.', specRef: 'D2', source: 'NCSC Cyber Essentials, 2024' },
     { tip: 'IDS detects suspicious activity; IPS can automatically block it. Together, they provide real-time threat monitoring and response.', specRef: 'D2', source: 'NIST SP 800-94, 2012' },
     { tip: 'Encryption converts readable plaintext into unreadable ciphertext. AES-256 would take billions of years to crack with current technology.', specRef: 'D2', source: 'NIST Encryption Standards, 2023' },
     { tip: 'Security awareness training reduces phishing success rates by 50\u201370%. Humans are often the weakest link \u2013 training strengthens them.', specRef: 'D2', source: 'KnowBe4 Phishing Benchmark Report, 2023' },
@@ -3745,8 +4582,8 @@ export const DID_YOU_KNOW_TIPS = [
     { tip: 'The DPA 2018 lists 6 principles: lawfulness, purpose limitation, data minimisation, accuracy, storage limitation, and security.', specRef: 'D3', source: 'DPA 2018, Schedule 1' },
     { tip: 'The ICO (Information Commissioner\'s Office) enforces UK data protection laws and can issue fines up to \u00A317.5 million or 4% of global turnover.', specRef: 'D3', source: 'ICO Regulatory Action Policy, 2022' },
     { tip: 'Under GDPR, children\'s data requires additional protection. Schools and youth organisations must implement enhanced safeguards.', specRef: 'D3', source: 'GDPR Article 8, ICO Children\'s Code, 2020' },
-    // D4 — Defense in Depth
-    { tip: 'Defense in depth means no single point of failure. Like a castle with moat, walls, guards, and a keep \u2013 if one fails, others protect.', specRef: 'D4', source: 'NCSC 10 Steps to Cyber Security, 2021' },
+    // D4 — Defence in Depth
+    { tip: 'Defence in depth means no single point of failure. Like a castle with moat, walls, guards, and a keep \u2013 if one fails, others protect.', specRef: 'D4', source: 'NCSC 10 Steps to Cyber Security, 2021' },
     { tip: 'The three types of security control are: technical (firewalls, encryption), procedural (policies, processes), and physical (locks, CCTV).', specRef: 'D4', source: 'NCSC Cyber Assessment Framework, 2022' },
     // D5 — Business Continuity
     { tip: 'The average cost of a data breach in the UK is \u00A33.4 million. Prevention is far cheaper than recovery.', specRef: 'D5', source: 'IBM Cost of a Data Breach Report, 2023' },
@@ -3800,7 +4637,7 @@ export const SPEC_TOPICS = [
     },
     {
         id: 'D4',
-        title: 'D4: Defense in Depth / Layered Security',
+        title: 'D4: Defence in Depth / Layered Security',
         subtopics: [
             { id: 'D4.1', name: 'Combining multiple security controls', coveredInLevels: [2, 3, 4, 5, 6, 7, 8, 9, 10] },
             { id: 'D4.2', name: 'Physical, technical, and procedural controls', coveredInLevels: [5, 6, 9, 10] },
@@ -3825,10 +4662,10 @@ export const ACHIEVEMENTS = [
     { id: 'no_damage', name: 'Impenetrable', description: 'Complete a level without any asset damage', icon: '\uD83D\uDEE1', condition: 'no_damage_level' },
     { id: 'budget_master', name: 'Budget Master', description: 'Complete a level with over 50% budget remaining', icon: '\uD83D\uDCB0', condition: 'budget_remaining_50' },
     { id: 'synergy_perimeter', name: 'Perimeter Pair', description: 'Use Firewall and IDS/IPS together in one level', icon: '\uD83D\uDEE1', condition: 'synergy_firewall_ids' },
-    { id: 'synergy_data', name: 'Data Defense', description: 'Use Encryption and Backup together in one level', icon: '\uD83D\uDD12', condition: 'synergy_encryption_backup' },
+    { id: 'synergy_data', name: 'Data Defence', description: 'Use Encryption and Backup together in one level', icon: '\uD83D\uDD12', condition: 'synergy_encryption_backup' },
     { id: 'synergy_channel', name: 'Secure Channel', description: 'Use Proxy and Encryption together in one level', icon: '\u27A1', condition: 'synergy_proxy_encryption' },
     { id: 'synergy_contain', name: 'Contain and Recover', description: 'Use Quarantine and Backup together in one level', icon: '\uD83D\uDD06', condition: 'synergy_quarantine_backup' },
-    { id: 'layered', name: 'Defense in Depth', description: 'Use 5 different tower types in one level', icon: '\uD83C\uDFEF', condition: 'tower_variety_5' },
+    { id: 'layered', name: 'Defence in Depth', description: 'Use 5 different tower types in one level', icon: '\uD83C\uDFEF', condition: 'tower_variety_5' },
     { id: 'all_towers', name: 'Full Arsenal', description: 'Use all tower types across your games', icon: '\u2694', condition: 'all_towers_used' },
     { id: 'encyclopedist', name: 'Knowledge is Power', description: 'Read all encyclopedia entries', icon: '\uD83D\uDCDA', condition: 'all_encyclopedia_read' },
     { id: 'high_score', name: 'High Scorer', description: 'Achieve a score of 10,000 or more', icon: '\uD83D\uDCC8', condition: 'score_10000' },

@@ -27,6 +27,7 @@ function eventToCanvasCoords(e) {
 
 // --- Game Callbacks ---
 game.onStateChange = (state) => {
+    updateSpeedButtons();
     switch (state) {
         case STATE.PLANNING:
         case STATE.PLAYING:
@@ -83,6 +84,10 @@ game.onThreatHover = (threat) => {
     } else {
         ui.hideThreatInfo();
     }
+};
+
+game.onNextWaveModalRequest = (waveIndex, waveConfig) => {
+    ui.showNextWaveModal(waveIndex + 1, waveConfig);
 };
 
 // --- Game area event listeners (on container so bottom padding still counts as bottom row) ---
@@ -158,11 +163,23 @@ document.getElementById('btn-pause').addEventListener('click', () => {
     }
 });
 
-document.getElementById('btn-speed').addEventListener('click', () => {
-    const speed = game.toggleSpeed();
-    const btn = document.getElementById('btn-speed');
-    btn.textContent = speed === 1 ? '\u25B6\u25B6' : speed === 2 ? '\u25B6\u25B6\u25B6' : '\u25B6';
-    ui.showNotification(`Speed: ${speed}x`, 'info');
+// Speed: 3 radio-style buttons (1x, 2x, 3x)
+function updateSpeedButtons() {
+    const s = game.gameSpeed;
+    [1, 2, 3].forEach(n => {
+        const btn = document.getElementById(`btn-speed-${n}`);
+        if (btn) {
+            btn.classList.toggle('active', s === n);
+            btn.setAttribute('aria-pressed', s === n ? 'true' : 'false');
+        }
+    });
+}
+[1, 2, 3].forEach(n => {
+    document.getElementById(`btn-speed-${n}`)?.addEventListener('click', () => {
+        game.setSpeed(n);
+        updateSpeedButtons();
+        ui.showNotification(`Speed: ${n}×`, 'info');
+    });
 });
 
 document.getElementById('btn-menu-ingame').addEventListener('click', () => {
@@ -301,6 +318,12 @@ document.getElementById('btn-back-ach').addEventListener('click', () => {
     ui.showMainMenu();
 });
 
+// --- Next Wave Intel Modal ---
+document.getElementById('btn-next-wave-begin').addEventListener('click', () => {
+    ui.hideModal('nextWave');
+    game.dismissNextWaveModal();
+});
+
 // --- Educational Popup ---
 document.getElementById('btn-close-edu').addEventListener('click', () => {
     ui.closeEduPopup();
@@ -381,6 +404,6 @@ setTimeout(resizeCanvas, 100);
 // --- Initial State ---
 ui.showMainMenu();
 
-console.log('Cyber Defense Simulator loaded successfully!');
+console.log('Cyber Defence Simulator loaded successfully!');
 console.log('BTEC IT Unit 1 - Learning Aim D');
 console.log('Educational features: Quiz system, Knowledge Tracker, Case Studies, Did You Know tips');

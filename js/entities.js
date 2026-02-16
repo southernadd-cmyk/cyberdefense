@@ -146,6 +146,19 @@ function drawThreatIcon(ctx, threatType, x, y, color, size) {
     ctx.fillStyle = color;
     ctx.strokeStyle = '#fff';
     ctx.lineWidth = 1;
+    // Hidden trojan: always draw explicitly so we never show wrong/empty icon
+    if (threatType === 'trojan_hidden') {
+        ctx.fillStyle = '#475569';
+        ctx.fillRect(px(x - s), px(y - s), s * 2, s * 2);
+        ctx.strokeStyle = '#64748b';
+        ctx.strokeRect(px(x - s), px(y - s), s * 2, s * 2);
+        ctx.fillStyle = '#fff';
+        ctx.font = `${Math.max(8, s)}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('?', x, y);
+        return;
+    }
     switch (threatType) {
         case 'phishing': { // envelope with flap
             ctx.fillRect(px(x - s), px(y - s), s * 2, s * 2);
@@ -155,7 +168,7 @@ function drawThreatIcon(ctx, threatType, x, y, color, size) {
             ctx.lineTo(px(x), px(y + s * 0.2));
             ctx.lineTo(px(x + s), px(y - s));
             ctx.stroke();
-            ctx.fillStyle = 'rgba(255,255,255,0.35)';
+            ctx.fillStyle = 'rgba(36, 180, 237, 0.35)';
             ctx.fillRect(px(x - s + 1), px(y - s + 1), s * 2 - 2, 3);
             break;
         }
@@ -439,6 +452,7 @@ export class Tower {
         for (const threat of threats) {
             if (!threat.alive || threat.reachedEnd) continue;
             if (threat._quarantineFrozen) continue; // Frozen threats are in quarantine
+            if (threat.type === 'trojan' && !threat.visible) continue; // Hidden trojans are unattackable
             if (!this.canTarget(threat.type)) continue; // Skip threats we can't damage
 
             const dist = Math.hypot(threat.x - this.x, threat.y - this.y);
@@ -599,14 +613,15 @@ export class Tower {
 export class Threat {
     static _nextId = 1;
 
-    constructor(threatType, path, pathIndex = 0) {
+    constructor(threatType, path, pathIndex = 0, options = {}) {
         this.id = Threat._nextId++;
         this.type = threatType;
         const config = THREAT_TYPES[threatType];
+        const hpMult = options.hpMult != null ? options.hpMult : 1;
 
         this.name = config.name;
-        this.health = config.health;
-        this.maxHealth = config.health;
+        this.health = config.health * hpMult;
+        this.maxHealth = config.health * hpMult;
         this.baseSpeed = config.speed;
         this.speed = config.speed;
         this.damage = config.damage;
@@ -628,8 +643,7 @@ export class Threat {
         // State
         this.alive = true;
         this.reachedEnd = false;
-        this.visible = true; // For trojan disguise
-        this.revealTimer = 0;
+        this.visible = true; // For trojan disguise (path-based reveal)
 
         // Effects
         this.effects = {};
@@ -641,10 +655,10 @@ export class Threat {
         this.synergyDamageResist = 0;  // damage resistance from synergies (0-1)
         this.inSegmentationZone = false; // suppresses synergies
 
-        // Trojan: initially looks like safe traffic
+        // Trojan: disguised until ~halfway across the grid (path progress 0.45–0.55)
         if (this.special === 'disguise') {
             this.visible = false;
-            this.revealTimer = 2000; // Reveal after 2 seconds or when damaged
+            this._revealAtPathProgress = 0.45 + Math.random() * 0.1;
         }
     }
 
@@ -677,6 +691,9 @@ export class Threat {
         // Quarantine freeze: frozen threats take no damage
         if (this._quarantineFrozen) return false;
 
+        // Hidden trojans are unattackable until revealed by timer
+        if (this.type === 'trojan' && !this.visible) return false;
+
         // Apply synergy damage resistance (sniffer buff)
         if (this.synergyDamageResist > 0) {
             amount *= (1 - this.synergyDamageResist);
@@ -689,9 +706,6 @@ export class Threat {
 
         this.health -= amount;
         this.damageFlash = 100;
-
-        // Reveal trojans when damaged
-        if (!this.visible) this.visible = true;
 
         // Apply slow effect
         if (effect === 'slow' && effectAmount) {
@@ -720,10 +734,9 @@ export class Threat {
             }
         }
 
-        // Trojan reveal timer
-        if (!this.visible) {
-            this.revealTimer -= dt;
-            if (this.revealTimer <= 0) this.visible = true;
+        // Trojan reveal at ~halfway across the path
+        if (!this.visible && this._revealAtPathProgress != null && this.pathProgress >= this._revealAtPathProgress) {
+            this.visible = true;
         }
 
         // Damage flash
@@ -816,20 +829,6 @@ export class Threat {
         const w = s * 2;
         const h = s * 2;
 
-        // Disguised trojan: pixel block + arcade "safe" icon
-        if (!this.visible) {
-            ctx.fillStyle = '#4ade8066';
-            ctx.fillRect(left, top, w, h);
-            ctx.strokeStyle = '#4ade80';
-            ctx.lineWidth = 1;
-            ctx.strokeRect(left, top, w, h);
-            ctx.fillStyle = '#4ade80';
-            ctx.fillRect(px(cx - 2), px(cy - 2), 4, 4);
-            ctx.strokeStyle = '#fff';
-            ctx.strokeRect(px(cx - 2), px(cy - 2), 4, 4);
-            return;
-        }
-
         // Slow effect: pixel outline
         if (this.effects.slow) {
             ctx.strokeStyle = '#a855f788';
@@ -895,13 +894,15 @@ export class Threat {
         ctx.fillRect(left, top, w, 1);
         ctx.fillRect(left, top, 1, h);
 
-        // Threat icon: SVG if available, else inline
-        const threatImg = getThreatImage(this.type);
+        // Threat icon: SVG if available, else inline (trojan uses hidden icon until revealed)
+        const iconType = (this.type === 'trojan' && !this.visible) ? 'trojan_hidden' : this.type;
+        const threatImg = getThreatImage(iconType);
         const threatIconSize = s * 2;
-        if (threatImg && threatImg.complete) {
+        const imgValid = threatImg && threatImg.complete && threatImg.naturalWidth > 0;
+        if (imgValid) {
             ctx.drawImage(threatImg, px(cx - threatIconSize / 2), px(cy - threatIconSize / 2), threatIconSize, threatIconSize);
         } else {
-            drawThreatIcon(ctx, this.type, cx, cy, '#ffffff', s);
+            drawThreatIcon(ctx, iconType, cx, cy, '#ffffff', s);
         }
 
         // Health bar (pixel blocks)
@@ -938,6 +939,7 @@ export class Asset {
         this.health = config.health;
         this.maxHealth = config.health;
         this.compromised = false;
+        this.critical = config.critical === true;
         this.hasBackup = false;
         this.hasEncryption = false;
         this.encryptionReduction = 0;

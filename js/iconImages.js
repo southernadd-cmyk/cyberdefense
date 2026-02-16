@@ -26,6 +26,7 @@ const THREAT_FILES = {
     ddos: 'threat_ddos_attack.svg',
     sqlInjection: 'threat_sql_injection.svg',
     trojan: 'threat_trojan_horse.svg',
+    trojan_hidden: 'threat_hidden_trojan.svg',
     insider: 'threat_insider_threat.svg',
     zeroDay: 'threat_zero_day_exploit.svg',
     sniffer: 'threat_network_sniffer.svg'
@@ -82,6 +83,18 @@ export function getThreatImage(threatType) {
     const file = THREAT_FILES[threatType];
     if (!file) return null;
     return cache.get(ICON_BASE + file) || null;
+}
+
+/** Return the URL path for a threat's SVG icon (for use in <img src="">). */
+export function getThreatIconSrc(threatType) {
+    const file = THREAT_FILES[threatType];
+    return file ? ICON_BASE + file : '';
+}
+
+/** Return the URL path for a tower's SVG icon (for use in <img src="">). */
+export function getTowerIconSrc(towerType) {
+    const file = TOWER_FILES[towerType];
+    return file ? ICON_BASE + file : '';
 }
 
 /** Asset: try asset_<name_slug>.svg (e.g. "File Server" -> asset_file_server.svg). */

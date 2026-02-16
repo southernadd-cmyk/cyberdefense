@@ -1,118 +1,70 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="256" height="256" shape-rendering="crispEdges">
-<title>threat_trojan_horse</title>
-<rect x="0" y="0" width="32" height="1" fill="#101726"/>
-<rect x="0" y="31" width="32" height="1" fill="#101726"/>
-<rect x="0" y="1" width="1" height="1" fill="#101726"/>
-<rect x="31" y="1" width="1" height="1" fill="#101726"/>
-<rect x="0" y="2" width="1" height="1" fill="#101726"/>
-<rect x="31" y="2" width="1" height="1" fill="#101726"/>
-<rect x="0" y="3" width="1" height="1" fill="#101726"/>
-<rect x="31" y="3" width="1" height="1" fill="#101726"/>
-<rect x="0" y="4" width="1" height="1" fill="#101726"/>
-<rect x="31" y="4" width="1" height="1" fill="#101726"/>
-<rect x="0" y="5" width="1" height="1" fill="#101726"/>
-<rect x="31" y="5" width="1" height="1" fill="#101726"/>
-<rect x="0" y="6" width="1" height="1" fill="#101726"/>
-<rect x="31" y="6" width="1" height="1" fill="#101726"/>
-<rect x="0" y="7" width="1" height="1" fill="#101726"/>
-<rect x="31" y="7" width="1" height="1" fill="#101726"/>
-<rect x="0" y="8" width="1" height="1" fill="#101726"/>
-<rect x="31" y="8" width="1" height="1" fill="#101726"/>
-<rect x="0" y="9" width="1" height="1" fill="#101726"/>
-<rect x="31" y="9" width="1" height="1" fill="#101726"/>
-<rect x="0" y="10" width="1" height="1" fill="#101726"/>
-<rect x="31" y="10" width="1" height="1" fill="#101726"/>
-<rect x="0" y="11" width="1" height="1" fill="#101726"/>
-<rect x="31" y="11" width="1" height="1" fill="#101726"/>
-<rect x="0" y="12" width="1" height="1" fill="#101726"/>
-<rect x="31" y="12" width="1" height="1" fill="#101726"/>
-<rect x="0" y="13" width="1" height="1" fill="#101726"/>
-<rect x="31" y="13" width="1" height="1" fill="#101726"/>
-<rect x="0" y="14" width="1" height="1" fill="#101726"/>
-<rect x="31" y="14" width="1" height="1" fill="#101726"/>
-<rect x="0" y="15" width="1" height="1" fill="#101726"/>
-<rect x="31" y="15" width="1" height="1" fill="#101726"/>
-<rect x="0" y="16" width="1" height="1" fill="#101726"/>
-<rect x="31" y="16" width="1" height="1" fill="#101726"/>
-<rect x="0" y="17" width="1" height="1" fill="#101726"/>
-<rect x="31" y="17" width="1" height="1" fill="#101726"/>
-<rect x="0" y="18" width="1" height="1" fill="#101726"/>
-<rect x="31" y="18" width="1" height="1" fill="#101726"/>
-<rect x="0" y="19" width="1" height="1" fill="#101726"/>
-<rect x="31" y="19" width="1" height="1" fill="#101726"/>
-<rect x="0" y="20" width="1" height="1" fill="#101726"/>
-<rect x="31" y="20" width="1" height="1" fill="#101726"/>
-<rect x="0" y="21" width="1" height="1" fill="#101726"/>
-<rect x="31" y="21" width="1" height="1" fill="#101726"/>
-<rect x="0" y="22" width="1" height="1" fill="#101726"/>
-<rect x="31" y="22" width="1" height="1" fill="#101726"/>
-<rect x="0" y="23" width="1" height="1" fill="#101726"/>
-<rect x="31" y="23" width="1" height="1" fill="#101726"/>
-<rect x="0" y="24" width="1" height="1" fill="#101726"/>
-<rect x="31" y="24" width="1" height="1" fill="#101726"/>
-<rect x="0" y="25" width="1" height="1" fill="#101726"/>
-<rect x="31" y="25" width="1" height="1" fill="#101726"/>
-<rect x="0" y="26" width="1" height="1" fill="#101726"/>
-<rect x="31" y="26" width="1" height="1" fill="#101726"/>
-<rect x="0" y="27" width="1" height="1" fill="#101726"/>
-<rect x="31" y="27" width="1" height="1" fill="#101726"/>
-<rect x="0" y="28" width="1" height="1" fill="#101726"/>
-<rect x="31" y="28" width="1" height="1" fill="#101726"/>
-<rect x="0" y="29" width="1" height="1" fill="#101726"/>
-<rect x="31" y="29" width="1" height="1" fill="#101726"/>
-<rect x="0" y="30" width="1" height="1" fill="#101726"/>
-<rect x="31" y="30" width="1" height="1" fill="#101726"/>
-<rect x="8" y="10" width="3" height="1" fill="#0a0f1f"/>
-<rect x="18" y="10" width="4" height="1" fill="#0a0f1f"/>
-<rect x="8" y="11" width="1" height="1" fill="#0a0f1f"/>
-<rect x="21" y="11" width="1" height="1" fill="#0a0f1f"/>
-<rect x="8" y="12" width="1" height="1" fill="#0a0f1f"/>
-<rect x="21" y="12" width="1" height="1" fill="#0a0f1f"/>
-<rect x="8" y="13" width="1" height="1" fill="#0a0f1f"/>
-<rect x="8" y="14" width="1" height="1" fill="#0a0f1f"/>
-<rect x="8" y="15" width="1" height="1" fill="#0a0f1f"/>
-<rect x="8" y="16" width="1" height="1" fill="#0a0f1f"/>
-<rect x="8" y="17" width="1" height="1" fill="#0a0f1f"/>
-<rect x="7" y="18" width="2" height="1" fill="#0a0f1f"/>
-<rect x="10" y="18" width="1" height="1" fill="#0a0f1f"/>
-<rect x="21" y="19" width="1" height="1" fill="#0a0f1f"/>
-<rect x="21" y="20" width="1" height="1" fill="#0a0f1f"/>
-<rect x="4" y="21" width="1" height="1" fill="#0a0f1f"/>
-<rect x="12" y="21" width="1" height="1" fill="#0a0f1f"/>
-<rect x="21" y="21" width="1" height="1" fill="#0a0f1f"/>
-<rect x="21" y="22" width="1" height="1" fill="#0a0f1f"/>
-<rect x="4" y="23" width="1" height="1" fill="#0a0f1f"/>
-<rect x="12" y="23" width="10" height="1" fill="#0a0f1f"/>
-<rect x="4" y="25" width="1" height="1" fill="#0a0f1f"/>
-<rect x="12" y="25" width="1" height="1" fill="#0a0f1f"/>
-<rect x="11" y="10" width="7" height="1" fill="#8d5a3b"/>
-<rect x="9" y="11" width="12" height="1" fill="#8d5a3b"/>
-<rect x="9" y="12" width="12" height="1" fill="#8d5a3b"/>
-<rect x="9" y="13" width="15" height="1" fill="#8d5a3b"/>
-<rect x="9" y="14" width="8" height="1" fill="#8d5a3b"/>
-<rect x="18" y="14" width="6" height="1" fill="#8d5a3b"/>
-<rect x="9" y="15" width="15" height="1" fill="#8d5a3b"/>
-<rect x="9" y="16" width="15" height="1" fill="#8d5a3b"/>
-<rect x="9" y="17" width="15" height="1" fill="#8d5a3b"/>
-<rect x="9" y="18" width="1" height="1" fill="#8d5a3b"/>
-<rect x="11" y="18" width="13" height="1" fill="#8d5a3b"/>
-<rect x="10" y="19" width="11" height="1" fill="#8d5a3b"/>
-<rect x="11" y="20" width="10" height="1" fill="#8d5a3b"/>
-<rect x="13" y="21" width="8" height="1" fill="#8d5a3b"/>
-<rect x="12" y="22" width="9" height="1" fill="#8d5a3b"/>
-<rect x="11" y="8" width="7" height="1" fill="#8d5a3b"/>
-<rect x="11" y="9" width="7" height="1" fill="#8d5a3b"/>
-<rect x="17" y="14" width="1" height="1" fill="#e8f1ff"/>
-<rect x="7" y="22" width="1" height="1" fill="#e8f1ff"/>
-<rect x="10" y="22" width="1" height="1" fill="#e8f1ff"/>
-<rect x="8" y="19" width="2" height="1" fill="#9b5de5"/>
-<rect x="7" y="20" width="4" height="1" fill="#9b5de5"/>
-<rect x="6" y="21" width="6" height="1" fill="#9b5de5"/>
-<rect x="6" y="22" width="1" height="1" fill="#9b5de5"/>
-<rect x="8" y="22" width="2" height="1" fill="#9b5de5"/>
-<rect x="11" y="22" width="1" height="1" fill="#9b5de5"/>
-<rect x="6" y="23" width="6" height="1" fill="#9b5de5"/>
-<rect x="6" y="24" width="6" height="1" fill="#9b5de5"/>
-<rect x="7" y="25" width="4" height="1" fill="#9b5de5"/>
-<rect x="7" y="26" width="4" height="1" fill="#9b5de5"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" shape-rendering="crispEdges">
+  <title>Trojan Horse</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#151a22"/>
+      <stop offset="1" stop-color="#090c11"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1a202a"/>
+      <stop offset="1" stop-color="#0d1219"/>
+    </linearGradient>
+    <linearGradient id="wood" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2a2f39"/>
+      <stop offset="1" stop-color="#161b24"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer frame -->
+  <rect x="3" y="3" width="26" height="26" fill="url(#bg)" stroke="#3b4350" stroke-width="1"/>
+  <rect x="3" y="3" width="26" height="3" fill="#10141b"/>
+
+  <!-- Header lights -->
+  <rect x="5" y="4" width="1" height="1" fill="#ff355e"/>
+  <rect x="7" y="4" width="1" height="1" fill="#ff9f1c"/>
+  <rect x="9" y="4" width="1" height="1" fill="#3cff9b"/>
+
+  <!-- Stage panel -->
+  <rect x="6" y="8" width="20" height="18" fill="url(#panel)" stroke="#2a313c" stroke-width="1"/>
+
+  <!-- Network target wall -->
+  <rect x="21" y="10" width="4" height="10" fill="#0b0f14" stroke="#57d9ff" stroke-width="1"/>
+  <path d="M22 12H24M22 14H24M22 16H24" stroke="#42f58d" stroke-width="1"/>
+
+  <!-- Trojan horse body -->
+  <path d="M9 18H17L19 16L18 14L15 12H11L9 14V18Z" fill="url(#wood)" stroke="#57d9ff" stroke-width="1"/>
+  <rect x="14" y="10" width="3" height="3" fill="url(#wood)" stroke="#57d9ff" stroke-width="1"/>
+  <path d="M16 10L18 9V12" stroke="#57d9ff" stroke-width="1"/>
+
+  <!-- Hollow compartment / hidden payload -->
+  <rect x="11" y="14" width="5" height="3" fill="#1a0d12" stroke="#ff355e" stroke-width="1"/>
+  <rect x="12" y="15" width="1" height="1" fill="#ff355e"/>
+  <rect x="14" y="15" width="1" height="1" fill="#ff355e"/>
+
+  <!-- Horse legs -->
+  <rect x="10" y="18" width="2" height="4" fill="#0a0d12" stroke="#57d9ff" stroke-width="1"/>
+  <rect x="14" y="18" width="2" height="4" fill="#0a0d12" stroke="#57d9ff" stroke-width="1"/>
+
+  <!-- Wheels (deception delivery) -->
+  <rect x="9" y="22" width="3" height="3" fill="#11161d" stroke="#42f58d" stroke-width="1"/>
+  <rect x="14" y="22" width="3" height="3" fill="#11161d" stroke="#42f58d" stroke-width="1"/>
+  <rect x="10" y="23" width="1" height="1" fill="#42f58d"/>
+  <rect x="15" y="23" width="1" height="1" fill="#42f58d"/>
+
+  <!-- Infiltration arrow -->
+  <path d="M18 16H21" stroke="#ff355e" stroke-width="1"/>
+  <path d="M21 15L23 16L21 17" stroke="#ff355e" stroke-width="1"/>
+
+  <!-- Hidden malware bug icon -->
+  <rect x="23" y="21" width="4" height="4" fill="#11161d" stroke="#ff355e" stroke-width="1"/>
+  <rect x="24" y="22" width="2" height="1" fill="#ff355e"/>
+  <rect x="24" y="23" width="1" height="1" fill="#57d9ff"/>
+  <rect x="25" y="23" width="1" height="1" fill="#57d9ff"/>
+
+  <!-- Alarm strip -->
+  <rect x="7" y="25" width="14" height="1" fill="#ff355e" fill-opacity="0.5"/>
+
+  <!-- Subtle glitch accents -->
+  <rect x="24" y="7" width="2" height="1" fill="#ff355e" fill-opacity="0.45"/>
+  <rect x="6" y="26" width="2" height="1" fill="#57d9ff" fill-opacity="0.4"/>
 </svg>

@@ -1,5 +1,5 @@
 // ========================================
-// CYBER DEFENSE SIMULATOR - UI MANAGER
+// CYBER DEFENCE SIMULATOR - UI MANAGER
 // Handles all DOM-based UI interactions
 // Including educational systems: quiz, knowledge tracker, case studies
 // ========================================
@@ -7,8 +7,9 @@
 import {
     STATE, TOWER_TYPES, THREAT_TYPES, LEVELS, ACHIEVEMENTS, ENCYCLOPEDIA,
     QUIZ_QUESTIONS, CASE_STUDIES, DID_YOU_KNOW_TIPS, SPEC_TOPICS, THREAT_COUNTERS,
-    SYNERGIES, getEncyclopediaEntryCount
+    SYNERGIES, getEncyclopediaEntryCount, getQuizReward, getLevelObjectives
 } from './config.js';
+import { getThreatIconSrc, getTowerIconSrc } from './iconImages.js';
 
 export class UIManager {
     constructor(game) {
@@ -31,7 +32,8 @@ export class UIManager {
             pause: document.getElementById('pause-modal'),
             eduPopup: document.getElementById('edu-popup'),
             quiz: document.getElementById('quiz-modal'),
-            assessment: document.getElementById('assessment-modal')
+            assessment: document.getElementById('assessment-modal'),
+            nextWave: document.getElementById('next-wave-modal')
         };
 
         this.hud = {
@@ -48,7 +50,7 @@ export class UIManager {
             towerInfoPanel: document.getElementById('tower-info-panel'),
             towerInfoName: document.getElementById('tower-info-name'),
             towerInfoStats: document.getElementById('tower-info-stats'),
-            levelGrid: document.getElementById('level-grid'),
+            levelGrid: document.getElementById('level-grid') || document.getElementById('level-defence-grid'),
             notifications: document.getElementById('notifications'),
             tooltip: document.getElementById('tooltip'),
             encyclopediaNav: document.getElementById('encyclopedia-nav'),
@@ -113,6 +115,77 @@ export class UIManager {
         Object.values(this.modals).forEach(m => m.classList.add('hidden'));
     }
 
+    /**
+     * Show the "next wave" intel modal: threat icon(s) and effectiveness matrix for each threat in the wave.
+     * @param {number} waveNumber - 1-based wave number (e.g. 1, 2, 3)
+     * @param {object} waveConfig - levelConfig.waves[i] with .threats array of { type, count, interval, path? }
+     */
+    showNextWaveModal(waveNumber, waveConfig) {
+        const titleEl = document.getElementById('next-wave-title');
+        const descEl = document.getElementById('next-wave-desc');
+        const threatsContainer = document.getElementById('next-wave-threats');
+        const beginBtn = document.getElementById('btn-next-wave-begin');
+        if (!titleEl || !descEl || !threatsContainer) return;
+
+        titleEl.textContent = `Wave ${waveNumber} of ${this.game.totalWaves}`;
+        descEl.textContent = waveNumber === 1
+            ? 'The following threat types are coming in this wave. Use the effectiveness matrix to plan your defences during the planning phase.'
+            : 'The following threat types are coming. Use the effectiveness matrix to choose the right defences.';
+        if (beginBtn) beginBtn.textContent = waveNumber === 1 ? 'START PLANNING' : 'BEGIN WAVE';
+
+        const threatGroups = waveConfig?.threats || [];
+        const uniqueTypes = [...new Set(threatGroups.map(g => g.type))];
+        const activeTowerKeys = Object.keys(TOWER_TYPES).filter(k => TOWER_TYPES[k].type === 'active' && TOWER_TYPES[k].effectiveness);
+
+        let html = '';
+        for (const threatKey of uniqueTypes) {
+            const threat = THREAT_TYPES[threatKey];
+            if (!threat) continue;
+            const iconSrc = getThreatIconSrc(threatKey);
+            const borderColor = threat.color || '#64748b';
+
+            let matrixRows = '';
+            for (const towKey of activeTowerKeys) {
+                const tower = TOWER_TYPES[towKey];
+                const eff = tower.effectiveness ? (tower.effectiveness[threatKey] ?? 0) : 0;
+                const pct = Math.round(eff * 100);
+                let cls = 'eff-0';
+                let label = 'NONE';
+                if (eff >= 2.0) { cls = 'eff-max'; label = 'SPECIALIST'; }
+                else if (eff >= 1.5) { cls = 'eff-high'; label = 'STRONG'; }
+                else if (eff >= 0.8) { cls = 'eff-std'; label = 'EFFECTIVE'; }
+                else if (eff >= 0.3) { cls = 'eff-mid'; label = 'PARTIAL'; }
+                else if (eff > 0) { cls = 'eff-low'; label = 'WEAK'; }
+                matrixRows += `<tr><th>${tower.symbol} ${tower.name}</th><td class="eff-cell ${cls}">${pct}%<span class="eff-label">${label}</span></td></tr>`;
+            }
+
+            html += `
+                <div class="next-wave-threat-card" style="border-left-color: ${borderColor}">
+                    <div class="next-wave-threat-header">
+                        <img class="next-wave-threat-icon" src="${iconSrc}" alt="${threat.name}" />
+                        <span class="next-wave-threat-name" style="color: ${borderColor}">${threat.name}</span>
+                    </div>
+                    <table class="next-wave-threat-matrix">
+                        <thead><tr><th>Tower</th><th>Effectiveness</th></tr></thead>
+                        <tbody>${matrixRows}</tbody>
+                    </table>
+                </div>`;
+        }
+        threatsContainer.innerHTML = html || '<p class="next-wave-desc">No threat data for this wave.</p>';
+        this.showModal('nextWave');
+        // Scroll to top after modal is visible so it sticks (hidden modals may ignore scrollTop)
+        const modalEl = document.getElementById('next-wave-modal');
+        const scrollToTop = () => {
+            threatsContainer.scrollTop = 0;
+            const content = modalEl && modalEl.querySelector('.next-wave-content');
+            if (content) content.scrollTop = 0;
+        };
+        requestAnimationFrame(() => {
+            scrollToTop();
+            requestAnimationFrame(scrollToTop);
+        });
+    }
+
     // --- Main Menu ---
     showMainMenu() {
         this.showScreen('mainMenu');
@@ -127,28 +200,56 @@ export class UIManager {
         this.renderLevelGrid();
     }
 
+    /** Return unique threat types encountered in this level (ordered by canonical threat order). */
+    getLevelThreatTypes(level) {
+        const seen = new Set();
+        (level.waves || []).forEach(w => {
+            (w.threats || []).forEach(t => { if (t && t.type) seen.add(t.type); });
+        });
+        const order = ['phishing', 'malware', 'ransomware', 'ddos', 'sqlInjection', 'trojan', 'insider', 'zeroDay', 'sniffer'];
+        return order.filter(t => seen.has(t));
+    }
+
     renderLevelGrid() {
-        const grid = this.elements.levelGrid;
+        const grid = this.elements.levelGrid || document.getElementById('level-grid') || document.getElementById('level-defence-grid');
+        if (!grid) return;
+
+        const levels = Array.isArray(LEVELS) ? LEVELS : [];
+        if (levels.length === 0) {
+            grid.innerHTML = '<p class="level-grid-empty">No missions available.</p>';
+            return;
+        }
+
+        const progress = this.game?.progress || {};
+        const levelsCompleted = progress.levelsCompleted || [];
+        const levelStars = progress.levelStars || {};
+        const levelScores = progress.levelScores || {};
+
         grid.innerHTML = '';
 
-        LEVELS.forEach((level, index) => {
-            const isUnlocked = index === 0 || this.game.progress.levelsCompleted.includes(index);
-            const isCompleted = this.game.progress.levelsCompleted.includes(level.id);
-            const stars = this.game.progress.levelStars[level.id] || 0;
-            const score = this.game.progress.levelScores[level.id] || 0;
+        levels.forEach((level, index) => {
+            const id = level?.id ?? index + 1;
+            const name = level?.name ?? `Mission ${id}`;
+            const description = level?.description ?? '';
+            const isUnlocked = index === 0 || levelsCompleted.includes(index) || levelsCompleted.includes(id);
+            const isCompleted = levelsCompleted.includes(id);
+            const stars = levelStars[id] || 0;
+            const score = levelScores[id] || 0;
+            const threatTypes = this.getLevelThreatTypes(level);
+            const threatIconsHtml = threatTypes.map(tKey => {
+                const t = THREAT_TYPES[tKey];
+                if (!t) return '';
+                return `<span class="level-threat-icon" style="background:${t.color}22;color:${t.color}" title="${(t.name || '').replace(/"/g, '&quot;')}">${t.symbol}</span>`;
+            }).join('');
 
             const card = document.createElement('div');
             card.className = `level-card ${isCompleted ? 'completed' : ''} ${!isUnlocked ? 'locked' : ''}`;
 
             card.innerHTML = `
-                <div class="level-number">MISSION ${level.id}</div>
-                <div class="level-name">${level.name}</div>
-                <div class="level-desc">${level.description}</div>
-                <div class="level-difficulty">
-                    ${Array.from({ length: 10 }, (_, i) =>
-                        `<div class="diff-dot ${i < level.difficulty ? 'active' : ''}"></div>`
-                    ).join('')}
-                </div>
+                <div class="level-number">MISSION ${id}</div>
+                <div class="level-name">${(name || '').replace(/</g, '&lt;')}</div>
+                <div class="level-desc">${(description || '').replace(/</g, '&lt;')}</div>
+                <div class="level-threats" title="Threat types in this mission">${threatIconsHtml}</div>
                 ${isCompleted ? `
                     <div class="level-stars">${'\u2605'.repeat(stars)}${'\u2606'.repeat(3 - stars)}</div>
                     <div style="font-size:0.75rem;color:#94a3b8;margin-top:4px;">Best: \u00A3${score}</div>
@@ -356,7 +457,7 @@ export class UIManager {
             this.hud.phase.textContent = 'PLANNING PHASE';
             this.hud.phase.style.color = '#00d4ff';
             const secs = Math.ceil(this.game.planningTimer / 1000);
-            this.hud.timer.textContent = `${secs}s remaining \u2013 Place your defenses!`;
+            this.hud.timer.textContent = `${secs}s remaining \u2013 Place your defences!`;
         } else if (this.game.state === STATE.PLAYING) {
             this.hud.phase.textContent = `WAVE ${this.game.currentWave}`;
             this.hud.phase.style.color = '#ff4757';
@@ -434,10 +535,27 @@ export class UIManager {
         tooltip.classList.remove('hidden');
 
         const rect = tooltip.getBoundingClientRect();
-        const x = event.clientX - rect.width - 10;
-        const y = event.clientY;
-        tooltip.style.left = Math.max(10, x) + 'px';
-        tooltip.style.top = Math.max(10, y) + 'px';
+        const pad = 10;
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+
+        let left = event.clientX - rect.width - pad;
+        let top = event.clientY;
+
+        // If tooltip would go off bottom, show above the cursor instead
+        if (top + rect.height > vh - pad) {
+            top = event.clientY - rect.height - pad;
+        }
+        // If tooltip would go off right, anchor to the right of cursor
+        if (left + rect.width > vw - pad) {
+            left = vw - rect.width - pad;
+        }
+        // Clamp to viewport
+        left = Math.max(pad, Math.min(left, vw - rect.width - pad));
+        top = Math.max(pad, Math.min(top, vh - rect.height - pad));
+
+        tooltip.style.left = left + 'px';
+        tooltip.style.top = top + 'px';
     }
 
     hideTooltip() {
@@ -468,28 +586,31 @@ export class UIManager {
         document.getElementById('intro-title').textContent = `Mission ${level.id}: ${level.name}`;
         document.getElementById('intro-scenario').textContent = level.scenario;
 
-        // Objectives
+        // Objectives (mechanical, tracked for stars)
         const objectives = document.getElementById('intro-objectives');
+        const levelObjectives = getLevelObjectives(level);
+        const criticalAssets = (level.assets || []).filter(a => a.critical);
         objectives.innerHTML = `
-            <h4>OBJECTIVES</h4>
-            <ul>
-                <li>Protect all network assets from cyber threats</li>
-                <li>Survive ${level.waves.length} waves of attacks</li>
+            <h4>OBJECTIVES <span style="font-size:0.7em;color:#00d4ff;">(tracked for stars)</span></h4>
+            <ul class="intro-objectives-list">
+                <li>Survive all ${level.waves.length} waves</li>
+                ${criticalAssets.length ? `<li><strong>Mission fail</strong> if critical asset is lost: ${criticalAssets.map(a => a.name).join(', ')}</li>` : ''}
+                ${levelObjectives.map(o => `<li>${o.label}</li>`).join('')}
                 <li>Starting budget: \u00A3${level.startingBudget}</li>
-                <li>Answer quiz questions between waves for bonus budget!</li>
             </ul>
         `;
 
         // Available towers
         const available = document.getElementById('intro-available');
-        available.innerHTML = '<h4>AVAILABLE DEFENSES</h4>';
+        available.innerHTML = '<h4>AVAILABLE DEFENCES</h4>';
         const tags = level.availableTowers.map(key => {
             const config = TOWER_TYPES[key];
             return `<span class="tower-tag">${config.symbol} ${config.name} (\u00A3${config.cost})</span>`;
         }).join('');
         available.innerHTML += tags;
 
-        // Case Study (if available for this level)
+        // Case Study (if available for this level) — remove any existing first to avoid duplication
+        document.querySelectorAll('#level-intro .case-study-box').forEach(el => el.remove());
         const caseStudy = CASE_STUDIES[level.id];
         if (caseStudy) {
             const caseBox = document.createElement('div');
@@ -516,15 +637,26 @@ export class UIManager {
     showLevelComplete() {
         const game = this.game;
         const healthPct = game.getOverallHealth();
-        const stars = healthPct >= 90 ? 3 : healthPct >= 50 ? 2 : 1;
+        const { objectives, results, metCount, stars } = game.getObjectivesResult();
         const timeSecs = Math.round((Date.now() - game.stats.startTime) / 1000);
 
         document.getElementById('complete-title').textContent =
             `MISSION ${game.levelConfig.id} COMPLETE`;
 
-        // Stats
+        // Objectives result (mechanical)
+        let objectivesHtml = '';
+        if (objectives.length > 0) {
+            objectivesHtml = `<div class="complete-objectives"><h4>OBJECTIVES</h4><ul>`;
+            objectives.forEach((obj, i) => {
+                const met = results[i];
+                objectivesHtml += `<li class="${met ? 'objective-met' : 'objective-missed'}">${met ? '\u2714' : '\u2718'} ${obj.label}</li>`;
+            });
+            objectivesHtml += `</ul><p class="objective-summary">${metCount}/${objectives.length} met \u2192 ${'\u2605'.repeat(stars)}${'\u2606'.repeat(3 - stars)} stars</p></div>`;
+        }
+
+        // Stats (objectives block first if present, then stat cards)
         const statsEl = document.getElementById('complete-stats');
-        statsEl.innerHTML = `
+        statsEl.innerHTML = (objectivesHtml || '') + `
             <div class="stat-card">
                 <div class="stat-label">SCORE</div>
                 <div class="stat-value">${game.score}</div>
@@ -598,12 +730,20 @@ export class UIManager {
     // --- Game Over Modal ---
     showGameOver() {
         const msg = document.getElementById('gameover-message');
-        const hasRansomware = this.game.threats.some(t => t.type === 'ransomware');
+        const reason = this.game._lastLossReason;
+        const assetName = this.game._lastLossAssetName || '';
 
-        if (hasRansomware) {
-            msg.innerHTML = '<strong>Ransomware has encrypted critical systems!</strong> Without adequate backup and layered defenses, your organization has suffered catastrophic data loss.<br><br><em style="color:#a855f7;">Learning point: Defense in depth and regular backups are essential for business continuity. Under GDPR, this breach must be reported to the ICO within 72 hours.</em>';
+        if (reason === 'critical_asset' && assetName) {
+            msg.innerHTML = `<strong>Mission failed: critical asset lost.</strong><br><br>${assetName} has been compromised. In real operations, losing this asset would end the mission (e.g. patient records, command systems, or payment data).<br><br><em style="color:#a855f7;">Learning point: Prioritise protecting critical assets. Use segmentation and backup so one breach does not compromise mission-critical systems.</em>`;
+        } else if (reason === 'all_compromised') {
+            const hasRansomware = this.game.threats.some(t => t.type === 'ransomware');
+            if (hasRansomware) {
+                msg.innerHTML = '<strong>Ransomware has encrypted critical systems!</strong> Without adequate backup and layered defences, your organization has suffered catastrophic data loss.<br><br><em style="color:#a855f7;">Learning point: Defence in depth and regular backups are essential for business continuity. Under GDPR, this breach must be reported to the ICO within 72 hours.</em>';
+            } else {
+                msg.innerHTML = 'Your network defences have been overwhelmed! All assets have been compromised.<br><br><em style="color:#a855f7;">Learning point: Consider using a wider variety of security controls. No single defence is sufficient \u2013 this is why defence in depth (D4) is essential.</em>';
+            }
         } else {
-            msg.innerHTML = 'Your network defenses have been overwhelmed! All critical assets have been compromised.<br><br><em style="color:#a855f7;">Learning point: Consider using a wider variety of security controls. No single defense is sufficient \u2013 this is why defense in depth (D4) is essential.</em>';
+            msg.innerHTML = 'Your network defences have been overwhelmed! All critical assets have been compromised.<br><br><em style="color:#a855f7;">Learning point: Consider using a wider variety of security controls. No single defence is sufficient \u2013 this is why defence in depth (D4) is essential.</em>';
         }
 
         this.showModal('gameOver');
@@ -696,10 +836,11 @@ export class UIManager {
         this.quizAnswered = false;
         this.quizCallback = callback;
 
-        // Populate quiz UI
+        // Populate quiz UI (reward scales by level and wave)
+        const quizReward = getQuizReward(levelId, this.game.currentWave || 1);
         document.getElementById('quiz-question').textContent = question.question;
         document.getElementById('quiz-spec-ref').textContent = `BTEC SPEC: ${question.specRef}`;
-        document.getElementById('quiz-reward').textContent = 'Correct = +\u00A3200 bonus!';
+        document.getElementById('quiz-reward').textContent = `Correct = +\u00A3${quizReward} bonus!`;
 
         // Build options
         const optionsContainer = document.getElementById('quiz-options');
@@ -753,13 +894,15 @@ export class UIManager {
         feedbackEl.classList.remove('hidden');
 
         const resultIcon = document.getElementById('quiz-result-icon');
+        const quizReward = getQuizReward(this.game.levelConfig?.id ?? 1, this.game.currentWave || 1);
         if (isCorrect) {
-            resultIcon.textContent = '\u2714 CORRECT! +\u00A3200 bonus budget';
+            resultIcon.textContent = `\u2714 CORRECT! +\u00A3${quizReward} bonus budget`;
             resultIcon.className = 'quiz-result-icon correct';
-            this.game.budget += 200;
-            this.game.score += 200;
+            this.game.budget += quizReward;
+            this.game.score += quizReward;
             if (!this.game.stats.quizBonusEarned) this.game.stats.quizBonusEarned = 0;
-            this.game.stats.quizBonusEarned += 200;
+            this.game.stats.quizBonusEarned += quizReward;
+            this.game.stats.quizzesCorrectThisLevel = (this.game.stats.quizzesCorrectThisLevel || 0) + 1;
         } else {
             resultIcon.textContent = '\u2718 INCORRECT';
             resultIcon.className = 'quiz-result-icon incorrect';
@@ -1100,27 +1243,27 @@ export class UIManager {
             <strong style="color:#a855f7;font-size:0.7rem;">\uD83D\uDCDA LEARN:</strong> ${config.educationalNote}
         `;
 
-        // Best defense recommendation using THREAT_COUNTERS
+        // Best defence recommendation using THREAT_COUNTERS
         const counters = THREAT_COUNTERS[threat.type];
-        let defenseHtml = '';
+        let defenceHtml = '';
         if (counters) {
             if (counters.strongCounters.length > 0) {
                 const names = counters.strongCounters.map(k => {
                     const t = TOWER_TYPES[k];
                     return t ? `<span style="color:#00ff88;">${t.symbol} ${t.name}</span>` : k;
                 }).join(', ');
-                defenseHtml += `<div style="margin-bottom:3px;"><strong style="color:#00ff88;">STRONG COUNTERS:</strong> ${names}</div>`;
+                defenceHtml += `<div style="margin-bottom:3px;"><strong style="color:#00ff88;">STRONG COUNTERS:</strong> ${names}</div>`;
             }
             if (counters.immune.length > 0) {
                 const names = counters.immune.map(k => {
                     const t = TOWER_TYPES[k];
                     return t ? t.name : k;
                 }).join(', ');
-                defenseHtml += `<div style="color:#ef4444;font-size:0.7rem;">Resists: ${names}</div>`;
+                defenceHtml += `<div style="color:#ef4444;font-size:0.7rem;">Resists: ${names}</div>`;
             }
         }
 
-        document.getElementById('threat-info-defense').innerHTML = defenseHtml || '<strong>BEST DEFENSE:</strong> Multiple layered controls';
+        document.getElementById('threat-info-defence').innerHTML = defenceHtml || '<strong>BEST DEFENCE:</strong> Multiple layered controls';
 
         // Synergy status
         let synergyHtml = '';
@@ -1149,14 +1292,14 @@ export class UIManager {
             }
         }
 
-        // Insert synergy info after defense section
-        const defenseEl = document.getElementById('threat-info-defense');
+        // Insert synergy info after defence section
+        const defenceEl = document.getElementById('threat-info-defence');
         let synergyEl = document.getElementById('threat-info-synergy');
         if (!synergyEl) {
             synergyEl = document.createElement('div');
             synergyEl.id = 'threat-info-synergy';
             synergyEl.style.fontSize = '0.72rem';
-            defenseEl.parentNode.insertBefore(synergyEl, defenseEl.nextSibling);
+            defenceEl.parentNode.insertBefore(synergyEl, defenceEl.nextSibling);
         }
         synergyEl.innerHTML = synergyHtml;
 
@@ -1444,8 +1587,8 @@ export class UIManager {
             }
         }
 
-        // Exam-style practice question (if threat or defense)
-        if (categoryKey === 'threats' || categoryKey === 'defenses') {
+        // Exam-style practice question (if threat or defence)
+        if (categoryKey === 'threats' || categoryKey === 'defences') {
             html += `<div class="enc-section" style="margin-top:16px;"><h4>EXAM PRACTICE</h4>`;
             html += `<p style="font-style:italic;color:#fbbf24;">Try to answer this without looking at the answer:</p>`;
 
@@ -1558,7 +1701,7 @@ export class UIManager {
     }
 
     // ========================================
-    // INTEL BRIEFING - Threat/Defense Matrix
+    // INTEL BRIEFING - Threat/Defence Matrix
     // ========================================
     showIntelBriefing(returnTo) {
         this.intelReturnTo = returnTo || 'mainMenu';
@@ -1582,10 +1725,14 @@ export class UIManager {
             const threat = THREAT_TYPES[threatKey];
             const counters = THREAT_COUNTERS[threatKey] || { strongCounters: [], weakCounters: [], immune: [] };
 
+            const threatIconSrc = getThreatIconSrc(threatKey);
             cardsHTML += `<div class="intel-threat-card" style="border-left: 3px solid ${threat.color}">`;
             cardsHTML += `<div class="intel-threat-card-header">`;
-            cardsHTML += `<div class="intel-threat-icon" style="background:${threat.color}20; color:${threat.color}">${threat.symbol}</div>`;
-            cardsHTML += `<div><h4>${threat.name}</h4><span class="intel-threat-type">${threatKey}</span></div>`;
+            cardsHTML += `<div class="intel-threat-icon" style="background:${threat.color}20; border-color:${threat.color}">`;
+            if (threatIconSrc) cardsHTML += `<img src="${threatIconSrc}" alt="" class="intel-icon-img" />`;
+            else cardsHTML += `<span style="color:${threat.color}">${threat.symbol}</span>`;
+            cardsHTML += `</div>`;
+            cardsHTML += `<div><h4 style="color:${threat.color}">${threat.name}</h4><span class="intel-threat-type">${threatKey}</span></div>`;
             cardsHTML += `</div>`;
 
             // Strong counters
@@ -1597,8 +1744,11 @@ export class UIManager {
                     const eff = tower.effectiveness ? tower.effectiveness[threatKey] : null;
                     const effLabel = eff ? ` (${Math.round(eff * 100)}%)` : '';
                     const isPassive = tower.type === 'passive';
+                    const towerIconSrc = getTowerIconSrc(tKey);
                     cardsHTML += `<li><span class="intel-counter-badge ${isPassive ? 'passive' : 'strong'}">${isPassive ? 'PASSIVE' : 'STRONG'}</span> `;
-                    cardsHTML += `<span class="intel-counter-strong">${tower.symbol} ${tower.name}${effLabel}</span></li>`;
+                    if (towerIconSrc) cardsHTML += `<img src="${towerIconSrc}" alt="" class="intel-inline-icon" /><span class="intel-counter-strong">${tower.name}${effLabel}</span>`;
+                    else cardsHTML += `<span class="intel-counter-strong">${tower.symbol} ${tower.name}${effLabel}</span>`;
+                    cardsHTML += `</li>`;
                 }
             }
             // Partial counters
@@ -1608,8 +1758,11 @@ export class UIManager {
                     if (!tower) continue;
                     const eff = tower.effectiveness ? tower.effectiveness[threatKey] : null;
                     const effLabel = eff ? ` (${Math.round(eff * 100)}%)` : '';
+                    const towerIconSrcW = getTowerIconSrc(tKey);
                     cardsHTML += `<li><span class="intel-counter-badge weak">PARTIAL</span> `;
-                    cardsHTML += `<span class="intel-counter-weak">${tower.symbol} ${tower.name}${effLabel}</span></li>`;
+                    if (towerIconSrcW) cardsHTML += `<img src="${towerIconSrcW}" alt="" class="intel-inline-icon" /><span class="intel-counter-weak">${tower.name}${effLabel}</span>`;
+                    else cardsHTML += `<span class="intel-counter-weak">${tower.symbol} ${tower.name}${effLabel}</span>`;
+                    cardsHTML += `</li>`;
                 }
             }
             // Immune / ineffective
@@ -1631,13 +1784,21 @@ export class UIManager {
         let tableHTML = '<thead><tr><th></th>';
         for (const tKey of threatKeys) {
             const t = THREAT_TYPES[tKey];
-            tableHTML += `<th class="rotate-header" style="color:${t.color}">${t.symbol} ${t.name}</th>`;
+            const tSrc = getThreatIconSrc(tKey);
+            tableHTML += `<th class="rotate-header" style="color:${t.color}">`;
+            if (tSrc) tableHTML += `<img src="${tSrc}" alt="" class="intel-matrix-threat-icon" />`;
+            else tableHTML += t.symbol;
+            tableHTML += ` ${t.name}</th>`;
         }
         tableHTML += '</tr></thead><tbody>';
 
         for (const towKey of activeTowerKeys) {
             const tower = TOWER_TYPES[towKey];
-            tableHTML += `<tr><th style="color:${tower.color}">${tower.symbol} ${tower.name}</th>`;
+            const towSrc = getTowerIconSrc(towKey);
+            tableHTML += `<tr><th style="color:${tower.color}">`;
+            if (towSrc) tableHTML += `<img src="${towSrc}" alt="" class="intel-matrix-tower-icon" />`;
+            else tableHTML += tower.symbol;
+            tableHTML += ` ${tower.name}</th>`;
 
             for (const threatKey of threatKeys) {
                 const eff = tower.effectiveness ? (tower.effectiveness[threatKey] || 0) : 0;
@@ -1667,8 +1828,12 @@ export class UIManager {
         let passiveHTML = '<div class="intel-passive-cards">';
         for (const pKey of passiveTowerKeys) {
             const tower = TOWER_TYPES[pKey];
+            const pIconSrc = getTowerIconSrc(pKey);
             passiveHTML += `<div class="intel-passive-card" style="border-left: 3px solid ${tower.color}">`;
-            passiveHTML += `<div class="intel-passive-icon">${tower.symbol}</div>`;
+            passiveHTML += `<div class="intel-passive-icon">`;
+            if (pIconSrc) passiveHTML += `<img src="${pIconSrc}" alt="" class="intel-icon-img" />`;
+            else passiveHTML += tower.symbol;
+            passiveHTML += `</div>`;
             passiveHTML += `<div><h4 style="color:${tower.color}">${tower.name}</h4>`;
             passiveHTML += `<p>${tower.passiveEffect || tower.description}</p>`;
             passiveHTML += `<p style="margin-top:4px;font-style:italic;color:#64748b;">${tower.educationalNote}</p>`;
@@ -1686,18 +1851,28 @@ export class UIManager {
             // Gather the threat icons for the "requires" list
             const reqIcons = syn.requires.map(tKey => {
                 const t = THREAT_TYPES[tKey];
-                return t ? `<span class="synergy-req-icon" style="background:${t.color}22;color:${t.color}" title="${t.name}">${t.symbol}</span>` : tKey;
+                const tSrc = getThreatIconSrc(tKey);
+                if (!t) return tKey;
+                if (tSrc) return `<span class="synergy-req-icon" style="background:${t.color}22;border-color:${t.color}" title="${t.name}"><img src="${tSrc}" alt="" class="intel-synergy-threat-icon" /></span>`;
+                return `<span class="synergy-req-icon" style="background:${t.color}22;color:${t.color}" title="${t.name}">${t.symbol}</span>`;
             }).join(' <span class="synergy-plus">+</span> ');
 
             // Which threats benefit
             let benefitHTML = '';
             if (syn.target) {
                 const t = THREAT_TYPES[syn.target];
-                if (t) benefitHTML = `<span class="synergy-benefit" style="color:${t.color}">${t.symbol} ${t.name}</span>`;
+                const tSrc = t ? getThreatIconSrc(syn.target) : '';
+                if (t) benefitHTML = tSrc
+                    ? `<span class="synergy-benefit" style="color:${t.color}"><img src="${tSrc}" alt="" class="intel-synergy-threat-icon" /> ${t.name}</span>`
+                    : `<span class="synergy-benefit" style="color:${t.color}">${t.symbol} ${t.name}</span>`;
             } else if (syn.protects) {
                 benefitHTML = syn.protects.map(tKey => {
                     const t = THREAT_TYPES[tKey];
-                    return t ? `<span class="synergy-benefit" style="color:${t.color}">${t.symbol} ${t.name}</span>` : tKey;
+                    const tSrc = t ? getThreatIconSrc(tKey) : '';
+                    if (!t) return tKey;
+                    return tSrc
+                        ? `<span class="synergy-benefit" style="color:${t.color}"><img src="${tSrc}" alt="" class="intel-synergy-threat-icon" /> ${t.name}</span>`
+                        : `<span class="synergy-benefit" style="color:${t.color}">${t.symbol} ${t.name}</span>`;
                 }).join(', ');
             } else if (syn.effect === 'aura') {
                 benefitHTML = '<span class="synergy-benefit" style="color:#d946ef;">All threats in range</span>';

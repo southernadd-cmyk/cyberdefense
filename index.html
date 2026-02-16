@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cyber Defense Simulator</title>
+    <title>Cyber Defence Simulator</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="preload" href="images/threat_hidden_trojan.svg" as="image">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -14,8 +15,8 @@
             <div class="menu-bg">
                 <div class="scanline"></div>
                 <div class="menu-content">
-                    <h1 class="game-title">CYBER DEFENSE<br><span>SIMULATOR</span></h1>
-                    <p class="subtitle">Tower Defense Cybersecurity Training</p>
+                    <h1 class="game-title">CYBER DEFENCE<br><span>SIMULATOR</span></h1>
+                    <p class="subtitle">Tower Defence Cybersecurity Training</p>
                     <div class="menu-buttons">
                         <button class="btn btn-primary" id="btn-play">PLAY</button>
                         <button class="btn btn-secondary" id="btn-intel">&#128269; INTEL BRIEFING</button>
@@ -67,7 +68,11 @@
                 </div>
                 <div class="hud-right">
                     <button class="btn-icon" id="btn-pause" title="Pause">&#9208;</button>
-                    <button class="btn-icon" id="btn-speed" title="Speed">&#9654;&#9654;</button>
+                    <div class="speed-buttons" role="group" aria-label="Game speed">
+                        <button type="button" class="btn-icon btn-speed-opt" id="btn-speed-1" title="1x speed" aria-pressed="true">1×</button>
+                        <button type="button" class="btn-icon btn-speed-opt" id="btn-speed-2" title="2x speed" aria-pressed="false">2×</button>
+                        <button type="button" class="btn-icon btn-speed-opt" id="btn-speed-3" title="3x speed" aria-pressed="false">3×</button>
+                    </div>
                     <button class="btn-icon" id="btn-menu-ingame" title="Menu">&#9776;</button>
                 </div>
             </div>
@@ -78,7 +83,7 @@
 
                 <!-- Tower Selection Sidebar -->
                 <div id="tower-sidebar">
-                    <h3>DEFENSES</h3>
+                    <h3>DEFENCES</h3>
                     <div id="tower-list"></div>
                     <div id="tower-info-panel" class="hidden">
                         <h4 id="tower-info-name"></h4>
@@ -218,6 +223,18 @@
             </div>
         </div>
 
+        <!-- Next Wave Intel Modal (before each wave) -->
+        <div id="next-wave-modal" class="modal hidden">
+            <div class="modal-overlay"></div>
+            <div class="modal-content next-wave-content">
+                <div class="next-wave-badge">&#128200; INCOMING WAVE</div>
+                <h3 id="next-wave-title">Wave 1</h3>
+                <p id="next-wave-desc" class="next-wave-desc">Prepare your defences.</p>
+                <div id="next-wave-threats" class="next-wave-threats"></div>
+                <button class="btn btn-primary" id="btn-next-wave-begin">BEGIN WAVE</button>
+            </div>
+        </div>
+
         <!-- Quiz Modal (between waves & post-level) -->
         <div id="quiz-modal" class="modal hidden">
             <div class="modal-overlay"></div>
@@ -248,7 +265,7 @@
             </div>
             <div id="threat-info-stats" class="threat-info-stats"></div>
             <div id="threat-info-edu" class="threat-info-edu"></div>
-            <div id="threat-info-defense" class="threat-info-defense"></div>
+            <div id="threat-info-defence" class="threat-info-defence"></div>
         </div>
 
         <!-- "Did You Know?" Banner (shown during planning/wave breaks) -->
@@ -277,10 +294,10 @@
         <div id="intel-screen" class="screen">
             <div class="screen-header">
                 <button class="btn btn-back" id="btn-back-intel">&larr; BACK</button>
-                <h2>INTEL BRIEFING &mdash; THREAT &amp; DEFENSE MATRIX</h2>
+                <h2>INTEL BRIEFING &mdash; THREAT &amp; DEFENCE MATRIX</h2>
             </div>
             <div class="intel-container" id="intel-container">
-                <p class="intel-intro">Understanding which security controls counter which threats is essential for effective cyber defense. <strong>No single defense stops everything</strong> &mdash; you must combine the right tools for each threat.</p>
+                <p class="intel-intro">Understanding which security controls counter which threats is essential for effective cyber defence. <strong>No single defence stops everything</strong> &mdash; you must combine the right tools for each threat.</p>
 
                 <!-- Threat cards with counter info -->
                 <div id="intel-threats"></div>
@@ -293,7 +310,7 @@
                 </div>
 
                 <!-- Passive tower info -->
-                <h3 class="intel-section-title">PASSIVE DEFENSES</h3>
+                <h3 class="intel-section-title">PASSIVE DEFENCES</h3>
                 <div id="intel-passives"></div>
 
                 <!-- Threat Synergies -->
@@ -305,8 +322,8 @@
                 <div class="intel-principle">
                     <span class="intel-principle-icon">&#128272;</span>
                     <div>
-                        <strong>DEFENSE IN DEPTH (D4):</strong> No single control stops all threats.
-                        Layer multiple defenses so that when one fails, others still protect your network.
+                        <strong>DEFENCE IN DEPTH (D4):</strong> No single control stops all threats.
+                        Layer multiple defences so that when one fails, others still protect your network.
                         This is the most important principle in cybersecurity.
                     </div>
                 </div>

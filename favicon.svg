@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" shape-rendering="crispEdges">
+  <!-- Background (transparent) -->
+
+  <!-- Shield body - dark base -->
+  <rect x="10" y="2" width="12" height="2" fill="#0f172a"></rect>
+  <rect x="8" y="4" width="16" height="2" fill="#0f172a"></rect>
+  <rect x="6" y="6" width="20" height="2" fill="#0f172a"></rect>
+  <rect x="6" y="8" width="20" height="2" fill="#0f172a"></rect>
+  <rect x="6" y="10" width="20" height="2" fill="#0f172a"></rect>
+  <rect x="6" y="12" width="20" height="2" fill="#0f172a"></rect>
+  <rect x="6" y="14" width="20" height="2" fill="#0f172a"></rect>
+  <rect x="8" y="16" width="16" height="2" fill="#0f172a"></rect>
+  <rect x="8" y="18" width="16" height="2" fill="#0f172a"></rect>
+  <rect x="10" y="20" width="12" height="2" fill="#0f172a"></rect>
+  <rect x="10" y="22" width="12" height="2" fill="#0f172a"></rect>
+  <rect x="12" y="24" width="8" height="2" fill="#0f172a"></rect>
+  <rect x="14" y="26" width="4" height="2" fill="#0f172a"></rect>
+
+  <!-- Shield border - neon green -->
+  <rect x="10" y="2" width="2" height="2" fill="#00ff88"></rect>
+  <rect x="12" y="2" width="2" height="2" fill="#00ff88"></rect>
+  <rect x="14" y="2" width="2" height="2" fill="#00ff88"></rect>
+  <rect x="16" y="2" width="2" height="2" fill="#00ff88"></rect>
+  <rect x="18" y="2" width="2" height="2" fill="#00ff88"></rect>
+  <rect x="20" y="2" width="2" height="2" fill="#00ff88"></rect>
+  <rect x="8" y="4" width="2" height="2" fill="#00ff88"></rect>
+  <rect x="22" y="4" width="2" height="2" fill="#00ff88"></rect>
+  <rect x="6" y="6" width="2" height="2" fill="#00ff88"></rect>
+  <rect x="24" y="6" width="2" height="2" fill="#00ff88"></rect>
+  <rect x="6" y="8" width="2" height="2" fill="#00ff88"></rect>
+  <rect x="24" y="8" width="2" height="2" fill="#00ff88"></rect>
+  <rect x="6" y="10" width="2" height="2" fill="#00ff88"></rect>
+  <rect x="24" y="10" width="2" height="2" fill="#00ff88"></rect>
+  <rect x="6" y="12" width="2" height="2" fill="#00ff88"></rect>
+  <rect x="24" y="12" width="2" height="2" fill="#00ff88"></rect>
+  <rect x="6" y="14" width="2" height="2" fill="#00ff88"></rect>
+  <rect x="24" y="14" width="2" height="2" fill="#00ff88"></rect>
+  <rect x="8" y="16" width="2" height="2" fill="#00ff88"></rect>
+  <rect x="22" y="16" width="2" height="2" fill="#00ff88"></rect>
+  <rect x="8" y="18" width="2" height="2" fill="#00ff88"></rect>
+  <rect x="22" y="18" width="2" height="2" fill="#00ff88"></rect>
+  <rect x="10" y="20" width="2" height="2" fill="#00ff88"></rect>
+  <rect x="20" y="20" width="2" height="2" fill="#00ff88"></rect>
+  <rect x="10" y="22" width="2" height="2" fill="#00ff88"></rect>
+  <rect x="20" y="22" width="2" height="2" fill="#00ff88"></rect>
+  <rect x="12" y="24" width="2" height="2" fill="#00ff88"></rect>
+  <rect x="18" y="24" width="2" height="2" fill="#00ff88"></rect>
+  <rect x="14" y="26" width="2" height="2" fill="#00ff88"></rect>
+  <rect x="16" y="26" width="2" height="2" fill="#00ff88"></rect>
+
+  <!-- Lock icon inside shield - cyan/blue -->
+  <!-- Lock body -->
+  <rect x="12" y="12" width="8" height="6" fill="#3b82f6"></rect>
+  <rect x="12" y="12" width="8" height="2" fill="#60a5fa"></rect>
+  <!-- Lock shackle -->
+  <rect x="14" y="8" width="4" height="2" fill="#3b82f6"></rect>
+  <rect x="12" y="10" width="2" height="2" fill="#3b82f6"></rect>
+  <rect x="18" y="10" width="2" height="2" fill="#3b82f6"></rect>
+  <!-- Keyhole -->
+  <rect x="15" y="14" width="2" height="2" fill="#0f172a"></rect>
+
+  <!-- Digital circuit lines - subtle green accents -->
+  <rect x="10" y="8" width="2" height="2" fill="#00ff8844"></rect>
+  <rect x="20" y="8" width="2" height="2" fill="#00ff8844"></rect>
+  <rect x="14" y="20" width="4" height="2" fill="#00ff8844"></rect>
+  <rect x="12" y="6" width="2" height="2" fill="#00ff8844"></rect>
+  <rect x="18" y="6" width="2" height="2" fill="#00ff8844"></rect>
+</svg></svg><style>@media (prefers-color-scheme: light) { :root { filter: none; } }
+@media (prefers-color-scheme: dark) { :root { filter: none; } }
+</style></svg>

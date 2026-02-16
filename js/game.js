@@ -6,7 +6,7 @@
 import {
     CELL_SIZE, GRID_COLS, GRID_ROWS, CANVAS_WIDTH, CANVAS_HEIGHT,
     CELL, STATE, COLORS, PLANNING_DURATION, WAVE_BREAK_DURATION,
-    THREAT_TYPES, TOWER_TYPES, LEVELS, SYNERGIES
+    THREAT_TYPES, TOWER_TYPES, LEVELS, SYNERGIES, getLevelObjectives, getInsiderSpawnPoints
 } from './config.js';
 
 import { Tower, Threat, Asset, Projectile } from './entities.js';
@@ -70,6 +70,10 @@ export class Game {
         this.onShowDYK = null;           // Called to show "Did You Know?" tips
         this.onHideDYK = null;           // Called to hide "Did You Know?" tips
         this.onThreatHover = null;       // Called when mouse hovers over a threat
+        this.onNextWaveModalRequest = null; // Called before each wave to show threat intel modal
+        this.nextWaveModalPending = false; // True when waiting for user to dismiss next-wave modal
+        this.prePlanningModalShown = false; // True after we've shown the wave-1 modal before planning (avoid re-showing)
+        this.waitingForBreakStart = false;  // True when next-wave modal was shown at wave clear; Begin starts the break timer
 
         // Level stats
         this.stats = {
@@ -81,7 +85,9 @@ export class Game {
             damageToAssets: 0,
             startTime: 0,
             ransomwareKills: 0,
-            quizBonusEarned: 0
+            quizBonusEarned: 0,
+            ransomwareBreachThisLevel: false,
+            quizzesCorrectThisLevel: 0
         };
 
         // Saved progress
@@ -159,6 +165,9 @@ export class Game {
         this.currentWave = 0;
         this.totalWaves = this.levelConfig.waves.length;
         this.waveActive = false;
+        this.nextWaveModalPending = false;
+        this.prePlanningModalShown = false;
+        this.waitingForBreakStart = false;
         this.elapsed = 0;
         this.gameSpeed = 1;
         this.selectedTowerType = null;
@@ -174,7 +183,9 @@ export class Game {
             damageToAssets: 0,
             startTime: Date.now(),
             ransomwareKills: 0,
-            quizBonusEarned: 0
+            quizBonusEarned: 0,
+            ransomwareBreachThisLevel: false,
+            quizzesCorrectThisLevel: 0
         };
 
         // Build grid
@@ -513,6 +524,38 @@ export class Game {
         }
     }
 
+    /** Called by UI when user dismisses the "next wave" modal. If before planning (wave 1), unfreeze planning timer. If at start of wave break, start the break timer and DYK/quiz; else start the next wave. */
+    dismissNextWaveModal() {
+        this.nextWaveModalPending = false;
+        if (this.state === STATE.PLANNING && this.currentWave === 0) {
+            // Pre-planning modal dismissed — planning timer will now run
+            return;
+        }
+        if (this.state === STATE.WAVE_BREAK && this.waitingForBreakStart) {
+            // Modal was shown at wave clear; user clicked Begin — start the break timer and show DYK/quiz
+            this.waitingForBreakStart = false;
+            this.waveBreakTimer = WAVE_BREAK_DURATION;
+            if (this.onShowDYK) this.onShowDYK();
+            if (this.currentWave % 2 === 0 && this.onQuizRequest) {
+                setTimeout(() => {
+                    if (this.state === STATE.WAVE_BREAK) this.onQuizRequest(this.levelConfig.id);
+                }, 1500);
+            }
+            return;
+        }
+        this.state = STATE.PLAYING;
+        this.startNextWave();
+        if (this.onStateChange) this.onStateChange(this.state);
+    }
+
+    /** Start the next wave (used internally after dismissNextWaveModal when not in planning). */
+    beginNextWave() {
+        this.nextWaveModalPending = false;
+        this.state = STATE.PLAYING;
+        this.startNextWave();
+        if (this.onStateChange) this.onStateChange(this.state);
+    }
+
     // --- Wave Management ---
     startNextWave() {
         if (this.currentWave >= this.totalWaves) return;
@@ -540,7 +583,8 @@ export class Game {
             }
         }
 
-        // Build spawn queue
+        // Build spawn queue (optional waveConfig.hpMult for elite waves)
+        const waveHpMult = waveConfig.hpMult != null ? waveConfig.hpMult : 1;
         for (const group of waveConfig.threats) {
             const pathIdx = group.path !== undefined ? group.path : 0;
             for (let i = 0; i < group.count; i++) {
@@ -548,7 +592,8 @@ export class Game {
                     type: group.type,
                     pathIndex: pathIdx,
                     delay: i * group.interval,
-                    spawned: false
+                    spawned: false,
+                    hpMult: waveHpMult
                 });
                 this.threatsRemaining++;
             }
@@ -575,31 +620,38 @@ export class Game {
         for (const spawn of this.waveSpawnQueue) {
             if (spawn.spawned) continue;
             if (waveTime >= spawn.delay) {
-                // Compute live BFS path for this threat at spawn time
-                const pathIdx = spawn.pathIndex || 0;
-                const pathDef = this.levelConfig.paths[pathIdx] || this.levelConfig.paths[0];
-                const spawnPos = pathDef[0];
-                const pathEnd = pathDef[pathDef.length - 1];
+                const isInsider = THREAT_TYPES[spawn.type].special === 'spawnInside';
+                let pathPixels;
 
-                // Find target asset (closest to path endpoint)
-                let assetPos = this.assetPositions[0];
-                let minDist = Infinity;
-                for (const asset of this.assetPositions) {
-                    const d = Math.abs(asset.x - pathEnd.x) + Math.abs(asset.y - pathEnd.y);
-                    if (d < minDist) { minDist = d; assetPos = asset; }
+                if (isInsider) {
+                    // Insider: pick one of the level's 5 spawn points at random, path from there to nearest asset
+                    const spawnPoints = getInsiderSpawnPoints(this.levelConfig);
+                    const pt = spawnPoints[Math.floor(Math.random() * spawnPoints.length)];
+                    let assetPos = this.assetPositions[0];
+                    let minDist = Infinity;
+                    for (const asset of this.assetPositions) {
+                        const d = Math.abs(asset.x - pt.x) + Math.abs(asset.y - pt.y);
+                        if (d < minDist) { minDist = d; assetPos = asset; }
+                    }
+                    const gridPath = findPathRandomized(this.grid, pt.x, pt.y, assetPos.x, assetPos.y);
+                    pathPixels = gridPath ? gridPathToPixels(gridPath) : (this.pathPixelSegments[spawn.pathIndex || 0] || this.pathPixelSegments[0]);
+                } else {
+                    // Normal threat: spawn at path start, path to asset
+                    const pathIdx = spawn.pathIndex || 0;
+                    const pathDef = this.levelConfig.paths[pathIdx] || this.levelConfig.paths[0];
+                    const spawnPos = pathDef[0];
+                    const pathEnd = pathDef[pathDef.length - 1];
+                    let assetPos = this.assetPositions[0];
+                    let minDist = Infinity;
+                    for (const asset of this.assetPositions) {
+                        const d = Math.abs(asset.x - pathEnd.x) + Math.abs(asset.y - pathEnd.y);
+                        if (d < minDist) { minDist = d; assetPos = asset; }
+                    }
+                    const gridPath = findPathRandomized(this.grid, spawnPos.x, spawnPos.y, assetPos.x, assetPos.y);
+                    pathPixels = gridPath ? gridPathToPixels(gridPath) : (this.pathPixelSegments[pathIdx] || this.pathPixelSegments[0]);
                 }
 
-                // Use randomized BFS so threats spread across different valid routes
-                const gridPath = findPathRandomized(this.grid, spawnPos.x, spawnPos.y, assetPos.x, assetPos.y);
-                let pathPixels = gridPath ? gridPathToPixels(gridPath) : (this.pathPixelSegments[pathIdx] || this.pathPixelSegments[0]);
-
-                // Insider threats spawn partway through the path
-                if (THREAT_TYPES[spawn.type].special === 'spawnInside') {
-                    const mid = Math.floor(pathPixels.length / 2);
-                    pathPixels = pathPixels.slice(mid);
-                }
-
-                const threat = new Threat(spawn.type, pathPixels);
+                const threat = new Threat(spawn.type, pathPixels, 0, { hpMult: spawn.hpMult != null ? spawn.hpMult : 1 });
                 this.threats.push(threat);
                 spawn.spawned = true;
             }
@@ -623,25 +675,26 @@ export class Game {
             if (this.onHideDYK) this.onHideDYK();
             this.onLevelComplete();
         } else {
-            // Wave break - trigger quiz and DYK tips
+            // Show next-wave threat intel modal first (before the break countdown)
             this.state = STATE.WAVE_BREAK;
-            this.waveBreakTimer = WAVE_BREAK_DURATION;
+            this.waveBreakTimer = 0;
+            this.waitingForBreakStart = true;
             if (this.onStateChange) this.onStateChange(this.state);
             if (this.onNotification) {
-                this.onNotification('Wave cleared! Prepare for next attack.', 'success');
+                this.onNotification('Wave cleared!', 'success');
             }
-
-            // Show "Did You Know?" tip
-            if (this.onShowDYK) this.onShowDYK();
-
-            // Trigger quiz between waves (every other wave to avoid overload)
-            if (this.currentWave % 2 === 0 && this.onQuizRequest) {
-                // Small delay so wave-clear notification shows first
-                setTimeout(() => {
-                    if (this.state === STATE.WAVE_BREAK) {
-                        this.onQuizRequest(this.levelConfig.id);
-                    }
-                }, 1500);
+            if (this.onNextWaveModalRequest) {
+                this.nextWaveModalPending = true;
+                this.onNextWaveModalRequest(this.currentWave, this.levelConfig.waves[this.currentWave]);
+            } else {
+                this.waitingForBreakStart = false;
+                this.waveBreakTimer = WAVE_BREAK_DURATION;
+                if (this.onShowDYK) this.onShowDYK();
+                if (this.currentWave % 2 === 0 && this.onQuizRequest) {
+                    setTimeout(() => {
+                        if (this.state === STATE.WAVE_BREAK) this.onQuizRequest(this.levelConfig.id);
+                    }, 1500);
+                }
             }
         }
     }
@@ -649,11 +702,8 @@ export class Game {
     onLevelComplete() {
         const levelId = this.levelConfig.id;
 
-        // Calculate stars
-        const healthPercent = this.getOverallHealth();
-        let stars = 1;
-        if (healthPercent >= 50) stars = 2;
-        if (healthPercent >= 90) stars = 3;
+        // Calculate stars from mechanical objectives
+        const { stars } = this.getObjectivesResult();
 
         // Save progress
         if (!this.progress.levelsCompleted.includes(levelId)) {
@@ -704,8 +754,20 @@ export class Game {
         const dt = Math.min(rawDt, 100) * this.gameSpeed;
 
         if (this.state === STATE.PLANNING) {
+            // Show wave-1 intel modal before planning starts (once per level), then freeze timer until dismissed
+            if (this.currentWave === 0 && this.onNextWaveModalRequest && !this.prePlanningModalShown) {
+                this.prePlanningModalShown = true;
+                this.nextWaveModalPending = true;
+                this.onNextWaveModalRequest(0, this.levelConfig.waves[0]);
+            }
+            if (this.nextWaveModalPending) {
+                this.render();
+                this.animFrameId = requestAnimationFrame(this.gameLoop);
+                return;
+            }
             this.planningTimer -= dt;
             if (this.planningTimer <= 0) {
+                // Wave 1: intel was already shown before planning — start wave
                 this.state = STATE.PLAYING;
                 this.startNextWave();
                 if (this.onStateChange) this.onStateChange(this.state);
@@ -716,9 +778,16 @@ export class Game {
             this.update(dt);
             this.render();
         } else if (this.state === STATE.WAVE_BREAK) {
+            if (this.nextWaveModalPending) {
+                // Modal shown at wave clear — wait for user to click Begin; don't run timer yet
+                this.updateProjectiles(dt);
+                this.updateParticles(dt);
+                this.render();
+                this.animFrameId = requestAnimationFrame(this.gameLoop);
+                return;
+            }
             this.waveBreakTimer -= dt;
             this.elapsed += dt;
-            // Still update towers/projectiles for visual continuity
             this.updateProjectiles(dt);
             this.updateParticles(dt);
             if (this.waveBreakTimer <= 0) {
@@ -834,9 +903,9 @@ export class Game {
             threat._damageAmp = 0;
         }
 
-        // Quarantine zones: freeze threats entering the zone
+        // Quarantine zones: freeze threats entering the zone (use game-time for speed-consistent expiry)
         const quarantines = this.towers.filter(t => t.towerType === 'quarantine');
-        const now = Date.now();
+        const gameTime = this.elapsed;
         for (const qb of quarantines) {
             const qConfig = TOWER_TYPES.quarantine;
             const freezeDur = qb.upgradeLevel > 0 ?
@@ -853,7 +922,7 @@ export class Game {
                     if (!qb._frozenThreats.has(threatKey) && !threat._quarantineFrozen) {
                         qb._frozenThreats.add(threatKey);
                         threat._quarantineFrozen = true;
-                        threat._quarantineFreezeEnd = now + freezeDur;
+                        threat._quarantineFreezeEnd = gameTime + freezeDur;
                     }
                 }
             }
@@ -901,8 +970,8 @@ export class Game {
             for (const threat of activeThreats) {
                 const dist = Math.hypot(threat.x - proxy.x, threat.y - proxy.y);
                 if (dist <= range) {
-                    // Threat is in proxy range - apply scan and refresh timer
-                    threat._proxyScanExpiry = now + scanDur;
+                    // Threat is in proxy range - apply scan and refresh timer (game-time)
+                    threat._proxyScanExpiry = gameTime + scanDur;
                     threat._proxySlow = Math.max(threat._proxySlow || 0, slowAmt);
                     threat._proxyDmgAmp = Math.max(threat._proxyDmgAmp || 0, dmgAmp);
                     // Deep Packet Inspection: strip synergy buffs
@@ -915,7 +984,7 @@ export class Game {
 
         // Apply proxy scan effects (persists after leaving range for scanDuration)
         for (const threat of activeThreats) {
-            if (threat._proxyScanExpiry && now < threat._proxyScanExpiry) {
+            if (threat._proxyScanExpiry && gameTime < threat._proxyScanExpiry) {
                 // Scan is active - apply slow and damage amp
                 threat._damageAmp = Math.max(threat._damageAmp, threat._proxyDmgAmp || 0);
                 threat.effects.proxyScan = {
@@ -946,7 +1015,7 @@ export class Game {
 
         // Update quarantine freeze state for all threats
         for (const threat of activeThreats) {
-            if (threat._quarantineFrozen && now >= threat._quarantineFreezeEnd) {
+            if (threat._quarantineFrozen && gameTime >= threat._quarantineFreezeEnd) {
                 // Freeze expired - unfreeze the threat
                 threat._quarantineFrozen = false;
                 delete threat._quarantineFreezeEnd;
@@ -1071,6 +1140,7 @@ export class Game {
             this.stats.damageToAssets += threat.damage;
 
             if (result === 'ransomware_critical') {
+                this.stats.ransomwareBreachThisLevel = true;
                 if (this.onNotification) {
                     this.onNotification('RANSOMWARE: ' + closestAsset.name + ' encrypted! No backup available!', 'danger');
                 }
@@ -1086,8 +1156,19 @@ export class Game {
     }
 
     checkLossCondition() {
+        // Mission fail if any critical asset is compromised (level-specific fail condition)
+        const criticalCompromised = this.assets.find(a => a.critical && a.compromised);
+        if (criticalCompromised) {
+            this._lastLossReason = 'critical_asset';
+            this._lastLossAssetName = criticalCompromised.name;
+            this.state = STATE.GAME_OVER;
+            if (this.onStateChange) this.onStateChange(this.state);
+            return;
+        }
+        // Otherwise fail only when all assets are compromised
         const allCompromised = this.assets.every(a => a.compromised);
         if (allCompromised) {
+            this._lastLossReason = 'all_compromised';
             this.state = STATE.GAME_OVER;
             if (this.onStateChange) this.onStateChange(this.state);
         }
@@ -1098,6 +1179,25 @@ export class Game {
         const total = this.assets.reduce((sum, a) => sum + a.maxHealth, 0);
         const current = this.assets.reduce((sum, a) => sum + a.health, 0);
         return Math.round((current / total) * 100);
+    }
+
+    /** Evaluate level objectives; returns { objectives, results, metCount, stars }. */
+    getObjectivesResult() {
+        if (!this.levelConfig) return { objectives: [], results: [], metCount: 0, stars: 1 };
+        const objectives = getLevelObjectives(this.levelConfig);
+        const healthPct = this.getOverallHealth();
+        const results = objectives.map(obj => {
+            if (obj.type === 'noRansomwareBreach') return !this.stats.ransomwareBreachThisLevel;
+            if (obj.type === 'healthPercent') return healthPct >= (obj.target || 50);
+            if (obj.type === 'quizCorrect') return (this.stats.quizzesCorrectThisLevel || 0) >= (obj.target || 1);
+            return false;
+        });
+        const metCount = results.filter(Boolean).length;
+        const total = objectives.length;
+        let stars = 1;
+        if (metCount >= total) stars = 3;
+        else if (metCount >= Math.ceil(total / 2)) stars = 2;
+        return { objectives, results, metCount, stars };
     }
 
     updateProjectiles(dt) {
@@ -1625,6 +1725,12 @@ export class Game {
             this._isSystemPause = false;
             if (this.onStateChange) this.onStateChange(this.state);
         }
+    }
+
+    /** Set game speed (1, 2, or 3). Returns the new speed. */
+    setSpeed(speed) {
+        this.gameSpeed = Math.max(1, Math.min(3, Math.floor(speed)));
+        return this.gameSpeed;
     }
 
     toggleSpeed() {

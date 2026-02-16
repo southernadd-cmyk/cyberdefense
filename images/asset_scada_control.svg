@@ -1,161 +1,58 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="256" height="256" shape-rendering="crispEdges">
-<title>asset_scada_control</title>
-<rect x="0" y="0" width="32" height="1" fill="#101726"/>
-<rect x="0" y="31" width="32" height="1" fill="#101726"/>
-<rect x="0" y="1" width="1" height="1" fill="#101726"/>
-<rect x="31" y="1" width="1" height="1" fill="#101726"/>
-<rect x="0" y="2" width="1" height="1" fill="#101726"/>
-<rect x="31" y="2" width="1" height="1" fill="#101726"/>
-<rect x="0" y="3" width="1" height="1" fill="#101726"/>
-<rect x="31" y="3" width="1" height="1" fill="#101726"/>
-<rect x="0" y="4" width="1" height="1" fill="#101726"/>
-<rect x="31" y="4" width="1" height="1" fill="#101726"/>
-<rect x="0" y="5" width="1" height="1" fill="#101726"/>
-<rect x="31" y="5" width="1" height="1" fill="#101726"/>
-<rect x="0" y="6" width="1" height="1" fill="#101726"/>
-<rect x="31" y="6" width="1" height="1" fill="#101726"/>
-<rect x="0" y="7" width="1" height="1" fill="#101726"/>
-<rect x="31" y="7" width="1" height="1" fill="#101726"/>
-<rect x="0" y="8" width="1" height="1" fill="#101726"/>
-<rect x="31" y="8" width="1" height="1" fill="#101726"/>
-<rect x="0" y="9" width="1" height="1" fill="#101726"/>
-<rect x="31" y="9" width="1" height="1" fill="#101726"/>
-<rect x="0" y="10" width="1" height="1" fill="#101726"/>
-<rect x="31" y="10" width="1" height="1" fill="#101726"/>
-<rect x="0" y="11" width="1" height="1" fill="#101726"/>
-<rect x="31" y="11" width="1" height="1" fill="#101726"/>
-<rect x="0" y="12" width="1" height="1" fill="#101726"/>
-<rect x="31" y="12" width="1" height="1" fill="#101726"/>
-<rect x="0" y="13" width="1" height="1" fill="#101726"/>
-<rect x="31" y="13" width="1" height="1" fill="#101726"/>
-<rect x="0" y="14" width="1" height="1" fill="#101726"/>
-<rect x="31" y="14" width="1" height="1" fill="#101726"/>
-<rect x="0" y="15" width="1" height="1" fill="#101726"/>
-<rect x="31" y="15" width="1" height="1" fill="#101726"/>
-<rect x="0" y="16" width="1" height="1" fill="#101726"/>
-<rect x="31" y="16" width="1" height="1" fill="#101726"/>
-<rect x="0" y="17" width="1" height="1" fill="#101726"/>
-<rect x="31" y="17" width="1" height="1" fill="#101726"/>
-<rect x="0" y="18" width="1" height="1" fill="#101726"/>
-<rect x="31" y="18" width="1" height="1" fill="#101726"/>
-<rect x="0" y="19" width="1" height="1" fill="#101726"/>
-<rect x="31" y="19" width="1" height="1" fill="#101726"/>
-<rect x="0" y="20" width="1" height="1" fill="#101726"/>
-<rect x="31" y="20" width="1" height="1" fill="#101726"/>
-<rect x="0" y="21" width="1" height="1" fill="#101726"/>
-<rect x="31" y="21" width="1" height="1" fill="#101726"/>
-<rect x="0" y="22" width="1" height="1" fill="#101726"/>
-<rect x="31" y="22" width="1" height="1" fill="#101726"/>
-<rect x="0" y="23" width="1" height="1" fill="#101726"/>
-<rect x="31" y="23" width="1" height="1" fill="#101726"/>
-<rect x="0" y="24" width="1" height="1" fill="#101726"/>
-<rect x="31" y="24" width="1" height="1" fill="#101726"/>
-<rect x="0" y="25" width="1" height="1" fill="#101726"/>
-<rect x="31" y="25" width="1" height="1" fill="#101726"/>
-<rect x="0" y="26" width="1" height="1" fill="#101726"/>
-<rect x="31" y="26" width="1" height="1" fill="#101726"/>
-<rect x="0" y="27" width="1" height="1" fill="#101726"/>
-<rect x="31" y="27" width="1" height="1" fill="#101726"/>
-<rect x="0" y="28" width="1" height="1" fill="#101726"/>
-<rect x="31" y="28" width="1" height="1" fill="#101726"/>
-<rect x="0" y="29" width="1" height="1" fill="#101726"/>
-<rect x="31" y="29" width="1" height="1" fill="#101726"/>
-<rect x="0" y="30" width="1" height="1" fill="#101726"/>
-<rect x="31" y="30" width="1" height="1" fill="#101726"/>
-<rect x="6" y="10" width="20" height="1" fill="#0a0f1f"/>
-<rect x="6" y="11" width="1" height="1" fill="#0a0f1f"/>
-<rect x="25" y="11" width="1" height="1" fill="#0a0f1f"/>
-<rect x="6" y="12" width="1" height="1" fill="#0a0f1f"/>
-<rect x="25" y="12" width="1" height="1" fill="#0a0f1f"/>
-<rect x="6" y="13" width="1" height="1" fill="#0a0f1f"/>
-<rect x="25" y="13" width="1" height="1" fill="#0a0f1f"/>
-<rect x="6" y="14" width="1" height="1" fill="#0a0f1f"/>
-<rect x="25" y="14" width="1" height="1" fill="#0a0f1f"/>
-<rect x="6" y="15" width="1" height="1" fill="#0a0f1f"/>
-<rect x="6" y="16" width="1" height="1" fill="#0a0f1f"/>
-<rect x="25" y="16" width="1" height="1" fill="#0a0f1f"/>
-<rect x="6" y="17" width="1" height="1" fill="#0a0f1f"/>
-<rect x="6" y="18" width="1" height="1" fill="#0a0f1f"/>
-<rect x="25" y="18" width="1" height="1" fill="#0a0f1f"/>
-<rect x="6" y="19" width="1" height="1" fill="#0a0f1f"/>
-<rect x="25" y="19" width="1" height="1" fill="#0a0f1f"/>
-<rect x="6" y="20" width="1" height="1" fill="#0a0f1f"/>
-<rect x="25" y="20" width="1" height="1" fill="#0a0f1f"/>
-<rect x="6" y="21" width="1" height="1" fill="#0a0f1f"/>
-<rect x="25" y="21" width="1" height="1" fill="#0a0f1f"/>
-<rect x="6" y="22" width="1" height="1" fill="#0a0f1f"/>
-<rect x="25" y="22" width="1" height="1" fill="#0a0f1f"/>
-<rect x="6" y="23" width="20" height="1" fill="#0a0f1f"/>
-<rect x="7" y="11" width="18" height="1" fill="#3b4a67"/>
-<rect x="7" y="12" width="1" height="1" fill="#3b4a67"/>
-<rect x="24" y="12" width="1" height="1" fill="#3b4a67"/>
-<rect x="7" y="13" width="1" height="1" fill="#3b4a67"/>
-<rect x="24" y="13" width="1" height="1" fill="#3b4a67"/>
-<rect x="7" y="14" width="1" height="1" fill="#3b4a67"/>
-<rect x="7" y="15" width="1" height="1" fill="#3b4a67"/>
-<rect x="24" y="15" width="1" height="1" fill="#3b4a67"/>
-<rect x="7" y="16" width="1" height="1" fill="#3b4a67"/>
-<rect x="24" y="16" width="1" height="1" fill="#3b4a67"/>
-<rect x="7" y="17" width="1" height="1" fill="#3b4a67"/>
-<rect x="24" y="17" width="1" height="1" fill="#3b4a67"/>
-<rect x="7" y="18" width="1" height="1" fill="#3b4a67"/>
-<rect x="7" y="19" width="1" height="1" fill="#3b4a67"/>
-<rect x="24" y="19" width="1" height="1" fill="#3b4a67"/>
-<rect x="7" y="20" width="11" height="1" fill="#3b4a67"/>
-<rect x="7" y="21" width="2" height="1" fill="#3b4a67"/>
-<rect x="10" y="21" width="1" height="1" fill="#3b4a67"/>
-<rect x="12" y="21" width="1" height="1" fill="#3b4a67"/>
-<rect x="14" y="21" width="1" height="1" fill="#3b4a67"/>
-<rect x="16" y="21" width="9" height="1" fill="#3b4a67"/>
-<rect x="7" y="22" width="18" height="1" fill="#3b4a67"/>
-<rect x="8" y="12" width="16" height="1" fill="#1c263b"/>
-<rect x="8" y="13" width="1" height="1" fill="#1c263b"/>
-<rect x="11" y="13" width="1" height="1" fill="#1c263b"/>
-<rect x="14" y="13" width="3" height="1" fill="#1c263b"/>
-<rect x="23" y="13" width="1" height="1" fill="#1c263b"/>
-<rect x="8" y="14" width="1" height="1" fill="#1c263b"/>
-<rect x="11" y="14" width="1" height="1" fill="#1c263b"/>
-<rect x="14" y="14" width="3" height="1" fill="#1c263b"/>
-<rect x="23" y="14" width="1" height="1" fill="#1c263b"/>
-<rect x="8" y="15" width="9" height="1" fill="#1c263b"/>
-<rect x="8" y="16" width="9" height="1" fill="#1c263b"/>
-<rect x="23" y="16" width="1" height="1" fill="#1c263b"/>
-<rect x="8" y="17" width="9" height="1" fill="#1c263b"/>
-<rect x="8" y="18" width="11" height="1" fill="#1c263b"/>
-<rect x="20" y="18" width="4" height="1" fill="#1c263b"/>
-<rect x="8" y="19" width="16" height="1" fill="#1c263b"/>
-<rect x="9" y="13" width="2" height="1" fill="#2fbf71"/>
-<rect x="9" y="14" width="2" height="1" fill="#2fbf71"/>
-<rect x="12" y="13" width="2" height="1" fill="#ffd166"/>
-<rect x="12" y="14" width="2" height="1" fill="#ffd166"/>
-<rect x="17" y="13" width="6" height="1" fill="#ff8a3d"/>
-<rect x="17" y="14" width="1" height="1" fill="#ff8a3d"/>
-<rect x="22" y="14" width="1" height="1" fill="#ff8a3d"/>
-<rect x="17" y="15" width="1" height="1" fill="#ff8a3d"/>
-<rect x="22" y="15" width="1" height="1" fill="#ff8a3d"/>
-<rect x="17" y="17" width="1" height="1" fill="#ff8a3d"/>
-<rect x="19" y="17" width="1" height="1" fill="#ff8a3d"/>
-<rect x="21" y="17" width="2" height="1" fill="#ff8a3d"/>
-<rect x="18" y="14" width="4" height="1" fill="#e8f1ff"/>
-<rect x="24" y="14" width="1" height="1" fill="#e8f1ff"/>
-<rect x="18" y="15" width="4" height="1" fill="#e8f1ff"/>
-<rect x="23" y="15" width="1" height="1" fill="#e8f1ff"/>
-<rect x="25" y="15" width="1" height="1" fill="#e8f1ff"/>
-<rect x="17" y="16" width="6" height="1" fill="#e8f1ff"/>
-<rect x="26" y="16" width="1" height="1" fill="#e8f1ff"/>
-<rect x="18" y="17" width="1" height="1" fill="#e8f1ff"/>
-<rect x="20" y="17" width="1" height="1" fill="#e8f1ff"/>
-<rect x="23" y="17" width="1" height="1" fill="#e8f1ff"/>
-<rect x="25" y="17" width="1" height="1" fill="#e8f1ff"/>
-<rect x="19" y="18" width="1" height="1" fill="#e8f1ff"/>
-<rect x="24" y="18" width="1" height="1" fill="#e8f1ff"/>
-<rect x="18" y="20" width="7" height="1" fill="#42ff87"/>
-<rect x="9" y="21" width="1" height="1" fill="#9fb3c8"/>
-<rect x="11" y="21" width="1" height="1" fill="#9fb3c8"/>
-<rect x="13" y="21" width="1" height="1" fill="#9fb3c8"/>
-<rect x="15" y="21" width="1" height="1" fill="#9fb3c8"/>
-<rect x="8" y="24" width="4" height="1" fill="#5c6f91"/>
-<rect x="20" y="24" width="4" height="1" fill="#5c6f91"/>
-<rect x="8" y="25" width="4" height="1" fill="#5c6f91"/>
-<rect x="20" y="25" width="4" height="1" fill="#5c6f91"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" shape-rendering="crispEdges">
+  <title>SCADA Control</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#151a22"/>
+      <stop offset="1" stop-color="#090c11"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1a202a"/>
+      <stop offset="1" stop-color="#0d1219"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer frame -->
+  <rect x="3" y="3" width="26" height="26" fill="url(#bg)" stroke="#3b4350" stroke-width="1"/>
+  <rect x="3" y="3" width="26" height="3" fill="#10141b"/>
+
+  <!-- Header lights -->
+  <rect x="5" y="4" width="1" height="1" fill="#ff355e"/>
+  <rect x="7" y="4" width="1" height="1" fill="#ff9f1c"/>
+  <rect x="9" y="4" width="1" height="1" fill="#3cff9b"/>
+
+  <!-- Control console -->
+  <rect x="6" y="8" width="20" height="14" fill="url(#panel)" stroke="#2a313c" stroke-width="1"/>
+
+  <!-- SCADA monitor grid -->
+  <rect x="8" y="10" width="12" height="8" fill="#05070b" stroke="#242c35" stroke-width="1"/>
+  <path d="M9 12H19M9 14H19M9 16H19" stroke="#57d9ff" stroke-width="1" stroke-opacity="0.55"/>
+  <path d="M11 11V17M14 11V17M17 11V17" stroke="#57d9ff" stroke-width="1" stroke-opacity="0.55"/>
+
+  <!-- Process flow line -->
+  <path d="M9 15H12L13 13L14 16L15 14H18" stroke="#42f58d" stroke-width="1"/>
+  <rect x="18" y="14" width="1" height="1" fill="#42f58d"/>
+
+  <!-- Remote field node -->
+  <rect x="22" y="10" width="3" height="3" fill="#0b0f14" stroke="#42f58d" stroke-width="1"/>
+  <path d="M20 11.5H22" stroke="#42f58d" stroke-width="1"/>
+
+  <!-- Alarm beacon -->
+  <rect x="22" y="15" width="3" height="3" fill="#11161d" stroke="#ff355e" stroke-width="1"/>
+  <path d="M23 16H24" stroke="#ff355e" stroke-width="1"/>
+
+  <!-- Bottom control rail -->
+  <rect x="7" y="23" width="18" height="4" fill="#0f141b" stroke="#3b4350" stroke-width="1"/>
+
+  <!-- Knob + toggles -->
+  <rect x="9" y="24" width="2" height="2" fill="#0b0f14" stroke="#57d9ff" stroke-width="1"/>
+  <rect x="13" y="24" width="1" height="2" fill="#42f58d"/>
+  <rect x="15" y="24" width="1" height="2" fill="#42f58d"/>
+  <rect x="18" y="24" width="4" height="1" fill="#ff355e" fill-opacity="0.55"/>
+
+  <!-- Uplink indicator -->
+  <path d="M24 23V21M23 22H25" stroke="#57d9ff" stroke-width="1"/>
+
+  <!-- Subtle glitch accents -->
+  <rect x="24" y="7" width="2" height="1" fill="#ff355e" fill-opacity="0.45"/>
+  <rect x="6" y="27" width="2" height="1" fill="#57d9ff" fill-opacity="0.4"/>
 </svg>

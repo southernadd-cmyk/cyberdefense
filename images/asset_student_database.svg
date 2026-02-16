@@ -1,129 +1,56 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="256" height="256" shape-rendering="crispEdges">
-<title>asset_student_database</title>
-<rect x="0" y="0" width="32" height="1" fill="#101726"/>
-<rect x="0" y="31" width="32" height="1" fill="#101726"/>
-<rect x="0" y="1" width="1" height="1" fill="#101726"/>
-<rect x="31" y="1" width="1" height="1" fill="#101726"/>
-<rect x="0" y="2" width="1" height="1" fill="#101726"/>
-<rect x="31" y="2" width="1" height="1" fill="#101726"/>
-<rect x="0" y="3" width="1" height="1" fill="#101726"/>
-<rect x="31" y="3" width="1" height="1" fill="#101726"/>
-<rect x="0" y="4" width="1" height="1" fill="#101726"/>
-<rect x="31" y="4" width="1" height="1" fill="#101726"/>
-<rect x="0" y="5" width="1" height="1" fill="#101726"/>
-<rect x="31" y="5" width="1" height="1" fill="#101726"/>
-<rect x="0" y="6" width="1" height="1" fill="#101726"/>
-<rect x="31" y="6" width="1" height="1" fill="#101726"/>
-<rect x="0" y="7" width="1" height="1" fill="#101726"/>
-<rect x="31" y="7" width="1" height="1" fill="#101726"/>
-<rect x="0" y="8" width="1" height="1" fill="#101726"/>
-<rect x="31" y="8" width="1" height="1" fill="#101726"/>
-<rect x="0" y="9" width="1" height="1" fill="#101726"/>
-<rect x="31" y="9" width="1" height="1" fill="#101726"/>
-<rect x="0" y="10" width="1" height="1" fill="#101726"/>
-<rect x="31" y="10" width="1" height="1" fill="#101726"/>
-<rect x="0" y="11" width="1" height="1" fill="#101726"/>
-<rect x="31" y="11" width="1" height="1" fill="#101726"/>
-<rect x="0" y="12" width="1" height="1" fill="#101726"/>
-<rect x="31" y="12" width="1" height="1" fill="#101726"/>
-<rect x="0" y="13" width="1" height="1" fill="#101726"/>
-<rect x="31" y="13" width="1" height="1" fill="#101726"/>
-<rect x="0" y="14" width="1" height="1" fill="#101726"/>
-<rect x="31" y="14" width="1" height="1" fill="#101726"/>
-<rect x="0" y="15" width="1" height="1" fill="#101726"/>
-<rect x="31" y="15" width="1" height="1" fill="#101726"/>
-<rect x="0" y="16" width="1" height="1" fill="#101726"/>
-<rect x="31" y="16" width="1" height="1" fill="#101726"/>
-<rect x="0" y="17" width="1" height="1" fill="#101726"/>
-<rect x="31" y="17" width="1" height="1" fill="#101726"/>
-<rect x="0" y="18" width="1" height="1" fill="#101726"/>
-<rect x="31" y="18" width="1" height="1" fill="#101726"/>
-<rect x="0" y="19" width="1" height="1" fill="#101726"/>
-<rect x="31" y="19" width="1" height="1" fill="#101726"/>
-<rect x="0" y="20" width="1" height="1" fill="#101726"/>
-<rect x="31" y="20" width="1" height="1" fill="#101726"/>
-<rect x="0" y="21" width="1" height="1" fill="#101726"/>
-<rect x="31" y="21" width="1" height="1" fill="#101726"/>
-<rect x="0" y="22" width="1" height="1" fill="#101726"/>
-<rect x="31" y="22" width="1" height="1" fill="#101726"/>
-<rect x="0" y="23" width="1" height="1" fill="#101726"/>
-<rect x="31" y="23" width="1" height="1" fill="#101726"/>
-<rect x="0" y="24" width="1" height="1" fill="#101726"/>
-<rect x="31" y="24" width="1" height="1" fill="#101726"/>
-<rect x="0" y="25" width="1" height="1" fill="#101726"/>
-<rect x="31" y="25" width="1" height="1" fill="#101726"/>
-<rect x="0" y="26" width="1" height="1" fill="#101726"/>
-<rect x="31" y="26" width="1" height="1" fill="#101726"/>
-<rect x="0" y="27" width="1" height="1" fill="#101726"/>
-<rect x="31" y="27" width="1" height="1" fill="#101726"/>
-<rect x="0" y="28" width="1" height="1" fill="#101726"/>
-<rect x="31" y="28" width="1" height="1" fill="#101726"/>
-<rect x="0" y="29" width="1" height="1" fill="#101726"/>
-<rect x="31" y="29" width="1" height="1" fill="#101726"/>
-<rect x="0" y="30" width="1" height="1" fill="#101726"/>
-<rect x="31" y="30" width="1" height="1" fill="#101726"/>
-<rect x="7" y="9" width="4" height="1" fill="#0a0f1f"/>
-<rect x="21" y="9" width="4" height="1" fill="#0a0f1f"/>
-<rect x="7" y="10" width="1" height="1" fill="#0a0f1f"/>
-<rect x="24" y="10" width="1" height="1" fill="#0a0f1f"/>
-<rect x="7" y="11" width="1" height="1" fill="#0a0f1f"/>
-<rect x="24" y="11" width="1" height="1" fill="#0a0f1f"/>
-<rect x="7" y="12" width="1" height="1" fill="#0a0f1f"/>
-<rect x="24" y="12" width="1" height="1" fill="#0a0f1f"/>
-<rect x="7" y="14" width="7" height="1" fill="#0a0f1f"/>
-<rect x="18" y="14" width="7" height="1" fill="#0a0f1f"/>
-<rect x="7" y="15" width="1" height="1" fill="#0a0f1f"/>
-<rect x="24" y="15" width="1" height="1" fill="#0a0f1f"/>
-<rect x="7" y="16" width="1" height="1" fill="#0a0f1f"/>
-<rect x="24" y="16" width="1" height="1" fill="#0a0f1f"/>
-<rect x="7" y="17" width="1" height="1" fill="#0a0f1f"/>
-<rect x="24" y="17" width="1" height="1" fill="#0a0f1f"/>
-<rect x="7" y="19" width="18" height="1" fill="#0a0f1f"/>
-<rect x="7" y="20" width="1" height="1" fill="#0a0f1f"/>
-<rect x="24" y="20" width="1" height="1" fill="#0a0f1f"/>
-<rect x="7" y="21" width="1" height="1" fill="#0a0f1f"/>
-<rect x="24" y="21" width="1" height="1" fill="#0a0f1f"/>
-<rect x="7" y="22" width="1" height="1" fill="#0a0f1f"/>
-<rect x="24" y="22" width="1" height="1" fill="#0a0f1f"/>
-<rect x="11" y="9" width="10" height="1" fill="#ffd166"/>
-<rect x="11" y="10" width="7" height="1" fill="#ffd166"/>
-<rect x="11" y="11" width="4" height="1" fill="#ffd166"/>
-<rect x="12" y="12" width="1" height="1" fill="#ffd166"/>
-<rect x="15" y="14" width="2" height="1" fill="#ffd166"/>
-<rect x="15" y="15" width="2" height="1" fill="#ffd166"/>
-<rect x="12" y="6" width="1" height="1" fill="#ffd166"/>
-<rect x="12" y="7" width="3" height="1" fill="#ffd166"/>
-<rect x="12" y="8" width="6" height="1" fill="#ffd166"/>
-<rect x="8" y="10" width="1" height="1" fill="#3b4a67"/>
-<rect x="23" y="10" width="1" height="1" fill="#3b4a67"/>
-<rect x="8" y="11" width="3" height="1" fill="#3b4a67"/>
-<rect x="15" y="11" width="9" height="1" fill="#3b4a67"/>
-<rect x="8" y="12" width="4" height="1" fill="#3b4a67"/>
-<rect x="13" y="12" width="2" height="1" fill="#3b4a67"/>
-<rect x="17" y="12" width="7" height="1" fill="#3b4a67"/>
-<rect x="8" y="15" width="1" height="1" fill="#3b4a67"/>
-<rect x="23" y="15" width="1" height="1" fill="#3b4a67"/>
-<rect x="8" y="16" width="16" height="1" fill="#3b4a67"/>
-<rect x="8" y="17" width="16" height="1" fill="#3b4a67"/>
-<rect x="8" y="20" width="1" height="1" fill="#3b4a67"/>
-<rect x="23" y="20" width="1" height="1" fill="#3b4a67"/>
-<rect x="8" y="21" width="16" height="1" fill="#3b4a67"/>
-<rect x="8" y="22" width="16" height="1" fill="#3b4a67"/>
-<rect x="9" y="10" width="2" height="1" fill="#9b5de5"/>
-<rect x="18" y="10" width="5" height="1" fill="#9b5de5"/>
-<rect x="9" y="15" width="5" height="1" fill="#9b5de5"/>
-<rect x="18" y="15" width="5" height="1" fill="#9b5de5"/>
-<rect x="9" y="20" width="14" height="1" fill="#9b5de5"/>
-<rect x="15" y="12" width="2" height="1" fill="#1c263b"/>
-<rect x="14" y="14" width="1" height="1" fill="#1c263b"/>
-<rect x="17" y="14" width="1" height="1" fill="#1c263b"/>
-<rect x="14" y="15" width="1" height="1" fill="#1c263b"/>
-<rect x="17" y="15" width="1" height="1" fill="#1c263b"/>
-<rect x="14" y="13" width="4" height="1" fill="#1c263b"/>
-<rect x="6" y="11" width="1" height="1" fill="#9fb3c8"/>
-<rect x="25" y="11" width="1" height="1" fill="#9fb3c8"/>
-<rect x="6" y="16" width="1" height="1" fill="#9fb3c8"/>
-<rect x="25" y="16" width="1" height="1" fill="#9fb3c8"/>
-<rect x="6" y="21" width="1" height="1" fill="#9fb3c8"/>
-<rect x="25" y="21" width="1" height="1" fill="#9fb3c8"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" shape-rendering="crispEdges">
+  <title>Student Database</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#151a22"/>
+      <stop offset="1" stop-color="#090c11"/>
+    </linearGradient>
+    <linearGradient id="db" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1a202a"/>
+      <stop offset="1" stop-color="#0d1219"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#11161d"/>
+      <stop offset="1" stop-color="#0a0d12"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer frame -->
+  <rect x="3" y="3" width="26" height="26" fill="url(#bg)" stroke="#3b4350" stroke-width="1"/>
+  <rect x="3" y="3" width="26" height="3" fill="#10141b"/>
+
+  <!-- Header lights -->
+  <rect x="5" y="4" width="1" height="1" fill="#ff355e"/>
+  <rect x="7" y="4" width="1" height="1" fill="#ff9f1c"/>
+  <rect x="9" y="4" width="1" height="1" fill="#3cff9b"/>
+
+  <!-- Database cylinder -->
+  <ellipse cx="16" cy="10" rx="7" ry="2.5" fill="#0a0d12" stroke="#57d9ff" stroke-width="1"/>
+  <path d="M9 10V22C9 23.7 12.1 25 16 25C19.9 25 23 23.7 23 22V10" fill="url(#db)" stroke="#57d9ff" stroke-width="1"/>
+
+  <!-- Data layers -->
+  <path d="M9 14C9 15.7 12.1 17 16 17C19.9 17 23 15.7 23 14" stroke="#42f58d" stroke-width="1"/>
+  <path d="M9 18C9 19.7 12.1 21 16 21C19.9 21 23 19.7 23 18" stroke="#42f58d" stroke-width="1"/>
+
+  <!-- Student identity card -->
+  <rect x="11" y="23" width="10" height="5" fill="url(#card)" stroke="#ff355e" stroke-width="1"/>
+  <rect x="12" y="24" width="2" height="2" fill="#42f58d"/>
+  <path d="M15 24H19M15 25H18" stroke="#57d9ff" stroke-width="1"/>
+
+  <!-- Graduation cap badge -->
+  <path d="M14 7L16 6L18 7L16 8L14 7Z" fill="#0b0f14" stroke="#ff355e" stroke-width="1"/>
+  <path d="M16 8V9" stroke="#ff355e" stroke-width="1"/>
+  <rect x="15" y="9" width="2" height="1" fill="#ff355e"/>
+
+  <!-- Secure student records lock -->
+  <rect x="23" y="17" width="4" height="4" fill="#11161d" stroke="#ff355e" stroke-width="1"/>
+  <path d="M24 17V16C24 15 24.8 14 25 14C25.2 14 26 15 26 16V17" stroke="#ff355e" stroke-width="1"/>
+
+  <!-- Side network node -->
+  <rect x="5" y="13" width="2" height="2" fill="#0b0f14" stroke="#42f58d" stroke-width="1"/>
+  <path d="M7 14H9" stroke="#57d9ff" stroke-width="1"/>
+
+  <!-- Subtle glitch accents -->
+  <rect x="23" y="8" width="2" height="1" fill="#ff355e" fill-opacity="0.45"/>
+  <rect x="8" y="24" width="2" height="1" fill="#57d9ff" fill-opacity="0.4"/>
 </svg>
